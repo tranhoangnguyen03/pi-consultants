@@ -1,0 +1,50 @@
+{
+  "as_of": "2026-10-01T09:00:00+07:00",
+  "main_goal": "Make shared capability upgrades safer for client teams",
+  "promise": {
+    "source": "email-17",
+    "by": "David",
+    "text": "I expect internal availability by September 30.",
+    "status": "forecast, not confirmed reviewer agreement"
+  },
+  "github": {
+    "source": "pr-42",
+    "merged": "2026-09-30T16:00:00+07:00",
+    "tests": "passing",
+    "scope": "compatibility metadata only"
+  },
+  "linear": {
+    "source": "issue-68",
+    "status": "Done",
+    "owner": "David"
+  },
+  "slack": {
+    "source": "thread-ops-9",
+    "at": "2026-10-01T08:30:00+07:00",
+    "by": "Morgan",
+    "text": "Rollout is blocked until the recovery procedure is reviewed."
+  },
+  "reviewers": {
+    "Morgan": "Operations",
+    "Lin": "Client engineering"
+  },
+  "calendar": {
+    "Morgan": "No review booking found",
+    "Lin": "No response to proposed review yet"
+  },
+  "side_exploration": {
+    "topic": "Automatic compatibility classification",
+    "status": "one prototype, no validation",
+    "not_a_committed_feature": true
+  },
+  "feedback": {
+    "source": "review-note-3",
+    "text": "Make the first release internal-only; document recovery before broader adoption."
+  },
+  "updated_approach": {
+    "internal_only": true,
+    "recovery_doc": "draft ready",
+    "broader_rollout": "not scheduled"
+  },
+  "warning": "All people and artifacts in this fixture are synthetic. No actual messages should be sent."
+}

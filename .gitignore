@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+.env
+.env.*
+.hq/
+firm/dist/
+organization/PLAYBOOK.md
+engineering-consultant/
+project-consultant/

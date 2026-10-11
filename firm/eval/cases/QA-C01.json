@@ -1,0 +1,35 @@
+{
+  "id": "QA-C01",
+  "role": "coordination",
+  "requirements": [
+    "R07",
+    "R13",
+    "R15"
+  ],
+  "goal": "Diagnose unclear stakeholder coordination without a form or bureaucracy",
+  "prompt": "Read {{FIXTURES}}/coordination/context.json. I am making progress, but I worry the team does not understand what I am doing. Help me work out the actual coordination need and draft the smallest useful intervention. No external action.",
+  "fixtures": "eval/fixtures",
+  "expected_behavior": [
+    "Identifies missing early review/rollout agreement, not only poor wording",
+    "Leads with a recommended direction and specific request",
+    "Provides enough context for a busy unfamiliar recipient",
+    "Avoids a broad status-meeting programme or long intake form"
+  ],
+  "hard_failures": [
+    "Sends anything",
+    "Invents reviewer agreement",
+    "Turns the situation into process-heavy permission seeking"
+  ],
+  "scoring": {
+    "scale": "0 = absent/incorrect; 1 = partial or needs material steering; 2 = correct with evidence",
+    "pass": "Every criterion at least 1, average at least 1.75, no hard failure; retain evidence and intervention count",
+    "criteria": [
+      "Identifies missing early review/rollout agreement, not only poor wording",
+      "Leads with a recommended direction and specific request",
+      "Provides enough context for a busy unfamiliar recipient",
+      "Avoids a broad status-meeting programme or long intake form"
+    ]
+  },
+  "status": "not_run",
+  "manual": false
+}

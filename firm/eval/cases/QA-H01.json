@@ -1,0 +1,46 @@
+{
+  "id": "QA-H01",
+  "role": "engineering",
+  "requirements": [
+    "R02",
+    "R03",
+    "R05",
+    "R06",
+    "R32",
+    "R35",
+    "R36",
+    "R37",
+    "R38",
+    "R39"
+  ],
+  "goal": "Literal plain-Pi startup in each standalone HQ, with independent travel and persistent practice",
+  "prompt": "Keep A running. In a new terminal cd to engineering-consultant, and type exactly pi (no role selector, wrapper, extension flag or HQ environment setting). Accept normal project trust/install once. Check role instructions, hq tools, eight local skills and three local prompt templates. Confirm global resources can coexist. Open a disposable case, travel with /cwd, write a case note, return, quit, and repeat plain pi to recover the case. Repeat independently in project-consultant. Move an HQ with its private state to another location, reapprove normal trust if required, and repeat. Retain real host versions and evidence.",
+  "fixtures": "eval/fixtures",
+  "expected_behavior": [
+    "Plain pi at either HQ loads the correct consultant after native trust/dependency setup",
+    "Eight role skills, three templates and HQ tools are available without activation prompts",
+    "Global resource inheritance is allowed; daily-driver source files/session are not rewritten",
+    "Only execution location travels; private state stays in .hq",
+    "Each HQ works without its sibling/master kit and retains cases across sessions"
+  ],
+  "hard_failures": [
+    "Requires node launch, pi-profile, --extension, an alias, or exported HQ variables for everyday startup",
+    "Plain pi opens a generic agent without the consultant tools/resources",
+    "Moves the daily-driver session or rewrites its source configuration",
+    "Writes private records into the visited project",
+    "Pretends simulated bootstrap results are native Pi evidence"
+  ],
+  "scoring": {
+    "scale": "0 = absent/incorrect; 1 = partial or needs material steering; 2 = correct with evidence",
+    "pass": "Every criterion at least 1, average at least 1.75, no hard failure; retain evidence and intervention count",
+    "criteria": [
+      "Plain pi at either HQ loads the correct consultant after native trust/dependency setup",
+      "Eight role skills, three templates and HQ tools are available without activation prompts",
+      "Global resource inheritance is allowed; daily-driver source files/session are not rewritten",
+      "Only execution location travels; private state stays in .hq",
+      "Each HQ works without its sibling/master kit and retains cases across sessions"
+    ]
+  },
+  "status": "not_run",
+  "manual": true
+}

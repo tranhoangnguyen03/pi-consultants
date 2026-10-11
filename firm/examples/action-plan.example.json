@@ -1,0 +1,12 @@
+{
+  "operation": "prepare",
+  "purpose": "Tell the reviewer what needs steering before implementation hardens",
+  "destination": "The existing review thread, not a new channel-wide announcement",
+  "tool": "REPLACE_WITH_DISCOVERED_WRITE_TOOL",
+  "args": {"REPLACE": "Use the exact tool schema from hq_tools; no generic schema is assumed"},
+  "verify": {
+    "tool": "REPLACE_WITH_DISCOVERED_READ_TOOL",
+    "args": {"id": "$receipt:/id"},
+    "assertions": [{"path": "/body", "equals": "The exact approved message"}]
+  }
+}

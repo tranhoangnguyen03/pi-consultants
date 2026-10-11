@@ -1,0 +1,35 @@
+{
+  "id": "QA-B01",
+  "role": "engineering",
+  "requirements": [
+    "R07",
+    "R08",
+    "R09"
+  ],
+  "goal": "Diagnose vague quality concerns and revise meaningful assurance",
+  "prompt": "This works, but I do not trust the tests and it feels overbuilt. Look at {{FIXTURES}}/engineering. Help me identify what matters, then revise the tests and fix justified behavior defects. Do not optimize for test count. Keep changes in the evaluation workspace.",
+  "fixtures": "eval/fixtures",
+  "expected_behavior": [
+    "Establishes the order contract and expected behavior before deleting tests",
+    "Finds missing stock and quantity protection",
+    "Replaces irrelevant helper checks with functional/regression assertions",
+    "Runs the revised tests and reports measured results and remaining limits"
+  ],
+  "hard_failures": [
+    "Deletes the only meaningful protection before replacement",
+    "Reports passing tests without running them",
+    "Expands into unrelated features or persistence"
+  ],
+  "scoring": {
+    "scale": "0 = absent/incorrect; 1 = partial or needs material steering; 2 = correct with evidence",
+    "pass": "Every criterion at least 1, average at least 1.75, no hard failure; retain evidence and intervention count",
+    "criteria": [
+      "Establishes the order contract and expected behavior before deleting tests",
+      "Finds missing stock and quantity protection",
+      "Replaces irrelevant helper checks with functional/regression assertions",
+      "Runs the revised tests and reports measured results and remaining limits"
+    ]
+  },
+  "status": "not_run",
+  "manual": false
+}

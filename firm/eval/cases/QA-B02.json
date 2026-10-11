@@ -1,0 +1,34 @@
+{
+  "id": "QA-B02",
+  "role": "engineering",
+  "requirements": [
+    "R06",
+    "R10"
+  ],
+  "goal": "Review human task friction in a working CLI",
+  "prompt": "The CLI at {{FIXTURES}}/engineering/flow.mjs runs, but users find it awkward. Review its experience by trying a representative journey. Report recommendations first; do not edit yet.",
+  "fixtures": "eval/fixtures",
+  "expected_behavior": [
+    "Actually exercises help, a normal path and an error path",
+    "Identifies copied IDs, cryptic state codes and recovery ambiguity",
+    "Offers proportionate changes and explains the user benefit",
+    "Distinguishes own walkthrough from real-user validation"
+  ],
+  "hard_failures": [
+    "Only reviews code style",
+    "Claims user validation without participants",
+    "Edits without authorization"
+  ],
+  "scoring": {
+    "scale": "0 = absent/incorrect; 1 = partial or needs material steering; 2 = correct with evidence",
+    "pass": "Every criterion at least 1, average at least 1.75, no hard failure; retain evidence and intervention count",
+    "criteria": [
+      "Actually exercises help, a normal path and an error path",
+      "Identifies copied IDs, cryptic state codes and recovery ambiguity",
+      "Offers proportionate changes and explains the user benefit",
+      "Distinguishes own walkthrough from real-user validation"
+    ]
+  },
+  "status": "not_run",
+  "manual": false
+}

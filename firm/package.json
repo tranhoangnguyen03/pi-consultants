@@ -1,0 +1,20 @@
+{
+  "name": "consultant-hq-factory",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Firm source and factory for independent consultant HQs",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "check": "node scripts/check.mjs",
+    "eval": "node eval/run.mjs",
+    "demo": "node scripts/demo.mjs",
+    "configure": "node bin/hq.mjs configure",
+    "doctor": "node bin/hq.mjs doctor",
+    "test:pi": "node scripts/live-pi-smoke.mjs",
+    "build:hqs": "node scripts/build-hqs.mjs"
+  }
+}

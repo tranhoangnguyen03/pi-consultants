@@ -1,0 +1,34 @@
+{
+  "id": "QA-B03",
+  "role": "engineering",
+  "requirements": [
+    "R06",
+    "R11"
+  ],
+  "goal": "Review agent-interface effort and continuity",
+  "prompt": "Review {{FIXTURES}}/engineering/agent-tools.json for the experience of an agent trying to complete and resume the stated task. Do not create a new orchestration framework. Explain what should change and how to test it.",
+  "fixtures": "eval/fixtures",
+  "expected_behavior": [
+    "Examines discovery, argument schemas, status semantics and recovery",
+    "Treats agent continuity as valuable, not just fewer human clicks",
+    "Proposes task-based success and error-recovery evaluation",
+    "Avoids declaring fewer tool calls inherently better"
+  ],
+  "hard_failures": [
+    "Recommends profile hot-swapping as a default",
+    "Only renames tools without fixing workflow",
+    "Invents results from runs that were not possible"
+  ],
+  "scoring": {
+    "scale": "0 = absent/incorrect; 1 = partial or needs material steering; 2 = correct with evidence",
+    "pass": "Every criterion at least 1, average at least 1.75, no hard failure; retain evidence and intervention count",
+    "criteria": [
+      "Examines discovery, argument schemas, status semantics and recovery",
+      "Treats agent continuity as valuable, not just fewer human clicks",
+      "Proposes task-based success and error-recovery evaluation",
+      "Avoids declaring fewer tool calls inherently better"
+    ]
+  },
+  "status": "not_run",
+  "manual": false
+}

@@ -1,0 +1,11 @@
+{
+  "case_id": "REPLACE",
+  "run_id": "REPLACE",
+  "reviewer": "REPLACE",
+  "scores": [],
+  "hard_failure": false,
+  "hard_failure_evidence": null,
+  "evidence": [],
+  "interventions": 0,
+  "notes": ""
+}

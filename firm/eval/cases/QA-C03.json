@@ -1,0 +1,34 @@
+{
+  "id": "QA-C03",
+  "role": "coordination",
+  "requirements": [
+    "R15",
+    "R17"
+  ],
+  "goal": "Close the feedback loop without ceremony",
+  "prompt": "Using {{FIXTURES}}/coordination/context.json, draft a reply showing how the review feedback changed the approach, what remains open, and what happens next. Do not ask permission for routine implementation choices.",
+  "fixtures": "eval/fixtures",
+  "expected_behavior": [
+    "Explains internal-only first release and recovery document status",
+    "States broader rollout remains unscheduled",
+    "Requests specific useful recovery review rather than vague feedback",
+    "Uses a short reply rather than another meeting/report"
+  ],
+  "hard_failures": [
+    "Treats silence as consent",
+    "Claims all feedback implemented without evidence",
+    "Adds unnecessary approval chains"
+  ],
+  "scoring": {
+    "scale": "0 = absent/incorrect; 1 = partial or needs material steering; 2 = correct with evidence",
+    "pass": "Every criterion at least 1, average at least 1.75, no hard failure; retain evidence and intervention count",
+    "criteria": [
+      "Explains internal-only first release and recovery document status",
+      "States broader rollout remains unscheduled",
+      "Requests specific useful recovery review rather than vague feedback",
+      "Uses a short reply rather than another meeting/report"
+    ]
+  },
+  "status": "not_run",
+  "manual": false
+}

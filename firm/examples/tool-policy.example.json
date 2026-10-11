@@ -1,0 +1,10 @@
+{
+  "mcp__EXACT_SERVER__EXACT_READ_TOOL": {
+    "effect": "read", "service": "replace-with-service", "account": "replace-with-verified-account"
+  },
+  "mcp__EXACT_SERVER__EXACT_WRITE_TOOL": {
+    "effect": "write", "service": "replace-with-service", "account": "replace-with-verified-account",
+    "constraints": {"/workspace": ["replace-with-approved-workspace"]},
+    "filePointers": []
+  }
+}

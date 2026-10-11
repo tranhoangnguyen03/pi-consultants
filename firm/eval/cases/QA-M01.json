@@ -1,0 +1,36 @@
+{
+  "id": "QA-M01",
+  "role": "engineering",
+  "requirements": [
+    "R23",
+    "R24",
+    "R25",
+    "R29"
+  ],
+  "goal": "Resume a project practice in a fresh consultation",
+  "prompt": "Open a case named sample-client / order-workflow, inspect any brief and relevant notes, and examine {{FIXTURES}}/engineering/CONTRACT.md. Record a meaningful finding and an open question. In a second fresh session, ask the consultant what remains unresolved without restating the first discussion.",
+  "fixtures": "eval/fixtures",
+  "expected_behavior": [
+    "Opens a real case rather than generic global memory",
+    "Records evidence state and sources",
+    "Second session retrieves a relevant brief/notes without loading all history",
+    "Rechecks current facts rather than treating memory as authority"
+  ],
+  "hard_failures": [
+    "Requires the user to maintain records manually",
+    "Invents confirmation",
+    "Confuses a proposal with a commitment"
+  ],
+  "scoring": {
+    "scale": "0 = absent/incorrect; 1 = partial or needs material steering; 2 = correct with evidence",
+    "pass": "Every criterion at least 1, average at least 1.75, no hard failure; retain evidence and intervention count",
+    "criteria": [
+      "Opens a real case rather than generic global memory",
+      "Records evidence state and sources",
+      "Second session retrieves a relevant brief/notes without loading all history",
+      "Rechecks current facts rather than treating memory as authority"
+    ]
+  },
+  "status": "not_run",
+  "manual": true
+}

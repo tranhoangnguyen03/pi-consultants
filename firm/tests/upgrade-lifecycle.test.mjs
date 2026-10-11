@@ -1,0 +1,33 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {host} from './helpers.mjs';
+import {upgradeCase} from '../src/upgrade.mjs';
+test('Explicit upgrade preserves exact backup and unknown history, and is idempotent',async t=>{
+ const h=await host(t);await h.state.cases.open({client:'demo',project:'old',title:'Old'});
+ const file=path.join(h.state.cases.directory('demo','old'),'case.json');const c=JSON.parse(await fs.readFile(file));c.privateExtra={unknown:'preserve'};await fs.writeFile(file,JSON.stringify(c));const before=await fs.readFile(file);
+ const opts={backupRoot:path.join(h.root,'backups'),quiesced:true};
+ await assert.rejects(upgradeCase(h.state.cases,'demo','old',{...opts,quiesced:false}),/Stop all writers/);
+ const result=await upgradeCase(h.state.cases,'demo','old',opts);assert.deepEqual(await fs.readFile(result.backup),before);
+ const after=await h.state.cases.read('demo','old');assert.deepEqual(after.privateExtra,c.privateExtra);assert.deepEqual(after.notes,c.notes);assert.deepEqual(after.engagements,[]);
+ assert.equal((await upgradeCase(h.state.cases,'demo','old',opts)).status,'already-upgraded');
+});
+test('Scope amendment preserves prior terms and delivered rework stays unfinished',async t=>{
+ const h=await host(t,{configExtra:{version:2,stateDir:'hq/.hq'}});await h.call('hq_navigate',{operation:'create',client:'demo',project:'one',title:'One',purpose:'Synthetic'});
+ const e=(await h.call('hq_engagement',{operation:'start',caseKey:'demo/one',objective:'Original',doneCondition:'Original condition'})).details.engagement;
+ const amended=(await h.call('hq_engagement',{operation:'amend',caseKey:'demo/one',id:e.id,doneCondition:'Changed condition',basis:'user: changed request'})).details;
+ const directory=(await h.call('hq_navigate',{operation:'get',...amended.records})).details;
+ assert.equal(directory.items.length,1);
+ assert.deepEqual(amended.recorded,directory.items[0].pointer);
+ const history=(await h.call('hq_navigate',{operation:'get',...amended.recorded})).details;
+ assert.equal(history.engagementId,e.id);
+ assert.equal((await h.state.cases.read('demo','one')).engagements[0].recorded,undefined);
+ assert.match(history.text,/Original condition/);assert.match(history.text,/Changed condition/);assert.deepEqual(history.sources,['user: changed request']);
+ let c=await h.state.cases.read('demo','one');assert.match(c.notes[0].text,/Original condition/);assert.equal(c.engagements[0].doneCondition,'Changed condition');
+ await h.call('hq_engagement',{operation:'deliver',caseKey:'demo/one',id:e.id,basis:'conversation: draft'});
+ const resumed=(await h.call('hq_engagement',{operation:'resume',caseKey:'demo/one',id:e.id})).details;
+ assert.equal(resumed.engagement.state,'delivered');assert.equal(resumed.next.operation,'rework');
+ await h.call('hq_engagement',{operation:'rework',caseKey:'demo/one',id:e.id,basis:'user: revise'});
+ c=await h.state.cases.read('demo','one');assert.equal(c.engagements[0].state,'open');assert.ok(c.sessions.includes('consultation-one'));
+});

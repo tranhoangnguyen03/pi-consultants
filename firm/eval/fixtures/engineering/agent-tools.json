@@ -1,0 +1,26 @@
+{
+  "tools": [
+    {
+      "name": "doThing",
+      "args": {
+        "data": "string"
+      },
+      "description": "Does a thing; data is an undocumented JSON string"
+    },
+    {
+      "name": "state",
+      "args": {
+        "id": "string"
+      },
+      "description": "Returns numeric codes: 0, 1, 3, 4 or 9"
+    },
+    {
+      "name": "resume",
+      "args": {
+        "data": "string"
+      },
+      "description": "Works only if previous state was saved elsewhere"
+    }
+  ],
+  "user_goal": "Start a task, understand whether it completed, and resume after interruption without guessing."
+}
