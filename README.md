@@ -116,6 +116,12 @@ Useful commands inside an office:
 
 The other offices work the same way: `cd ~/pi-consultants/offices/project-consultant` or `cd ~/pi-consultants/offices/user-consultant`, then `pi`.
 
+## Optional: human-steered parallel sessions
+
+Ask the project consultant to plan named branches when you want to visit and steer each one yourself. Approve the assignments, open the agreed Pi sessions, and give it their names or Intercom IDs. It sends the briefs without waiting for the work to finish; each branch gathers context, reports in its own session, and pauses for you. When you tell the main consultant a branch is ready, it coordinates the handback and incorporates the results. You do not need to copy messages or merge reports yourself.
+
+This practice uses [pi-intercom](https://github.com/nicobailon/pi-intercom), an optional package you install and enable separately in the participating sessions. It is **not** the customer-support Intercom connector listed below. The sessions must share a broker and routing scope. Before relying on it, test one kickoff and handback; `human-first` busy delivery is recommended but must be configured explicitly. This kit supplies the [coordination method](firm/skills/coordination/parallel-branches/SKILL.md), not a session launcher, mandatory dependency, or proof of live delivery in your setup.
+
 ## The shared toolset
 
 Every office ships the same tools, listed in its `.pi/toolset.json`. Pi installs the pinned packages the first time you start in a trusted office.
