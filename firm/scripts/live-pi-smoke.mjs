@@ -35,7 +35,8 @@ try{
  const result=JSON.parse(await fs.readFile(report,'utf8'));
  const checks=[];const check=(name,pass,detail)=>checks.push({name,passed:!!pass,detail});
  check('HQ working directory',await fs.realpath(result.cwd)===await fs.realpath(root),result.cwd);
- check('Consultant role instructions',result.systemPrompt.includes(marker.role==='engineering'?'# Engineering consultant':'# Coordination and communication consultant'),'From root AGENTS.md');
+ const heading=(await fs.readFile(path.join(root,'AGENTS.md'),'utf8')).split('\n')[0];
+ check('Consultant role instructions',result.systemPrompt.includes(heading),'From root AGENTS.md');
  check('Note attribution required in actual host schema',result.noteSchema?.required?.includes('attribution'),'Schema inspection, not model behavior');
  check('Note scope required in actual host schema',result.noteSchema?.required?.includes('scope'),'Schema inspection, not model behavior');
  for(const tool of ['hq_navigate','hq_engagement','hq_paper','hq_case','hq_note','hq_brief','session_find','session_consult','hq_actions','hq_execute','change_dir'])check(`Registered ${tool}`,result.tools.includes(tool),'Actual host registry');

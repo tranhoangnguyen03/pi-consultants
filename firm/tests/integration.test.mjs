@@ -16,6 +16,13 @@ test('[EV-P01] Optional outbox approval, execution and automatic receipt form on
  const r=await h.call('hq_execute',{ids:[a.id]});assert.equal(r.details.outcomes[0].status,'verified');assert.equal(writes,1);
  const c=await h.state.cases.read('client','project');assert(c.notes.some(n=>n.kind==='action-receipt'));
 });
+test('Approved check 7: the optional outbox works for consultants other than C',async t=>{
+ for(const role of ['engineering','user']){
+  const h=await host(t,{role});let writes=0;h.external('mcp__test__post',async()=>{writes++;return response({id:'message'});});await open(h);
+  const a=await prepare(h);await h.commands.get('hq').handler(`approve ${a.id}`,h.ctx);
+  const r=await h.call('hq_execute',{ids:[a.id]});assert.notEqual(r.details.outcomes[0].status,'not-started',role);assert.equal(writes,1,role);
+ }
+});
 test('[EV-P02] A changed preview or headless session cannot approve an outbox draft',async t=>{
  const h=await host(t);h.external('mcp__test__post',async()=>response({id:'x'}));await open(h);const a=await prepare(h);
  h.ctx.hasUI=false;await h.commands.get('hq').handler(`approve ${a.id}`,h.ctx);assert.equal((await h.state.actions.get(a.id)).status,'draft');
@@ -61,8 +68,10 @@ test('[EV-P05][EV-P08] Replies do not create records; legacy generated notes are
  assert.equal(reopened.recentNotes.length,1);assert.equal(reopened.pastReplies,undefined);
 });
 test('[EV-P09] Each HQ shows its own intro banner at session start and clears it at the first prompt',async t=>{
+ const offices=JSON.parse(await fs.readFile(new URL('../offices.json',import.meta.url),'utf8'));
  for(const [role,title] of [['engineering','CONSULTANT B · ENGINEERING'],['coordination','CONSULTANT C · COORDINATION']]){
-  const h=await host(t,{role});const banner=h.widgets.get('consultant-hq-intro');
+  const {folder,role:_,...office}=offices.find(o=>o.role===role);
+  const h=await host(t,{role,configExtra:{office}});const banner=h.widgets.get('consultant-hq-intro');
   assert(banner.some(l=>l.includes(title)));assert(banner.some(l=>l.includes('Case  none yet')));
   await h.emit('before_agent_start',{});assert.equal(h.widgets.get('consultant-hq-intro'),undefined);
   await h.emit('session_start',{reason:'reload'});assert.equal(h.widgets.get('consultant-hq-intro'),undefined);

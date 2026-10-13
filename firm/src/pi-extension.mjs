@@ -13,24 +13,25 @@ function sid(ctx) { return ctx.sessionManager.getSessionId(); }
 function splitNotes(notes) {
   return {own:notes.filter(n=>!['checkpoint','session-consultation'].includes(n.kind))};
 }
-const BANNER={
- engineering:['   ▄██▄▄██▄   ',' ▄█▀▀    ▀▀█▄ ',' ██  ▄██▄  ██ ',' ▀█▄▄    ▄▄█▀ ','   ▀██▀▀██▀   '],
- coordination:[' ▄▀▀▀▀▀▀▀▄    ',' █ ▪ ▪ ▪ █    ',' ▀▄▄▄▄▄▄▀█▄   ','     ▄▀▀▀▀▀▀▄ ','     ▀▄▄▄▄▄▄▀ ']};
 export function introBanner(config,caseKey) {
   const home=process.env.HOME,where=home&&config.hq.startsWith(home+path.sep)?'~'+config.hq.slice(home.length):config.hq;
-  const side=config.role==='engineering'
-    ?['CONSULTANT B · ENGINEERING','plan · review · debug · optimise · test · UX · docs',`HQ    ${where}`,`Case  ${caseKey??'none yet: name a project to open one'}`,'/hq · /consult · /case-recap · /close-consultation']
-    :['CONSULTANT C · COORDINATION','steer · prioritise · commit · communicate · hand off',`HQ    ${where}`,`Case  ${caseKey??'none yet: name a project to open one'}`,'Ordinary Pi authority · /hq for status and optional outbox'];
-  return BANNER[config.role].map((art,i)=>`${art}   ${side[i]}`);
+  const o=config.office??{};
+  const side=[`CONSULTANT ${o.letter??'·'} · ${o.title??config.role.toUpperCase()}`,o.tagline??'',`HQ    ${where}`,`Case  ${caseKey??'none yet: name a project to open one'}`,'/hq · /consult · /case-recap · /close-consultation'];
+  const art=o.banner??side.map(()=>'');
+  return side.map((s,i)=>`${art[i]??''}   ${s}`);
 }
 
 /** Thin Pi adapter: all durable and security-sensitive state transitions are in tested core modules. */
 export async function registerHQ(pi,{Type:T,configPath,answer}={}) {
   assert(configPath && path.isAbsolute(configPath),'Load the local HQ extension from .pi/extensions/consultant.ts; it supplies its own configuration path');
   let config=await loadHQConfig(configPath);
-  assert([1,2].includes(config.version) && ['engineering','coordination'].includes(config.role),'Invalid consultant configuration');
+  assert([1,2].includes(config.version) && typeof config.role==='string' && /^[a-z][a-z-]*$/.test(config.role),'Invalid consultant configuration');
   assert(path.isAbsolute(config.hq),'HQ must be absolute');
   config.policy=validatePolicy(config.policy??{});
+  // Shared toolset: every office registers the same shipped MCP servers; connectors stay off until enabled in hq.local.json.
+  const toolset=await readJSON(path.join(path.dirname(configPath),'toolset.json'),null);
+  if(toolset&&typeof pi.registerMcpServer==='function')for(const [name,{enabled,...server}] of Object.entries(toolset.mcpServers??{}))
+    pi.registerMcpServer(name,{...server,enabled:!!enabled||(config.connectors??[]).includes(name)});
   const stateRoot=config.stateDir??config.hq;
   const cases=new CaseStore(path.join(stateRoot,'cases'));
   const actions=new ActionStore(path.join(stateRoot,'outbox'),{fileRoots:config.attachmentRoots??[]});
@@ -184,7 +185,6 @@ export async function registerHQ(pi,{Type:T,configPath,answer}={}) {
     operation:T.Union([T.Literal('prepare'),T.Literal('list')]),tool:T.Optional(T.String()),args:T.Optional(T.Record(T.String(),T.Unknown())),
     caseKey:T.Optional(T.String()),purpose:T.Optional(T.String()),destination:T.Optional(T.String()),preflight:T.Optional(T.Unknown()),verify:T.Optional(T.Unknown()),repeatOf:T.Optional(T.String())
   }),async(p,ctx)=>{
-    assert(config.role==='coordination','External actions belong to the coordination consultant');
     if(p.operation==='list')return actions.list({caseKey:caseKey(),ownerSession:sid(ctx)});
     assert(pi.getAllTools().some(t=>t.name===p.tool),'Target tool is not registered');
     writeTarget(p.caseKey);
@@ -194,7 +194,7 @@ export async function registerHQ(pi,{Type:T,configPath,answer}={}) {
     return {id:a.id,status:a.status,digest:a.digest,duplicate:a.duplicate??false,preview:reviewText([a]),next:`Human review: /hq approve ${a.id}. Execution follows approval without another confirmation.`};
   });
   tool('hq_execute','Execute only exact, unexpired human-approved actions. Uses the existing authenticated MCP tool pipeline; never retries ambiguous writes.',T.Object({ids:T.Array(T.String())}),async(p,ctx,{signal})=>{
-    assert(config.role==='coordination','Wrong consultant');assert(typeof ctx.executeTool==='function','Host lacks pipeline-aware ctx.executeTool');
+    assert(typeof ctx.executeTool==='function','Host lacks pipeline-aware ctx.executeTool');
     assert(p.ids.length>0&&p.ids.length<=20,'Execute 1..20 approved actions');
     const outcomes=[];
     for(const actionId of p.ids){
@@ -217,7 +217,7 @@ export async function registerHQ(pi,{Type:T,configPath,answer}={}) {
     return {outcomes,remainingIds:p.ids.slice(outcomes.length),note:'A batch is not atomic. Verified, acknowledged, blocked and unknown are different outcomes.'};
   });
 
-  // Both roles inherit ordinary Pi authority. The optional outbox validates its own actions.
+  // Every role inherits ordinary Pi authority. The optional outbox validates its own actions.
 
 
   async function humanReview(ctx,title,preview){
@@ -251,7 +251,7 @@ export async function registerHQ(pi,{Type:T,configPath,answer}={}) {
         const evidence=await ctx.ui.editor('Paste remote evidence / link and your conclusion','');if(!evidence?.trim())return;
         if(await humanReview(ctx,'Reconcile uncertain outcome',`${a.id}\n${verdict}\n${evidence}`))await actions.reconcile(a.id,verdict,evidence,sid(ctx));
       }else{
-        ctx.ui.notify(`Consultant: ${config.role}\nHQ: ${config.hq}\nPrivate records: ${stateRoot}\nStartup: local HQ resources; no role launcher required\nCase: ${selected?caseKey():'not yet selected'}\nSources: ${(config.sessionRoots??[]).length} explicit roots\n/hq approve [ids] · /hq reject <ids> · /hq policy-review · /hq reconcile <id>\nSaved-history consultation only. Both roles inherit ordinary Pi authority; the outbox is optional.`,'info');
+        ctx.ui.notify(`Consultant: ${config.role}\nHQ: ${config.hq}\nPrivate records: ${stateRoot}\nStartup: local HQ resources; no role launcher required\nCase: ${selected?caseKey():'not yet selected'}\nSources: ${(config.sessionRoots??[]).length} explicit roots\n/hq approve [ids] · /hq reject <ids> · /hq policy-review · /hq reconcile <id>\nSaved-history consultation only. Every consultant has ordinary Pi authority; the outbox is optional.`,'info');
       }
     }catch(e){ctx.ui?.notify?.(e.message,'error');}
   }});

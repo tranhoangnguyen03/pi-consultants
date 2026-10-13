@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "role": "coordination",
+  "office": {
+    "letter": "C",
+    "title": "COORDINATION",
+    "tagline": "steer · prioritise · commit · communicate · hand off",
+    "banner": [
+      " ▄▀▀▀▀▀▀▀▄    ",
+      " █ ▪ ▪ ▪ █    ",
+      " ▀▄▄▄▄▄▄▀█▄   ",
+      "     ▄▀▀▀▀▀▀▄ ",
+      "     ▀▄▄▄▄▄▄▀ "
+    ]
+  },
+  "hq": "..",
+  "stateDir": "../.hq",
+  "kitRoot": "..",
+  "sessionRoots": [],
+  "projectRoots": [],
+  "localReadRoots": [],
+  "attachmentRoots": [],
+  "maxSessionFiles": 500,
+  "maxSessionBytes": 16777216,
+  "maxConsultChars": 80000,
+  "policy": {}
+}

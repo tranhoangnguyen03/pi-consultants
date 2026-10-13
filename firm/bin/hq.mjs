@@ -24,6 +24,12 @@ async function configure(){
     if(opts[arg]){local[key]=await Promise.all(opts[arg].map(async p=>{const full=await fs.realpath(path.resolve(p));assert((await fs.stat(full)).isDirectory(),`${arg} must name directories`);return full;}));}
   }
   if(opts.projects&&!opts.attachments)local.attachmentRoots=local.projectRoots;
+  if(opts.connect){
+    // shortcut: connectors can only be added here; remove one by editing .pi/hq.local.json.
+    const servers=(await readJSON(path.join(root,'.pi/toolset.json'),{})).mcpServers??{};
+    for(const name of opts.connect)assert(servers[name],`Unknown connector ${name}. Available: ${Object.keys(servers).join(', ')}`);
+    local.connectors=[...new Set([...(local.connectors??[]),...opts.connect])];
+  }
   await atomic(file,local);
   if(opts.model||opts.provider||opts.thinking){
     const settingsPath=path.join(root,'.pi/settings.json');const settings=await readJSON(settingsPath);
@@ -35,7 +41,7 @@ async function configure(){
     try{await fs.access(target);throw new Error('Local mcp.json already exists; edit it explicitly instead of overwriting it');}catch(e){if(e.code!=='ENOENT')throw e;}
     const supplied=await readJSON(path.resolve(one('mcp-source')));assert(supplied.mcpServers,'MCP source needs mcpServers');await atomic(target,supplied);
   }
-  console.log(`Configured ${base.role} at ${root}\nOnly this HQ was changed. No launch command or environment variable is required.\nRun: cd ${JSON.stringify(root)} && pi\nApprove Pi's normal project-trust prompt on first use.\nRead/write connector policy is reviewed separately inside C with /hq policy-review.`);
+  console.log(`Configured ${base.role} at ${root}\nOnly this HQ was changed. No launch command or environment variable is required.\nRun: cd ${JSON.stringify(root)} && pi\nApprove Pi's normal project-trust prompt on first use.\nRead/write connector policy for the optional outbox is reviewed inside the consultant with /hq policy-review.`);
 }
 async function doctor(){
   const c=await loadHQConfig(configPath);const checks=[];
@@ -51,9 +57,18 @@ async function doctor(){
   const settings=await readJSON(path.join(root,'.pi/settings.json'));
   add('Native local sessions',settings.sessionDir==='.hq/sessions','No launcher-supplied session directory');
   add('HQ identity',c.hq===await fs.realpath(root),`${c.role}: ${c.hq}`);
-  const skills=await fs.readdir(path.join(root,'.pi/skills'));add('Role skills',skills.length===(c.role==='engineering'?9:8),`${skills.length} local role skills`);
+  const skills=await fs.readdir(path.join(root,'.pi/skills'));
+  const shipped=Object.keys((await readJSON(path.join(root,'HQ-ROLE.json'),{})).generated??{}).filter(f=>/^\.pi\/skills\/[^/]+\/SKILL\.md$/.test(f.split(path.sep).join('/'))).length;
+  add('Role skills',shipped>0&&skills.length>=shipped,`${skills.length} local role skills; ${shipped} shipped`);
+  const toolset=await readJSON(path.join(root,'.pi/toolset.json'),{}),software=[];
+  for(const tool of toolset.software??[]){
+    let found=(tool.commands??[]).some(([cmd,...args])=>spawnSync(cmd,args,{timeout:10000}).status===0);
+    for(const p of tool.paths??[])found||=await fs.access(p).then(()=>true,()=>false);
+    software.push({name:tool.name,purpose:tool.purpose,required:tool.required,found,...(found?{}:{install:tool.install})});
+    if(tool.required)add(tool.name,found,found?tool.purpose:`Missing. Install: ${tool.install}`);
+  }
   add('Directory package declared',settings.packages?.some(p=>String(typeof p==='string'?p:p.source).includes('fitchmultz/pi-change-working-dir')),'Pinned project package; installed by Pi after trust');
-  const report={verdict:checks.every(x=>x.passed)?'prerequisites_met':'prerequisites_unmet',scope:'Local prerequisites and files only, not a real Pi startup test',role:c.role,hq:c.hq,state:c.stateDir,globalExtensions:'Inherited normally; not filtered',sourceRoots:c.sessionRoots,checks};
+  const report={verdict:checks.every(x=>x.passed)?'prerequisites_met':'prerequisites_unmet',scope:'Local prerequisites and files only, not a real Pi startup test',role:c.role,hq:c.hq,state:c.stateDir,globalExtensions:'Inherited normally; not filtered',sourceRoots:c.sessionRoots,checks,software,connectors:{enabled:c.connectors??[],available:Object.keys(toolset.mcpServers??{}).filter(n=>!toolset.mcpServers[n].enabled)}};
   console.log(JSON.stringify(report,null,2));return checks.every(x=>x.passed)?0:1;
 }
 async function migrate(){
@@ -94,5 +109,5 @@ try{
   else if(command==='doctor')process.exitCode=await doctor();
   else if(command==='migrate')await migrate();
   else if(command==='launch'||command==='init')throw new Error('v0.2 has no launch/init wrapper. Enter one HQ repository and run plain pi. Optional configuration: node .runtime/bin/hq.mjs configure.');
-  else console.log('Consultant HQ 0.3.0\n\nEveryday use: cd /path/to/HQ && pi\n\nOptional one-time setup:\n  node .runtime/bin/hq.mjs configure --projects ROOT --sessions ROOT\n  node .runtime/bin/hq.mjs configure --provider PROVIDER --model MODEL --thinking high\n  node .runtime/bin/hq.mjs doctor\n  node .runtime/bin/hq.mjs migrate --from OLD_ROLE_HQ\n\n--projects, --sessions and --attachments may repeat.\nNormal Pi authentication and global resources are inherited. Nothing is installed or edited globally.\nNo profile selector, environment export, or custom launcher is required.');
+  else console.log('Consultant HQ 0.3.0\n\nEveryday use: cd /path/to/HQ && pi\n\nOptional one-time setup:\n  node .runtime/bin/hq.mjs configure --projects ROOT --sessions ROOT\n  node .runtime/bin/hq.mjs configure --provider PROVIDER --model MODEL --thinking high\n  node .runtime/bin/hq.mjs configure --connect linear --connect figma\n  node .runtime/bin/hq.mjs doctor\n  node .runtime/bin/hq.mjs migrate --from OLD_ROLE_HQ\n\n--projects, --sessions, --attachments and --connect may repeat. Connectors are listed in .pi/toolset.json.\nNormal Pi authentication and global resources are inherited. Nothing is installed or edited globally.\nNo profile selector, environment export, or custom launcher is required.');
 }catch(e){console.error(`Consultant HQ: ${e.message}`);process.exitCode=1;}

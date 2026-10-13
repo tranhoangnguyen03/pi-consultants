@@ -8,18 +8,18 @@ import {temp} from './helpers.mjs';
 import {loadHQConfig,saveHQPolicy} from '../src/config.mjs';
 import {hash} from '../src/util.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-async function pair(t){const d=await temp(t),out=path.join(d,'repos');const r=spawnSync(process.execPath,[path.join(root,'scripts/build-hqs.mjs'),out],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);return {d,out,b:path.join(out,'engineering-consultant'),c:path.join(out,'project-consultant')};}
+async function pair(t){const d=await temp(t),out=path.join(d,'repos');const r=spawnSync(process.execPath,[path.join(root,'scripts/build-hqs.mjs'),out],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);const offices=JSON.parse(await fs.readFile(path.join(root,'offices.json'),'utf8'));return {d,out,b:path.join(out,'engineering-consultant'),c:path.join(out,'project-consultant'),all:offices.map(o=>[path.join(out,o.folder),o.role])};}
 function run(repo,args=[]){return spawnSync(process.execPath,[path.join(repo,'.runtime/bin/hq.mjs'),...args],{cwd:repo,encoding:'utf8'});}
 async function bootstrap(repo,env={}){
  return spawnSync(process.execPath,['--no-warnings','--experimental-loader',path.join(root,'tests/fixtures/ts-contract-loader.mjs'),path.join(root,'tests/fixtures/native-bootstrap.mjs')],{cwd:repo,env:{...process.env,...env},encoding:'utf8'});
 }
-test('[EV-I01] Two standalone HQ repositories expose local settings, role-selected skills and three prompts without changing global files',async t=>{
+test('[EV-I01] Each standalone HQ repository exposes local settings, role-selected skills and three prompts without changing global files',async t=>{
  const p=await pair(t),source=path.join(p.d,'daily-driver');await fs.mkdir(source);const global=path.join(source,'settings.json');await fs.writeFile(global,'{"packages":["daily-driver"]}');const before=hash(await fs.readFile(global));
- for(const [repo,role] of [[p.b,'engineering'],[p.c,'coordination']]){
+ for(const [repo,role] of p.all){
   const config=await loadHQConfig(path.join(repo,'.pi/hq.json'));assert.equal(config.role,role);assert.equal(config.hq,repo);assert.equal(config.stateDir,path.join(repo,'.hq'));assert.deepEqual(config.sessionRoots,[path.join(repo,'.hq/sessions')]);
   const settings=JSON.parse(await fs.readFile(path.join(repo,'.pi/settings.json'),'utf8'));assert.equal(settings.sessionDir,'.hq/sessions');assert(!JSON.stringify(settings).includes('PI_CODING_AGENT_DIR'));
   assert(!settings.packages.some(x=>String(x).includes('pi-profile-switch')));
-  const skills=await fs.readdir(path.join(repo,'.pi/skills'));assert.equal(skills.length,role==='engineering'?9:8);assert.equal(skills.includes('asd-ste100'),role==='engineering');assert.equal((await fs.readdir(path.join(repo,'.pi/prompts'))).length,3);
+  const skills=await fs.readdir(path.join(repo,'.pi/skills'));assert.equal(skills.length,(await fs.readdir(path.join(root,'skills',role))).length);assert.equal(skills.includes('asd-ste100'),role==='engineering');assert.equal((await fs.readdir(path.join(repo,'.pi/prompts'))).length,3);
   const r=run(repo,['configure','--projects',p.d,'--sessions',source]);assert.equal(r.status,0,r.stderr);
  }
  assert.equal(hash(await fs.readFile(global)),before);
@@ -27,11 +27,11 @@ test('[EV-I01] Two standalone HQ repositories expose local settings, role-select
 test('[EV-I02] Native usage replaces old launcher commands; no alias, wrapper or profile selection is required',async t=>{
  const p=await pair(t);const help=run(p.b,['help']);assert.equal(help.status,0);assert.match(help.stdout,/cd \/path\/to\/HQ && pi/);
  assert.notEqual(run(p.b,['launch']).status,0);
- for(const repo of [p.b,p.c]){const entry=await fs.readFile(path.join(repo,'.runtime/extensions/index.ts'),'utf8');assert.match(entry,/fileURLToPath\(import.meta.url\)/);assert.doesNotMatch(entry,/process\.env\.[A-Z_]+\s*=/);}
+ for(const repo of p.all.map(([r])=>r)){const entry=await fs.readFile(path.join(repo,'.runtime/extensions/index.ts'),'utf8');assert.match(entry,/fileURLToPath\(import.meta.url\)/);assert.doesNotMatch(entry,/process\.env\.[A-Z_]+\s*=/);}
 });
 test('[EV-N01] Shipped native entry registers the correct consultant and persists at HQ despite stale launcher variables',async t=>{
  const p=await pair(t);
- for(const [repo,role] of [[p.b,'engineering'],[p.c,'coordination']]){
+ for(const [repo,role] of p.all){
   const r=await bootstrap(repo,{CONSHQ_CONFIG:'/wrong/hq.json',CONSHQ_HOME:'/wrong',PI_PROFILE_SWITCH_DIR:'/wrong'});assert.equal(r.status,0,r.stderr);
   const report=JSON.parse(r.stdout.trim());assert.equal(report.firstSkillReadableBeforeCase,true);assert(report.tools.includes('session_consult'));assert(report.tools.includes('hq_case'));assert(report.commands.includes('hq'));
   assert(report.notifications.some(n=>n.includes(`Consultant: ${role}`)&&n.includes(`HQ: ${repo}`)));
@@ -51,7 +51,7 @@ test('[EV-N03] Local policy review persists only an ignored overlay and does not
  const local=JSON.parse(await fs.readFile(path.join(p.c,'.pi/hq.local.json'),'utf8'));assert.equal(local.hq,undefined);
 });
 test('[EV-N04] Native inheritance is additive; neither global resources nor the global append prompt are replaced by the HQ',async t=>{
- const p=await pair(t);for(const repo of [p.b,p.c]){
+ const p=await pair(t);for(const repo of p.all.map(([r])=>r)){
   const settings=JSON.parse(await fs.readFile(path.join(repo,'.pi/settings.json'),'utf8'));
   for(const k of ['skills','extensions','prompts','themes'])assert.equal(settings[k],undefined);
   assert(settings.defaultTools.every(x=>x.startsWith('+')));
@@ -78,7 +78,7 @@ test('Migration rejects symlink state before copying or mutating source',async t
 
 test('Factory output is lean, inventoried, private-free and refuses overwrite',async t=>{
  const p=await pair(t);
- for(const repo of [p.b,p.c]){
+ for(const repo of p.all.map(([r])=>r)){
   for(const name of ['src','profiles','skills','tests','scripts','docs','.hq','.env','organization/PLAYBOOK.md'])assert.equal(await fs.access(path.join(repo,name)).then(()=>true,()=>false),false,name);
   const manifest=JSON.parse(await fs.readFile(path.join(repo,'HQ-ROLE.json'),'utf8'));
   for(const [file,digest] of Object.entries(manifest.generated))assert.equal(hash(await fs.readFile(path.join(repo,file))),digest);
@@ -89,7 +89,7 @@ test('Factory output is lean, inventoried, private-free and refuses overwrite',a
 
 test('Bundled setup examples work and doctor accepts Pi 1.x without hiding Node prerequisites',async t=>{
  const p=await pair(t),pi=path.join(p.d,'fake-pi');await fs.writeFile(pi,'#!/bin/sh\necho 1.0.2\n',{mode:0o700});
- for(const repo of [p.b,p.c]){
+ for(const repo of p.all.map(([r])=>r)){
   const help=run(repo,['help']);assert.doesNotMatch(help.stdout,/npm run/);assert.match(help.stdout,/node \.runtime\/bin\/hq.mjs configure/);
   const readme=await fs.readFile(path.join(repo,'README.md'),'utf8');assert.match(readme,/cp organization\/PLAYBOOK.example.md organization\/PLAYBOOK.md/);
   assert.equal(run(repo,['configure','--root',repo,'--projects',p.d]).status,0);
@@ -98,4 +98,12 @@ test('Bundled setup examples work and doctor accepts Pi 1.x without hiding Node 
   assert.match(report.scope,/not a real Pi startup test/);
   assert.equal(doctor.status,report.checks.every(c=>c.passed)?0:1);
  }
+});
+test('Approved check 6: doctor names missing machine software with its install hint',async t=>{
+ const p=await pair(t),bin=path.join(p.d,'empty-bin');await fs.mkdir(bin);
+ const r=spawnSync(process.execPath,[path.join(p.b,'.runtime/bin/hq.mjs'),'doctor','--pi',process.execPath],{cwd:p.b,encoding:'utf8',env:{...process.env,PATH:bin}});
+ const report=JSON.parse(r.stdout);
+ const git=report.checks.find(c=>c.name==='git');assert.equal(git.passed,false);assert.match(git.detail,/Install: https:\/\/git-scm.com/);
+ assert.equal(report.verdict,'prerequisites_unmet');assert.notEqual(r.status,0);
+ const gh=report.software.find(s=>s.name==='gh');assert.equal(gh.found,false);assert.equal(gh.required,false);assert.match(gh.install,/cli.github.com/);
 });

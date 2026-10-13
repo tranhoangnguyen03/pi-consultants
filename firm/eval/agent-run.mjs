@@ -5,6 +5,7 @@ import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {assert,atomic,mkdir,id,readJSON} from '../src/util.mjs';
+import {agentsMd} from '../scripts/agents-md.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const argv=process.argv.slice(2),opts={};for(let i=0;i<argv.length;i+=2){assert(argv[i]?.startsWith('--')&&argv[i+1],'Use --case ID --auth-agent PATH --pi BINARY [--model ID]');opts[argv[i].slice(2)]=argv[i+1];}
 assert(opts.case&&opts['auth-agent'],'Explicit --case and --auth-agent are required. This invokes the selected model and may incur cost.');
@@ -15,7 +16,7 @@ const fixtureDir=path.join(runDir,'fixtures');await fs.cp(path.join(root,'eval/f
 const hq=path.join(runDir,'hq'),agent=path.join(runDir,'auth-agent');await mkdir(agent);await mkdir(path.join(hq,'.pi/extensions'));
 for(const folder of ['src','extensions'])await fs.cp(path.join(root,folder),path.join(hq,folder),{recursive:true});
 await fs.cp(path.join(root,'skills',c.role),path.join(hq,'.pi/skills'),{recursive:true});
-await fs.copyFile(path.join(root,'profiles',c.role,'AGENTS.md'),path.join(hq,'AGENTS.md'));
+await fs.writeFile(path.join(hq,'AGENTS.md'),await agentsMd(root,JSON.parse(await fs.readFile(path.join(root,'offices.json'),'utf8')).find(o=>o.role===c.role)));
 await atomic(path.join(hq,'.pi/extensions/consultant.ts'),"export {default} from '../../extensions/index.ts';\n");
 await atomic(path.join(hq,'.pi/hq.json'),{version:2,role:c.role,hq:'..',stateDir:'../.hq',sessionRoots:[],projectRoots:[fixtureDir],localReadRoots:[fixtureDir,'skills'],attachmentRoots:[],policy:{}});
 await atomic(path.join(hq,'.pi/settings.json'),{sessionDir:'.hq/sessions',extensions:['-builtin:mcp'],defaultTools:c.role==='engineering'?['read','bash','edit','write','grep','find','ls']:['read','grep','find','ls']});

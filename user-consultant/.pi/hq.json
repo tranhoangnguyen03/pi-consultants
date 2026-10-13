@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "role": "user",
+  "office": {
+    "letter": "D",
+    "title": "USERS",
+    "tagline": "research · usability · UI · accessibility · agent experience",
+    "banner": [
+      "     ▄██▄     ",
+      "     ▀██▀     ",
+      "   ▄██████▄   ",
+      "  ██ ████ ██  ",
+      "     █  █     "
+    ]
+  },
+  "hq": "..",
+  "stateDir": "../.hq",
+  "kitRoot": "..",
+  "sessionRoots": [],
+  "projectRoots": [],
+  "localReadRoots": [],
+  "attachmentRoots": [],
+  "maxSessionFiles": 500,
+  "maxSessionBytes": 16777216,
+  "maxConsultChars": 80000,
+  "policy": {}
+}

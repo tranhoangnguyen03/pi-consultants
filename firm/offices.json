@@ -1,0 +1,47 @@
+[
+  {
+    "folder": "engineering-consultant",
+    "role": "engineering",
+    "letter": "B",
+    "identity": "consultant B, the engineering consultant",
+    "title": "ENGINEERING",
+    "tagline": "plan · review · debug · optimise · test · UX · docs",
+    "banner": [
+      "   ▄██▄▄██▄   ",
+      " ▄█▀▀    ▀▀█▄ ",
+      " ██  ▄██▄  ██ ",
+      " ▀█▄▄    ▄▄█▀ ",
+      "   ▀██▀▀██▀   "
+    ]
+  },
+  {
+    "folder": "project-consultant",
+    "role": "coordination",
+    "letter": "C",
+    "identity": "consultant C, the coordination and communication consultant",
+    "title": "COORDINATION",
+    "tagline": "steer · prioritise · commit · communicate · hand off",
+    "banner": [
+      " ▄▀▀▀▀▀▀▀▄    ",
+      " █ ▪ ▪ ▪ █    ",
+      " ▀▄▄▄▄▄▄▀█▄   ",
+      "     ▄▀▀▀▀▀▀▄ ",
+      "     ▀▄▄▄▄▄▄▀ "
+    ]
+  },
+  {
+    "folder": "user-consultant",
+    "role": "user",
+    "letter": "D",
+    "identity": "consultant D, the user consultant",
+    "title": "USERS",
+    "tagline": "research · usability · UI · accessibility · agent experience",
+    "banner": [
+      "     ▄██▄     ",
+      "     ▀██▀     ",
+      "   ▄██████▄   ",
+      "  ██ ████ ██  ",
+      "     █  █     "
+    ]
+  }
+]

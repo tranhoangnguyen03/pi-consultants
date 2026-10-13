@@ -1,0 +1,9 @@
+{
+  "name": "pi-consultants",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node firm/scripts/setup.mjs",
+    "drift": "node firm/scripts/drift.mjs"
+  }
+}

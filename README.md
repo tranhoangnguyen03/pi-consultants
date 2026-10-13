@@ -1,8 +1,8 @@
 # Pi Consultants
 
-Two AI consultants for [Pi](https://pi.dev), the terminal coding agent. Each one runs in its own folder, called an **office**, and its notes stay there between conversations. You keep doing your everyday work in your usual Pi session. When you want a second opinion, a careful review or help with the people side of a project, you open a consultant in another terminal.
+Three AI consultants for [Pi](https://pi.dev), the terminal coding agent. Each one runs in its own folder, called an **office**, and its notes stay there between conversations. You keep doing your everyday work in your usual Pi session. When you want a second opinion, a careful review, help with the people side of a project, or a hard look at how your product works for its users, you open a consultant in another terminal.
 
-This repository is the **factory**. It contains no ready-made offices. You run one command to build two fresh offices on your own machine, then set each one up once.
+The offices are **ready to use** in this repository. Clone it, run one setup command, and start Pi in an office.
 
 ## Why use it
 
@@ -10,24 +10,27 @@ This repository is the **factory**. It contains no ready-made offices. You run o
 - **It remembers the project.** A consultant keeps private case records: a short brief, bounded objectives, decisions, findings and open questions. Next time, it can pick up where you left off instead of starting from scratch.
 - **It can read your other sessions without interrupting them.** If you allow it, a consultant can search saved Pi session histories and ask one focused question about a saved session. The original session is never changed or messaged.
 - **Your rules, applied every time.** Each office reads a playbook that you write: your working rules, which sources to trust and what to avoid.
-- **Local and private.** Offices are ordinary folders on your machine. There is no shared server or firm-wide memory, and the two consultants don't share records.
+- **It brings its own tools.** Every office ships the same toolset: web search and reading, documents, a browser, diagrams, Chrome DevTools audits, and optional connectors for the services you use. Your personal Pi setup is a bonus, not a requirement.
+- **Local and private.** Offices are ordinary folders on your machine. There is no shared server or firm-wide memory, and the consultants don't share records.
 
-## The two consultants
+## The three consultants
 
 | Office folder | Consultant | Ask it about |
 |---|---|---|
-| `engineering-consultant/` | **Engineering consultant** | Code and design review, debugging and verification, test strategy, performance, simplification, documentation, and usability for people and for AI agents. |
-| `project-consultant/` | **Coordination and communication consultant** | Priorities, commitments, stakeholders, meeting decisions, dependencies, release handoffs, and clear writing for the people involved. It can also prepare outgoing messages that you review before they are sent (optional). |
+| `engineering-consultant/` | **Engineering consultant (B)** | Code and design review, debugging and verification, test strategy, performance, simplification, documentation, and usability for people and for AI agents. |
+| `project-consultant/` | **Coordination and communication consultant (C)** | Priorities, commitments, stakeholders, meeting decisions, dependencies, release handoffs, and clear writing for the people involved. |
+| `user-consultant/` | **User consultant (D)** | Everyone who uses your product, people and the AI agents people assign tasks to: user research and synthesis, usability, UI critique, accessibility, behaviour analytics, journey maps, interface writing, agent experience and delegation to agents. |
 
-You don't need to pick a skill or fill in a form. Describe your concern in plain language and the consultant decides how to approach it. Both consultants have normal Pi powers: they can read files, run commands and edit files on your machine.
+You don't need to pick a skill or fill in a form. Describe your concern in plain language and the consultant decides how to approach it. Every consultant has normal Pi powers: it can read files, run commands and edit files on your machine, and work in your repositories and connected services. Their specialty decides which tools they reach for, not which they may use. Before any outside action (pushing, posting, messaging, changing a ticket) a consultant gives you a heads-up. Any consultant can also prepare an exact outgoing action for you to approve with `/hq approve` first, then keep a receipt (the optional outbox).
 
 ## What you need
 
 - **macOS or Linux with a terminal.** The commands below were tested on macOS. Windows has not been tested.
 - **Git**, to clone this repository.
 - **Node.js 24.15 or newer.** Check with `node --version`. Pi itself accepts Node 22.19+, but the directory-switching package these offices install requires 24.15.0 or newer. We tested with Node 26.11.1. If you use nvm, `nvm install 26` and `nvm use 26` are one way to get there. Use the same Node version for every step below.
-- **Pi**, installed and signed in to a model provider (tested with Pi 1.1.0). See the next section.
-- **Network access** the first time each office starts, so Pi can download the pinned package from GitHub.
+- **Pi 1.2 or newer**, installed and signed in to a model provider (tested with Pi 1.2.0). See the next section.
+- **Network access** the first time each office starts, so Pi can download the office's pinned packages.
+- **Optional software** some tools use: `gh` (GitHub CLI), Google Chrome, `yt-dlp` and `ffmpeg`. `doctor` (run by setup) tells you which are missing and how to install them.
 
 ## Install and sign in to Pi
 
@@ -51,45 +54,37 @@ Check it:
 pi --version
 ```
 
-Then sign in. Start `pi` in any folder, type `/login`, choose a provider and follow the prompts to use a subscription or an API key. Use `/model` to pick a model, then `/quit` to exit. Pi saves credentials for your user account, so both offices use them; you don't sign in again for each office. Pi can also read provider API keys such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` from the environment. For providers, local models and other details, see Pi's [quickstart](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/quickstart.md).
+Then sign in. Start `pi` in any folder, type `/login`, choose a provider and follow the prompts to use a subscription or an API key. Use `/model` to pick a model, then `/quit` to exit. Pi saves credentials for your user account, so every office uses them; you don't sign in again for each office. Pi can also read provider API keys such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` from the environment. For providers, local models and other details, see Pi's [quickstart](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/quickstart.md).
 
 ## Quickstart: clone to first conversation
 
-These examples use three locations. Change them if you like:
-
-| Placeholder | Example used below | What it is |
-|---|---|---|
-| Factory | `~/pi-consultants` | This repository. You only need it to build offices. |
-| Offices | `~/consultant-offices` | Where the two offices are created. **The folder must not already contain them.** |
-| **Your project** | `~/code/my-project` | **Replace this with a real folder you want help with.** |
-
-### 1. Clone and build the offices
+### 1. Clone and run setup
 
 ```sh
 git clone https://github.com/tranhoangnguyen03/pi-consultants.git ~/pi-consultants
 cd ~/pi-consultants
-node firm/scripts/build-hqs.mjs ~/consultant-offices
+npm run setup
 ```
 
-This creates `~/consultant-offices/engineering-consultant/` and `~/consultant-offices/project-consultant/`. Each office has its own copy of everything it needs, so it doesn't depend on this clone afterwards. The builder refuses to overwrite an office that already exists. Never rebuild into the folder of an office you are using.
+The three offices are already in the repository. Setup asks a few questions for each one; press Enter to skip any:
+
+- **Your organization's shared playbook?** Give the path to one playbook file and setup installs it in every office (next step). Or skip, and it offers to copy the example for you to edit.
+- **Project folders** the consultant works in, for example `~/code/my-project`. Folders must exist.
+- **Pi session folders** it may search. By default it sees only its own sessions. Pi normally saves sessions under `~/.pi/agent/sessions/`, grouped by working folder. Allow only what you want the consultant to read.
+- **Connectors** to switch on, such as `linear`, `figma` or `posthog`. You sign in to them later inside Pi.
+
+Then it runs `doctor` and lists anything missing, with how to install it. Setup writes only each office's private files (`organization/PLAYBOOK.md`, `.pi/hq.local.json`); it never changes the shipped files. Run it again any time. `npm run setup -- --only user` limits it to one office; `--yes` skips the questions.
 
 ### 2. Write your playbook
 
-Each office reads `organization/PLAYBOOK.md` before organization-specific work. If the file is missing, the consultant tells you instead of guessing your rules. Start from the included template:
-
-```sh
-cd ~/consultant-offices/engineering-consultant
-cp organization/PLAYBOOK.example.md organization/PLAYBOOK.md
-```
-
-Open `organization/PLAYBOOK.md` in your editor and replace the `SET ME` lines. If you work alone, this is still worth doing: the "organization" can be you. A short playbook works fine. For example:
+Each office reads `organization/PLAYBOOK.md` before organization-specific work. If the file is missing, the consultant tells you instead of guessing your rules. Keep **one shared playbook** for your organization, outside the repository (for example `~/my-org/PLAYBOOK.md`), and install it in every office with `npm run setup -- --playbook ~/my-org/PLAYBOOK.md`. Run that again whenever you change it; an office's previous copy is saved in its `.hq/setup-backup/` first. Rules meant for one consultant only go in that office's `organization/PLAYBOOK.local.md`; the shared playbook wins on conflict. Start from `organization/PLAYBOOK.example.md` and replace the `SET ME` lines. If you work alone, this is still worth doing: the "organization" can be you. A short playbook works fine. For example:
 
 ```markdown
 # Organization playbook
 
 Organization: Jane Doe (independent developer)
 Canonical source: this organization/PLAYBOOK.md file (maintained by me)
-Revision: 2026-10-12
+Revision: 2026-10-13
 
 - Sources: trust the repository and its issue tracker over chat history; ask me when they disagree.
 - Ask before committing, pushing, or contacting anyone outside this machine.
@@ -97,45 +92,16 @@ Revision: 2026-10-12
 - Don't copy client names or secrets into notes.
 ```
 
-Write rules you actually want followed. The example template is a placeholder, not a policy. Each office has its own playbook, so copy yours into the other office too, or write a different one.
+Write rules you actually want followed. The template is a placeholder, not a policy.
 
-### 3. Point the office at your project
-
-```sh
-node .runtime/bin/hq.mjs configure --projects ~/code/my-project
-```
-
-Replace `~/code/my-project` with your project folder. It must already exist. Repeat `--projects` for more folders. This changes only the office's local settings file. Optional extras:
-
-- `--sessions <folder>` lets the consultant search saved Pi sessions in that folder. By default it can only see its own sessions. Pi normally saves sessions under `~/.pi/agent/sessions/`, grouped by working folder. Allow only what you want the consultant to read.
-- `--provider <name> --model <id>` sets a default model for this office only.
-
-### 4. Install the pinned directory package
-
-The offices use [`pi-change-working-dir`](https://github.com/fitchmultz/pi-change-working-dir), a third-party Pi package that lets a consultant move into your project folder while its records stay in the office. It is pinned to one reviewed commit:
+### 3. Start your first conversation
 
 ```sh
-pi install 'git:github.com/fitchmultz/pi-change-working-dir@d0846a834036b17fd118d0ca1011331812cea52b' --local --approve
-```
-
-`--local` records the package in this office only, not in your global Pi settings. `--approve` trusts this office folder for this one command. Packages run code with your permissions, so check the source first if you have any doubt. If you skip this step, Pi installs the package itself the first time you start in the office and trust it.
-
-### 5. Check your setup
-
-```sh
-node .runtime/bin/hq.mjs doctor
-```
-
-Look for `"verdict": "prerequisites_met"`. If a check fails, read its `detail` field. The usual cause is an old Node version: `doctor` checks the `node` that runs it. `doctor` checks only local files and versions. It doesn't start Pi or test a model.
-
-### 6. Start your first conversation
-
-```sh
-cd ~/consultant-offices/engineering-consultant
+cd ~/pi-consultants/engineering-consultant
 pi
 ```
 
-Always start Pi **from inside the office folder**. That is how Pi finds the consultant's instructions, skills and records. When Pi asks whether to trust this folder, review it and accept. The consultant tools won't load until you do. Then ask in plain language, for example:
+Always start Pi **from inside the office folder**. That is how Pi finds the consultant's instructions, skills, tools and records. When Pi asks whether to trust this folder, review it and accept: the consultant's tools and pinned packages load only after you do, and Pi downloads the packages on this first start. Then ask in plain language, for example:
 
 ```text
 Please review the error handling in ~/code/my-project/src/api and tell me what you'd fix first.
@@ -145,23 +111,35 @@ Useful commands inside an office:
 
 - `/consult`, `/case-recap`, `/close-consultation`: prompts for opening a consultation, recapping a project's history and wrapping one up.
 - `/hq`: shows the consultant's role, its records folder and its currently selected case.
+- `/mcp`: shows connectors; sign in to the ones you switched on.
 - `pi --continue` (from the office folder): resumes the most recent conversation.
 
-### 7. Set up the coordination consultant
+The other offices work the same way: `cd ~/pi-consultants/project-consultant` or `cd ~/pi-consultants/user-consultant`, then `pi`.
 
-Repeat steps 2–6 in the second office:
+## The shared toolset
+
+Every office ships the same tools, listed in its `.pi/toolset.json`. Pi installs the pinned packages the first time you start in a trusted office.
+
+| Ships ready | What for |
+|---|---|
+| [`pi-change-working-dir`](https://github.com/fitchmultz/pi-change-working-dir) | Lets a consultant work in your project folder while its records stay in the office |
+| `pi-web-access` | Web search (no key needed by default) and reading pages, PDFs and videos |
+| `pi-docparser` | Word, PowerPoint, Excel, PDF and images |
+| `pi-agent-browser` | Using real web pages; installs its own browser on first use |
+| `diagram-design` skill | Architecture, timelines, journey maps, service blueprints |
+| Chrome DevTools MCP | Accessibility and performance audits of web pages (needs Chrome) |
+
+**Connectors** ship switched off: GitHub (uses your `gh` login), Sentry, Linear, Slack, Figma, PostHog, Mixpanel, Amplitude, Microsoft Clarity, Dovetail and Intercom. Switch one on with setup or with `node .runtime/bin/hq.mjs configure --connect NAME` in the office, then sign in with `/mcp` inside Pi. Clarity and Dovetail read an API token from `CLARITY_API_TOKEN` and `DOVETAIL_API_TOKEN`. Slack may require your workspace's own Slack app. A connector with the same name in your personal Pi MCP settings takes precedence. Connector sign-ins have not all been tested with Pi; report what doesn't work.
+
+## Customizing the consultants
+
+The consultants are built from `firm/`: instructions in `firm/profiles/`, skills in `firm/skills/`, the office list in `firm/offices.json`, the toolset in `firm/toolset.json`. To change them, edit `firm/` and build **your own offices outside the repository**:
 
 ```sh
-cd ~/consultant-offices/project-consultant
-cp organization/PLAYBOOK.example.md organization/PLAYBOOK.md
-# edit organization/PLAYBOOK.md, then:
-node .runtime/bin/hq.mjs configure --projects ~/code/my-project
-pi install 'git:github.com/fitchmultz/pi-change-working-dir@d0846a834036b17fd118d0ca1011331812cea52b' --local --approve
-node .runtime/bin/hq.mjs doctor
-pi
+npm run setup -- --out ~/my-consultants
 ```
 
-Its outgoing-message review is optional. If you use it, the consultant prepares exact drafts, you review and approve them with `/hq approve`, and it keeps a receipt. Without it, the consultant behaves like any Pi session and follows your instructions and playbook.
+Running the same command later updates those offices from your `firm/`. This keeps the shipped offices untouched, so `git pull` never collides with your changes. Advanced: `npm run setup -- --rebuild` regenerates the offices inside the repository instead; your next `git pull` may then conflict with them.
 
 ## What to expect
 
@@ -169,27 +147,23 @@ Its outgoing-message review is optional. If you use it, the consultant prepares 
 - **Notes are deliberate.** A consultant saves significant findings, decisions and open questions when it decides they matter or when you ask. Not every reply is saved. Ask it to record something if you want it kept.
 - **"Delivered" is not "accepted."** Delivery and closure are separate recorded steps. Closure should mean the completion condition was met or you stopped the work; the tool does not independently verify acceptance.
 - **No guarantees for production use.** Automated tests and real Pi startup checks pass, but there has been no long-term field use, no load testing and no qualification of recall over real long histories. Treat it as early software.
-- **Updates are manual.** There is no automatic upgrade or migration for an office you already use. See [Updating an office](#updating-an-office).
+- **Updates are deliberate.** Offices change only when you pull or run setup. See [Updating](#updating).
 
 ## Privacy and safety
 
 - Each office stores its records and sessions in a local `.hq/` folder inside the office. This is not encrypted storage or a guarantee that content stays on-device: material read into a conversation can be sent to your model provider.
 - Conversations go to whichever model provider you configured in Pi, just like any Pi session.
-- An office keeps your normal Pi setup: its credentials, global extensions and integrations. If you have connected services such as email or chat, the consultant can use them too.
+- An office keeps your normal Pi setup: its credentials, global extensions and integrations. If you have connected services such as email or chat, the consultant can use them too, along with any connectors you switch on.
+- Each office installs third-party Pi packages and starts MCP servers listed in `.pi/toolset.json`, pinned to specific versions. They run code with your permissions; review them before trusting an office if you have any doubt.
 - Consultants can read, edit and run anything your user account can. Folder settings such as `--projects` and project trust are not a sandbox. For sensitive work, use a separate account, container or virtual machine. See Pi's [security notes](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md).
-- Each office includes a `.gitignore` for its private files (`.hq/`, `.env`, `organization/PLAYBOOK.md`, local settings). If you put an office under version control, keep the repository private. Never commit offices, playbooks, credentials or client records to this public repository.
+- Each office includes a `.gitignore` for its private files (`.hq/`, `.env`, `organization/PLAYBOOK.md`, `organization/PLAYBOOK.local.md`, local settings), so your records stay out of git. Never commit playbooks, credentials or client records to a public repository.
 
-## Updating an office
+## Updating
 
-Generated offices never update themselves. To use a newer version of this factory:
+- **Offices in the repository:** close Pi sessions in them, then `git pull`. Run `npm run setup` afterwards to build any newly added consultant.
+- **Your own offices (`--out`):** `git pull`, then `npm run setup -- --out ~/my-consultants`.
 
-1. Pull this repository and build into a **new, empty** folder, for example `~/consultant-offices-new`.
-2. Stop every Pi session that is running in the old office.
-3. Back up the old office, especially `.hq/`, `organization/PLAYBOOK.md`, `.pi/hq.local.json`, `.env` and any files you customized.
-4. Compare the new office with the old one. Replace only the product files you agreed to change, and keep your private state and customizations.
-5. Run `doctor`, start Pi and check that your cases are still there.
-
-Never restore a backup over newer work without comparing the two first.
+Every update keeps each office's private files (`.hq/`, `organization/PLAYBOOK.md`, `organization/PLAYBOOK.local.md`, `.env`, `.pi/hq.local.json`, `.pi/mcp.json`) and files you added. If you edited a shipped file, setup stops and lists it, changing nothing. Move your change into `firm/`, or rerun with `--force` to save the edited files into `.hq/setup-backup/` and replace them. There is no automatic migration of case records between versions.
 
 ## For maintainers
 
@@ -203,11 +177,13 @@ npm run demo    # offline walkthrough with synthetic data; no model or Pi proces
 npm run eval    # offline checks of the office startup layout
 ```
 
-`firm/scripts/live-pi-smoke.mjs` starts real Pi in a generated office without sending a prompt. Pi startup can still connect your inherited integrations. See `firm/README.md` and `firm/eval/README.md` for details.
+From the repository root, `npm run drift` fails if the shipped offices differ from what `firm/` builds; rebuild them with `npm run setup -- --rebuild` before a release.
+
+`firm/scripts/live-pi-smoke.mjs` starts real Pi in an office without sending a prompt. Pi startup can still connect your inherited integrations. See `firm/README.md` and `firm/eval/README.md` for details.
 
 ## License
 
 MIT. See [`LICENSE`](LICENSE). Third-party material keeps its own license and attribution:
 
 - The engineering consultant's Simplified Technical English skill (`firm/skills/engineering/asd-ste100/`) comes from [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill) under the MIT license (copyright Dustin Yuchen Teng). See its `LICENSE` and `SOURCE.md`, and keep both with any copy.
-- [`pi-change-working-dir`](https://github.com/fitchmultz/pi-change-working-dir) is not bundled. Pi downloads it from its author at the pinned commit, under that project's own license.
+- The toolset is not bundled. Pi or `npx` downloads each item from its author at the pinned version, under its own license: [`pi-change-working-dir`](https://github.com/fitchmultz/pi-change-working-dir), `pi-web-access`, `pi-docparser`, `pi-agent-browser`, [`diagram-design`](https://github.com/cathrynlavery/diagram-design) and `@microsoft/clarity-mcp-server` (MIT), and [`chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp) (Apache-2.0). Remote connectors are services run by their vendors under their own terms.

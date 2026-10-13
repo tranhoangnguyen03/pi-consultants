@@ -3,7 +3,10 @@
 This is the canonical maintainer source, not a working consultant office.
 
 - `src/`, `extensions/`, `bin/`: shared runtime and operational CLI.
-- `profiles/`, `skills/`: both specialist source libraries; only the selected role is deployed.
+- `offices.json`: the list of offices to build (folder, role, identity, banner).
+- `profiles/shared/AGENTS.md`: practice every consultant shares; `profiles/<role>/AGENTS.md`: the role's title, intro and own sections. The builder joins them into each office's `AGENTS.md`.
+- `skills/<role>/`: each role's skills; only the office's own role is deployed.
+- `toolset.json`: the shared toolset every office ships (Pi packages, MCP servers, machine software for `doctor`).
 - `scripts/`, `tests/`: factory and verification tools.
 - `eval/`, `templates/`, `examples/`: evaluation fixtures and reusable examples. Internal historical documents are not distributed. See the root README for current setup and qualification limits.
 
@@ -15,7 +18,7 @@ npm run check
 node scripts/build-hqs.mjs /absolute/path/to/new-output
 ```
 
-The factory refuses existing target HQs. Generated HQs carry their own `.runtime/`; they never import this directory at runtime. Private offices, organization playbooks, credentials and local overlays are never factory inputs copied wholesale.
+`build-hqs.mjs` refuses existing target HQs. To build missing offices and safely update existing ones, use `npm run setup` from the repository root (`--out DIR`, `--rebuild`, `--only ROLE`, `--force`, `--yes`); it then asks a few questions to personalize each office, writing only private files. `npm run drift` (root) or `node scripts/drift.mjs DIR` fails if shipped offices differ from what this source builds. Generated HQs carry their own `.runtime/`; they never import this directory at runtime. Private offices, organization playbooks, credentials and local overlays are never factory inputs copied wholesale.
 
 To probe a deployed HQ with actual Pi without adding factory files to it:
 

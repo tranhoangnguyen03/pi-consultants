@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "role": "engineering",
+  "office": {
+    "letter": "B",
+    "title": "ENGINEERING",
+    "tagline": "plan · review · debug · optimise · test · UX · docs",
+    "banner": [
+      "   ▄██▄▄██▄   ",
+      " ▄█▀▀    ▀▀█▄ ",
+      " ██  ▄██▄  ██ ",
+      " ▀█▄▄    ▄▄█▀ ",
+      "   ▀██▀▀██▀   "
+    ]
+  },
+  "hq": "..",
+  "stateDir": "../.hq",
+  "kitRoot": "..",
+  "sessionRoots": [],
+  "projectRoots": [],
+  "localReadRoots": [],
+  "attachmentRoots": [],
+  "maxSessionFiles": 500,
+  "maxSessionBytes": 16777216,
+  "maxConsultChars": 80000,
+  "policy": {}
+}
