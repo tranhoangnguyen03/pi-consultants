@@ -2,7 +2,7 @@
 
 Three AI consultants for [Pi](https://pi.dev), the terminal coding agent. Each one runs in its own folder, called an **office**, and its notes stay there between conversations. You keep doing your everyday work in your usual Pi session. When you want a second opinion, a careful review, help with the people side of a project, or a hard look at how your product works for its users, you open a consultant in another terminal.
 
-The offices are **ready to use** in this repository. Clone it, run one setup command, and start Pi in an office.
+The offices are **ready to use** in this repository's `offices/` folder. Clone it, run one setup command, and start Pi in an office.
 
 ## Why use it
 
@@ -17,9 +17,9 @@ The offices are **ready to use** in this repository. Clone it, run one setup com
 
 | Office folder | Consultant | Ask it about |
 |---|---|---|
-| `engineering-consultant/` | **Engineering consultant (B)** | Code and design review, debugging and verification, test strategy, performance, simplification, documentation, and usability for people and for AI agents. |
-| `project-consultant/` | **Coordination and communication consultant (C)** | Priorities, commitments, stakeholders, meeting decisions, dependencies, release handoffs, and clear writing for the people involved. |
-| `user-consultant/` | **User consultant (D)** | Everyone who uses your product, people and the AI agents people assign tasks to: user research and synthesis, usability, UI critique, accessibility, behaviour analytics, journey maps, interface writing, agent experience and delegation to agents. |
+| `offices/engineering-consultant/` | **Engineering consultant (B)** | Code and design review, debugging and verification, test strategy, performance, simplification, documentation, and usability for people and for AI agents. |
+| `offices/project-consultant/` | **Coordination and communication consultant (C)** | Priorities, commitments, stakeholders, meeting decisions, dependencies, release handoffs, and clear writing for the people involved. |
+| `offices/user-consultant/` | **User consultant (D)** | Everyone who uses your product, people and the AI agents people assign tasks to: user research and synthesis, usability, UI critique, accessibility, behaviour analytics, journey maps, interface writing, agent experience and delegation to agents. |
 
 You don't need to pick a skill or fill in a form. Describe your concern in plain language and the consultant decides how to approach it. Every consultant has normal Pi powers: it can read files, run commands and edit files on your machine, and work in your repositories and connected services. Their specialty decides which tools they reach for, not which they may use. Before any outside action (pushing, posting, messaging, changing a ticket) a consultant gives you a heads-up. Any consultant can also prepare an exact outgoing action for you to approve with `/hq approve` first, then keep a receipt (the optional outbox).
 
@@ -97,7 +97,7 @@ Write rules you actually want followed. The template is a placeholder, not a pol
 ### 3. Start your first conversation
 
 ```sh
-cd ~/pi-consultants/engineering-consultant
+cd ~/pi-consultants/offices/engineering-consultant
 pi
 ```
 
@@ -114,7 +114,7 @@ Useful commands inside an office:
 - `/mcp`: shows connectors; sign in to the ones you switched on.
 - `pi --continue` (from the office folder): resumes the most recent conversation.
 
-The other offices work the same way: `cd ~/pi-consultants/project-consultant` or `cd ~/pi-consultants/user-consultant`, then `pi`.
+The other offices work the same way: `cd ~/pi-consultants/offices/project-consultant` or `cd ~/pi-consultants/offices/user-consultant`, then `pi`.
 
 ## The shared toolset
 

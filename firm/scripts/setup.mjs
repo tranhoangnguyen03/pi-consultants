@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /** npm run setup: build missing offices, safely update existing ones, then personalize each one. Personalization writes only private files.
- * Options: --out DIR (offices outside the repo; existing ones are updated), --rebuild (update the in-repo offices from firm/),
+ * Offices live in <repo>/offices/ by default. Options: --out DIR (offices outside the repo; existing ones are updated), --rebuild (update the in-repo offices from firm/),
  * --only ROLE,ROLE, --force (replace locally edited shipped files after backing them up), --playbook FILE (install your organization's
  * shared playbook in every office; a different existing one is backed up first), --yes (no questions). */
 import fs from 'node:fs/promises';
@@ -19,7 +19,7 @@ for(let i=2;i<process.argv.length;i++){
  if(['--out','--only','--playbook'].includes(a)){assert(process.argv[i+1],`Value required after ${a}`);opts[a.slice(2)]=process.argv[++i];}
  else{assert(['--rebuild','--force','--yes'].includes(a),`Unknown option ${a}`);flags.add(a.slice(2));}
 }
-const target=path.resolve(opts.out??path.dirname(root));
+const target=path.resolve(opts.out??path.join(path.dirname(root),'offices'));
 const exists=p=>fs.access(p).then(()=>true,()=>false);
 const sha=async p=>(await exists(p))?hash(await fs.readFile(p)):null;
 const backupOf=dir=>path.join(dir,'.hq/setup-backup',STAMP);

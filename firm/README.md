@@ -18,7 +18,7 @@ npm run check
 node scripts/build-hqs.mjs /absolute/path/to/new-output
 ```
 
-`build-hqs.mjs` refuses existing target HQs. To build missing offices and safely update existing ones, use `npm run setup` from the repository root (`--out DIR`, `--rebuild`, `--only ROLE`, `--force`, `--yes`); it then asks a few questions to personalize each office, writing only private files. `npm run drift` (root) or `node scripts/drift.mjs DIR` fails if shipped offices differ from what this source builds. Generated HQs carry their own `.runtime/`; they never import this directory at runtime. Private offices, organization playbooks, credentials and local overlays are never factory inputs copied wholesale.
+`build-hqs.mjs` refuses existing target HQs. To build missing offices (in `<repo>/offices/` by default) and safely update existing ones, use `npm run setup` from the repository root (`--out DIR`, `--rebuild`, `--only ROLE`, `--force`, `--yes`); it then asks a few questions to personalize each office, writing only private files. `npm run drift` (root) or `node scripts/drift.mjs DIR` fails if shipped offices differ from what this source builds. Generated HQs carry their own `.runtime/`; they never import this directory at runtime. Private offices, organization playbooks, credentials and local overlays are never factory inputs copied wholesale.
 
 To probe a deployed HQ with actual Pi without adding factory files to it:
 

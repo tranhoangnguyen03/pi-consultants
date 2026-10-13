@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Drift check: the offices in DIR (default: the repository root) must match what firm/ builds now. Exit 1 lists every difference. */
+/** Drift check: the offices in DIR (default: <repo>/offices) must match what firm/ builds now. Exit 1 lists every difference. */
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 import {readJSON,hash} from '../src/util.mjs';
 import {loadFirm,buildOffice} from './factory.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const dir=path.resolve(process.argv[2]??path.dirname(root));
+const dir=path.resolve(process.argv[2]??path.join(path.dirname(root),'offices'));
 const {offices,toolset}=await loadFirm(root);
 const tmp=await fs.mkdtemp(path.join(os.tmpdir(),'hq-drift-')),problems=[];
 try{
