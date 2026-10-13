@@ -1,18 +1,21 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import {assert, atomic, locked, id, now, text, hash, redact, safeReal, slug}  from './util.mjs';
+import {deliberateNotes, supersededIds} from './cases.mjs';
 
 const recordKey=x=>`${x.at??x.createdAt??x.updatedAt??''}/${x.id}`;
 const referenceEqual=(a,b)=>a.system===b.system&&a.namespace===b.namespace&&a.key===b.key;
 function validReference(r){for(const field of ['system','namespace','key'])text(r[field],field,200);return r;}
-const cleanNotes = c => c.notes.filter(n => !['checkpoint','session-consultation'].includes(n.kind));
+const cleanNotes = c => deliberateNotes(c.notes,{includeSuperseded:true});
+const currentNotes = c => deliberateNotes(c.notes);
+const supersededBy = (c,noteId) => cleanNotes(c).filter(n=>supersededIds(n).includes(noteId)).map(n=>n.id);
 const pointer = (c, section, recordId) => ({caseKey:`${c.client}/${c.project}`,section,...(recordId?{id:recordId}:{})});
 export function keyParts(key) {
   assert(typeof key==='string' && key.split('/').length===2,'Use the caseKey returned by index: client/project');
   return key.split('/').map((part,i)=>slug(part,i?'project':'client'));
 }
 export function validateOperation(p) {
- const fields={batch:['pointers'],index:['query','limit','after'],get:['caseKey','section','id','offset','length','after','expectedRevision','contentRevision','query','scope','engagementId'],select:['caseKey'],create:['client','project','title','purpose','reviewToken','distinction','workspace','workRefs'],curate:['caseKey','expectedRevision','purpose','aliases','related'],reference:['caseKey','system','namespace','key','source'],resolve:['system','namespace','key','after','limit']};
+ const fields={batch:['pointers'],index:['query','limit','after'],get:['caseKey','section','id','offset','length','after','expectedRevision','contentRevision','query','scope','engagementId','includeSuperseded'],select:['caseKey'],create:['client','project','title','purpose','reviewToken','distinction','workspace','workRefs'],curate:['caseKey','expectedRevision','purpose','aliases','related'],reference:['caseKey','system','namespace','key','source'],resolve:['system','namespace','key','after','limit']};
  assert(fields[p.operation],`Unknown operation ${JSON.stringify(p.operation)}; use index, get, select, create, curate, reference or resolve`);
  const hint=p.operation==='reference'?'; use {operation:"reference",caseKey,system,namespace,key,source}, one reference per call; workRefs is for create':'';
  for(const key of Object.keys(p))assert(key==='operation'||fields[p.operation].includes(key),`${p.operation} does not accept ${key}; remove it or use the appropriate operation${hint}`);
@@ -48,7 +51,7 @@ export async function index(store,{query='',limit=12,after}={}) {
       const matchedFields=Object.keys(fields).filter(k=>terms.some(t=>fields[k].toLowerCase().includes(t)));
       if(terms.length&&!matchedFields.length)continue;
       entries.push({caseKey:key,title:c.title,navigation:c.navigation??null,uncurated:!c.navigation,matchedFields,
-        notes:cleanNotes(c).length,papers:(c.papers??[]).length,
+        notes:currentNotes(c).length,papers:(c.papers??[]).length,
         unfinished:(c.engagements??[]).filter(e=>e.state!=='closed').slice(0,3).map(e=>({objective:e.objective,state:e.state,pointer:pointer(c,'engagement',e.id)})),pointer:pointer(c,'overview')});
     }catch{warnings.push({caseKey:`${item.client}/${item.project}`,error:'unreadable'});}
   }
@@ -64,8 +67,10 @@ export async function overview(store,key) {
 
     engagementCount:(c.engagements??[]).length,
     engagements:(c.engagements??[]).slice(-12).map(e=>({id:e.id,objective:e.objective.slice(0,240),shortened:e.objective.length>240,state:e.state,pointer:pointer(c,'engagement',e.id)})),
-    recordCount:cleanNotes(c).length,
-    records:cleanNotes(c).slice(-12).map(n=>({kind:n.kind,state:n.state,at:n.at,attribution:n.attribution??null,engagementId:n.engagementId??null,supersedes:n.supersedes??null,preview:n.text.slice(0,160),shortened:n.text.length>160,pointer:pointer(c,'note',n.id)})),
+    recordCount:currentNotes(c).length,
+    supersededCount:cleanNotes(c).length-currentNotes(c).length,
+    ...(cleanNotes(c).length>currentNotes(c).length?{history:{...pointer(c,'notes'),includeSuperseded:true}}:{}),
+    records:currentNotes(c).slice(-12).map(n=>({kind:n.kind,state:n.state,at:n.at,attribution:n.attribution??null,engagementId:n.engagementId??null,supersedes:n.supersedes??null,preview:n.text.slice(0,160),shortened:n.text.length>160,pointer:pointer(c,'note',n.id)})),
     paperCount:(c.papers??[]).length,
     papers:(c.papers??[]).slice(-12).map(p=>({title:p.title,purpose:p.purpose,revision:p.revision,characters:p.body?.length??null,pointer:pointer(c,'paper',p.id)}))};
 }
@@ -133,7 +138,8 @@ export async function get(store,p) {
  assert(typeof p.caseKey==='string'&&p.caseKey.length>0,`get requires caseKey (client/project); received caseKey=${JSON.stringify(p.caseKey)}, id=${JSON.stringify(p.id)}. id locates a record inside a case. Example: {operation:"get",caseKey:"demo/atlas",section:"overview"}`);
  assert(['overview','brief','references','reference','notes','papers','engagements','note','paper','engagement'].includes(p.section),'get requires section: overview, brief, notes, papers, engagements, note, paper or engagement');
  if(['note','paper','engagement','reference'].includes(p.section))assert(typeof p.id==='string'&&p.id.trim().length>0,`get section ${p.section} requires id from its returned pointer; caseKey alone is not a record ID`);
- if(p.section!=='notes')assert(p.scope===undefined&&p.engagementId===undefined,'scope and engagementId filters require section:"notes"');
+ if(p.section!=='notes')assert(p.scope===undefined&&p.engagementId===undefined&&p.includeSuperseded===undefined,'scope, engagementId and includeSuperseded require section:"notes"');
+ assert(p.includeSuperseded===undefined||typeof p.includeSuperseded==='boolean','includeSuperseded must be true or false');
  if(!['note','paper','engagement','reference'].includes(p.section))assert(p.id===undefined,`${p.section} does not accept id; use a singular record section for an ID`);
  assert(p.scope===undefined||['all','case','engagement'].includes(p.scope),'Note filter scope must be all, case or engagement');
  if(p.scope==='engagement')assert(typeof p.engagementId==='string'&&p.engagementId.trim().length>0,'Note filter scope:"engagement" requires engagementId');
@@ -142,7 +148,7 @@ export async function get(store,p) {
  if(p.scope==='engagement')assert(c.engagements?.some(e=>e.id===p.engagementId),'engagementId filter is not an objective in this case');
  if(p.section==='overview')return overview(store,p.caseKey);
  if(['notes','papers','engagements','references'].includes(p.section)){
-  const list=[...(p.section==='notes'?cleanNotes(c):p.section==='references'?c.workRefs??[]:c[p.section]??[])].sort((a,b)=>recordKey(a)<recordKey(b)?-1:recordKey(a)>recordKey(b)?1:0);
+  const list=[...(p.section==='notes'?(p.includeSuperseded?cleanNotes(c):currentNotes(c)):p.section==='references'?c.workRefs??[]:c[p.section]??[])].sort((a,b)=>recordKey(a)<recordKey(b)?-1:recordKey(a)>recordKey(b)?1:0);
   const matches=list.filter(x=>(p.scope!=='case'||x.engagementId==null)&&(p.scope!=='engagement'||x.engagementId===p.engagementId)&&(!p.query||JSON.stringify(x).toLowerCase().includes(p.query.toLowerCase())));
   assert(!(p.after!==undefined&&p.offset!==undefined),'Use after OR offset, not both');
   const ordered=p.after?matches.filter(x=>`${x.at??x.createdAt??x.updatedAt??''}/${x.id}`>p.after):matches;
@@ -150,7 +156,7 @@ export async function get(store,p) {
   let used=0;const page=[];
   for(const x of ordered.slice(offset,offset+length)){const n=JSON.stringify(x.title??x.objective??x.text?.slice(0,160)??x.key??'').length+JSON.stringify(x.attribution??'').length+JSON.stringify(x.purpose??'').length+800;if(page.length&&used+n>16000)break;page.push(x);used+=n;}
   const count=page.length;
-  return {scope:p.scope??'all',engagementId:p.engagementId??null,total:matches.length,consistency:'Per-case snapshot; subsequent pages may change. Refresh to see inserts before the cursor.',items:page.map(x=>({id:x.id,engagementId:x.engagementId??null,title:x.title??x.objective??x.text?.slice(0,160)??`${x.system}/${x.namespace}/${x.key}`,state:x.state,at:x.at??x.createdAt??x.updatedAt,attribution:x.attribution??null,supersedes:x.supersedes??null,shortened:!!x.text&&x.text.length>160,purpose:x.purpose,pointer:pointer(c,p.section==='notes'?'note':p.section==='papers'?'paper':p.section==='references'?'reference':'engagement',x.id)})),nextAfter:p.offset===undefined&&offset+count<ordered.length?recordKey(page.at(-1)):null,nextOffset:p.offset!==undefined&&offset+count<ordered.length?offset+count:null};
+  return {scope:p.scope??'all',engagementId:p.engagementId??null,...(p.section==='notes'?{includeSuperseded:!!p.includeSuperseded}:{}),total:matches.length,consistency:'Per-case snapshot; subsequent pages may change. Refresh to see inserts before the cursor.',items:page.map(x=>({id:x.id,engagementId:x.engagementId??null,title:x.title??x.objective??x.text?.slice(0,160)??`${x.system}/${x.namespace}/${x.key}`,state:x.state,at:x.at??x.createdAt??x.updatedAt,attribution:x.attribution??null,supersedes:x.supersedes??null,...(p.section==='notes'&&p.includeSuperseded&&supersededBy(c,x.id).length?{supersededBy:supersededBy(c,x.id)}:{}),shortened:!!x.text&&x.text.length>160,purpose:x.purpose,pointer:pointer(c,p.section==='notes'?'note':p.section==='papers'?'paper':p.section==='references'?'reference':'engagement',x.id)})),nextAfter:p.offset===undefined&&offset+count<ordered.length?recordKey(page.at(-1)):null,nextOffset:p.offset!==undefined&&offset+count<ordered.length?offset+count:null};
  }
  if(p.section==='brief'){
   const offset=p.offset??0,length=p.length??4000;assert(Number.isInteger(offset)&&offset>=0&&Number.isInteger(length)&&length>0&&length<=16000,'Brief range: offset >= 0, length 1..16000');
@@ -161,6 +167,7 @@ export async function get(store,p) {
  assert(collection,'section must be overview, brief, note, paper or engagement');const record=collection.find(r=>r.id===p.id);
  if(!record)return {status:'missing',pointer:p,next:{caseKey:p.caseKey,section:'overview'}};
  if(p.section==='engagement')return {...record,records:{caseKey:p.caseKey,section:'notes',scope:'engagement',engagementId:record.id},caseGuidance:{caseKey:p.caseKey,section:'notes',scope:'case'}};
+ if(p.section==='note'){const by=supersededBy(c,record.id);return by.length?{...record,supersededBy:by}:record;}
  if(p.section!=='paper')return record;
  let body=record.body,contentRevision=record.revision;
  if(record.file){

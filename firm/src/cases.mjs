@@ -4,6 +4,14 @@ import {atomic, locked, readJSON, id, now, slug, assert, text, clone, redact} fr
 
 export const NOTE_KINDS = ['finding','decision','proposal','open-question','feedback','superseded'];
 export const NOTE_STATES = ['observed','proposed','confirmed','superseded','uncertain'];
+export const supersededIds = n => n.supersedes == null ? [] : [].concat(n.supersedes);
+// Default views show deliberate notes no later note replaces; superseded ones stay readable by pointer.
+export function deliberateNotes(notes, {includeSuperseded=false}={}) {
+  const own = notes.filter(n => !['checkpoint','session-consultation'].includes(n.kind));
+  if (includeSuperseded) return own;
+  const gone = new Set(own.flatMap(supersededIds));
+  return own.filter(n => !gone.has(n.id));
+}
 const STORED_KINDS = new Set([...NOTE_KINDS,'checkpoint','session-consultation','action-receipt']);
 
 export class CaseStore {
@@ -54,7 +62,10 @@ export class CaseStore {
       text(input.text, 'note', 16000);
       assert(Array.isArray(input.sources), 'sources must be an array; use [] and state uncertain when unavailable');
       if (input.state === 'confirmed') assert(input.sources.length > 0, 'Confirmed claims require evidence references');
-      if (input.supersedes) assert(state.notes.some(n => n.id === input.supersedes), 'Superseded note does not exist');
+      const replaced = supersededIds(input);
+      assert(replaced.length <= 50 && replaced.every(x => typeof x === 'string' && x.trim()), 'supersedes takes 1..50 note IDs');
+      assert(new Set(replaced).size === replaced.length, 'supersedes lists a note more than once');
+      for (const x of replaced) assert(state.notes.some(n => n.id === x), `Superseded note ${JSON.stringify(x)} does not exist in this case`);
       const target=Object.hasOwn(input,'engagementId')?input.engagementId:null;
       if(target!==null){
         assert(typeof target==='string'&&target.trim()===target&&target.length>0&&!['null','undefined','none'].includes(target.toLowerCase()),'Invalid engagementId; case-level records use null internally');
@@ -63,7 +74,7 @@ export class CaseStore {
       }
       if(input.sessionId&&!state.sessions.includes(input.sessionId))state.sessions.push(input.sessionId);
       const note = {id:id(), at:now(), kind:input.kind, state:input.state, text:redact(input.text), sources:input.sources.map(s => redact(text(s,'source',2000))),
-        sessionId:input.sessionId ?? null, ...(state.version===2?{engagementId:input.engagementId??null,attribution:system?'outbox journal':input.attribution,writer:system?'system:outbox':'consultant'}:{}), ...(input.supersedes ? {supersedes:input.supersedes} : {})};
+        sessionId:input.sessionId ?? null, ...(state.version===2?{engagementId:input.engagementId??null,attribution:system?'outbox journal':input.attribution,writer:system?'system:outbox':'consultant'}:{}), ...(replaced.length ? {supersedes:replaced.length===1?replaced[0]:replaced} : {})};
       state.notes.push(note); state.updatedAt = now();
       await atomic(path.join(dir,'case.json'), state); return note;
     });

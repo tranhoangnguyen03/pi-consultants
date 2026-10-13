@@ -39,7 +39,7 @@ try{
  check('Consultant role instructions',result.systemPrompt.includes(heading),'From root AGENTS.md');
  check('Note attribution required in actual host schema',result.noteSchema?.required?.includes('attribution'),'Schema inspection, not model behavior');
  check('Note scope required in actual host schema',result.noteSchema?.required?.includes('scope'),'Schema inspection, not model behavior');
- for(const tool of ['hq_navigate','hq_engagement','hq_paper','hq_case','hq_note','hq_brief','session_find','session_consult','hq_actions','hq_execute','change_dir'])check(`Registered ${tool}`,result.tools.includes(tool),'Actual host registry');
+ for(const tool of ['hq_navigate','hq_engagement','hq_paper','hq_case','hq_note','hq_brief','session_find','session_read','session_consult','hq_actions','hq_execute','change_dir'])check(`Registered ${tool}`,result.tools.includes(tool),'Actual host registry');
  for(const name of await fs.readdir(path.join(root,'.pi/skills'))){const s=await fs.readFile(path.join(root,'.pi/skills',name,'SKILL.md'),'utf8');const title=s.match(/^name: (.+)$/m)[1];check(`Available skill ${title}`,result.systemPrompt.includes(title),'Native skill catalogue in system prompt');}
  for(const command of ['hq','consult','case-recap','close-consultation'])check(`Available command ${command}`,result.commands.includes(command),'Actual host command registry');
  const after=await fingerprints();check('Daily-driver source files unchanged',JSON.stringify(before)===JSON.stringify(after),'Native auth refresh files are deliberately excluded from this comparison');

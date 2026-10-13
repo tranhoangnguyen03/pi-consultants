@@ -1,17 +1,17 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {CaseStore,NOTE_KINDS,NOTE_STATES} from './cases.mjs';
+import {CaseStore,NOTE_KINDS,NOTE_STATES,deliberateNotes} from './cases.mjs';
 import * as navigation from './navigation.mjs';
 import {loadHQConfig,saveHQPolicy} from './config.mjs';
 import {ActionStore, executeAction, reviewText, validatePolicy} from './actions.mjs';
-import {findSessions, consultSession} from './sessions.mjs';
+import {findSessions, consultSession, searchHistory, readEntries} from './sessions.mjs';
 import {assert,atomic,readJSON,hash,contentText,clone,mkdir} from './util.mjs';
 
 const reply = data => ({content:[{type:'text',text:JSON.stringify(data,null,2)}],details:data,...(data?.usage?{usage:data.usage}:{})});
 function sid(ctx) { return ctx.sessionManager.getSessionId(); }
 // Preserve legacy generated records on disk, but never present them as deliberate notes.
 function splitNotes(notes) {
-  return {own:notes.filter(n=>!['checkpoint','session-consultation'].includes(n.kind))};
+  return {own:deliberateNotes(notes)};
 }
 export function introBanner(config,caseKey) {
   const home=process.env.HOME,where=home&&config.hq.startsWith(home+path.sep)?'~'+config.hq.slice(home.length):config.hq;
@@ -90,13 +90,13 @@ export async function registerHQ(pi,{Type:T,configPath,answer}={}) {
   pi.on('session_tree',async(_e,ctx)=>restore(ctx));
   pi.on('before_agent_start',async(_e,ctx)=>{ctx.ui?.setWidget?.('consultant-hq-intro',undefined);restore(ctx,{preserveExplicit:true});});
 
-  tool('hq_navigate','Discover and curate cases. index finds descriptions; get reads a returned pointer without selecting it; batch reads 1..8 pointers with a shared output budget and explicit remaining pointers; select explicitly sets a case as the write target and clears the selected engagement (use hq_engagement resume for an objective); create checks candidate duplicates; curate revises identity; reference registers one reference with top-level caseKey, system, namespace, key, source (workRefs is only for create). This experimental navigation tool does not grant authority.',T.Object({
+  tool('hq_navigate','Discover and curate cases. index finds descriptions; get reads a returned pointer without selecting it; batch reads 1..8 pointers with a shared output budget and explicit remaining pointers; select explicitly sets a case as the write target and clears the selected engagement (use hq_engagement resume for an objective); create checks candidate duplicates; curate revises identity; reference registers one reference with top-level caseKey, system, namespace, key, source (workRefs is only for create). Notes views omit superseded notes; get section:notes with includeSuperseded:true shows them, and a singular note pointer always reads. This experimental navigation tool does not grant authority.',T.Object({
     operation:T.Union(['index','get','batch','select','create','curate','reference','resolve'].map(x=>T.Literal(x))),caseKey:T.Optional(T.String({description:'Case locator client/project; required for get/select/curate/reference. Copy caseKey from a returned pointer.'})),query:T.Optional(T.String()),after:T.Optional(T.String()),limit:T.Optional(T.Number()),
     client:T.Optional(T.String()),project:T.Optional(T.String()),title:T.Optional(T.String()),purpose:T.Optional(T.String()),aliases:T.Optional(T.Array(T.String())),related:T.Optional(T.Array(T.Object({caseKey:T.String(),reason:T.String()}))),
-    pointers:T.Optional(T.Array(T.Object({caseKey:T.String(),section:T.String(),id:T.Optional(T.String()),scope:T.Optional(T.String()),engagementId:T.Optional(T.String()),offset:T.Optional(T.Number()),length:T.Optional(T.Number()),after:T.Optional(T.String()),expectedRevision:T.Optional(T.Number()),contentRevision:T.Optional(T.Union([T.Number(),T.String()]))}))),
+    pointers:T.Optional(T.Array(T.Object({caseKey:T.String(),section:T.String(),id:T.Optional(T.String()),scope:T.Optional(T.String()),engagementId:T.Optional(T.String()),offset:T.Optional(T.Number()),length:T.Optional(T.Number()),after:T.Optional(T.String()),expectedRevision:T.Optional(T.Number()),contentRevision:T.Optional(T.Union([T.Number(),T.String()])),includeSuperseded:T.Optional(T.Boolean())}))),
     workspace:T.Optional(T.String()),workRefs:T.Optional(T.Array(T.Object({system:T.String(),namespace:T.String(),key:T.String(),source:T.String()}))),
     system:T.Optional(T.String()),namespace:T.Optional(T.String()),key:T.Optional(T.String()),source:T.Optional(T.String()),
-    scope:T.Optional(T.Union(['all','case','engagement'].map(x=>T.Literal(x)))),engagementId:T.Optional(T.String({description:'Only for get section:notes scope:engagement; use a returned objective ID.'})),
+    scope:T.Optional(T.Union(['all','case','engagement'].map(x=>T.Literal(x)))),engagementId:T.Optional(T.String({description:'Only for get section:notes scope:engagement; use a returned objective ID.'})),includeSuperseded:T.Optional(T.Boolean({description:'Only for get section:notes; true also lists superseded notes, marked supersededBy.'})),
     section:T.Optional(T.String({description:'get section: overview, brief, notes, papers, engagements, references, or singular note/paper/engagement/reference.'})),id:T.Optional(T.String({description:'Record ID inside caseKey; required for singular note/paper/engagement/reference get. Does not replace caseKey.'})),offset:T.Optional(T.Number()),length:T.Optional(T.Number()),expectedRevision:T.Optional(T.Number()),contentRevision:T.Optional(T.Union([T.Number(),T.String()])),reviewToken:T.Optional(T.String()),distinction:T.Optional(T.String())
   }),async(p,ctx)=>{
     navigation.validateOperation(p);
@@ -145,19 +145,25 @@ export async function registerHQ(pi,{Type:T,configPath,answer}={}) {
     return navigation.overview(cases,caseKey());
   });
   tool('hq_note','Record a significant finding, decision, feedback, proposal or unresolved question. V2 requires attribution and explicit scope on every write, including after closure. Use scope:case for case-level notes, or scope:engagement with a returned engagementId. Never send string null. After restoration confirm caseKey or select/resume first. Preserve evidence state and source links.',T.Object({
-    kind:T.Union(NOTE_KINDS.map(x=>T.Literal(x))),state:T.Union(NOTE_STATES.map(x=>T.Literal(x))),text:T.String(),sources:T.Array(T.String()),supersedes:T.Optional(T.String()),caseKey:T.Optional(T.String()),attribution:T.String({description:'Whose statement or observation this records; writer/session identity is recorded separately.'}),scope:T.Union([T.Literal('case'),T.Literal('engagement')]),engagementId:T.Optional(T.String({description:'Nonempty ID returned by start/resume. Omit for scope:case; required for scope:engagement. Never send null or undefined strings.'}))
+    kind:T.Union(NOTE_KINDS.map(x=>T.Literal(x))),state:T.Union(NOTE_STATES.map(x=>T.Literal(x))),text:T.String(),sources:T.Array(T.String()),supersedes:T.Optional(T.Array(T.String(),{description:'IDs of earlier notes in this case that this note replaces; one consolidation note may replace several. They leave default views but stay readable. Nothing is deleted.'})),caseKey:T.Optional(T.String()),attribution:T.String({description:'Whose statement or observation this records; writer/session identity is recorded separately.'}),scope:T.Union([T.Literal('case'),T.Literal('engagement')]),engagementId:T.Optional(T.String({description:'Nonempty ID returned by start/resume. Omit for scope:case; required for scope:engagement. Never send null or undefined strings.'}))
   }),async(p,ctx)=>{assert(!['checkpoint','session-consultation','action-receipt'].includes(p.kind),'Legacy generated note kinds cannot be written; choose a deliberate finding or decision');return record(ctx,p);});
   tool('hq_brief','Update the selected case brief using its current revision. Do not create a competing task tracker.',T.Object({
     expectedRevision:T.Number(),brief:T.String(),sources:T.Array(T.String()),caseKey:T.Optional(T.String())
   }),async(p,ctx)=>{const s=writeTarget(p.caseKey);await requireWritable(caseKey());return cases.brief(s.client,s.project,p.expectedRevision,p.brief,p.sources,sid(ctx));});
-  tool('session_find','Find relevant saved Pi sessions within explicitly configured source roots. No recipient extension or live broker is required.',T.Object({
-    query:T.Optional(T.String()),sessionId:T.Optional(T.String()),limit:T.Optional(T.Number())
+  tool('session_find',"Search this office's own saved sessions for passages. Covers the full original conversation, including entries from before compaction and side branches left via /tree (marked branch:side: abandoned or side work, so check whether it took effect). Returns entry IDs, timestamps, speaker and excerpts; cite original entries. A hit marked summary is a compaction summary: use it only to locate original entries. Then read context with session_read. Use this instead of reading raw session files. scope:'case' (default when a case is selected) searches that case's sessions; scope:'office' searches all of this office's sessions. Without query, lists sessions.",T.Object({
+    query:T.Optional(T.String()),sessionId:T.Optional(T.String()),limit:T.Optional(T.Number()),offset:T.Optional(T.Number()),scope:T.Optional(T.Union([T.Literal('case'),T.Literal('office')]))
   }),async(p)=>{
-    const sessionIds=selected?(await cases.read(selected.client,selected.project)).sessions:undefined;
-    return findSessions(config,{...p,client:selected?.client,sessionIds});
+    assert(p.scope===undefined||['case','office'].includes(p.scope),"scope must be 'case' or 'office'");
+    const byCase=!!selected&&(p.scope??'case')==='case';
+    const sessionIds=byCase?(await cases.read(selected.client,selected.project)).sessions:undefined;
+    if(p.query)return {scope:byCase?'case':'office',...await searchHistory(config,{query:p.query,sessionId:p.sessionId,limit:p.limit??10,offset:p.offset??0,client:selected?.client,sessionIds})};
+    return findSessions(config,{sessionId:p.sessionId,limit:p.limit,client:selected?.client,sessionIds});
   });
-  tool('session_consult','Ask ONE bounded question against a saved session checkpoint in a tool-free model call. Never changes or messages the source session.',T.Object({
-    file:T.String(),checkpoint:T.Optional(T.String()),question:T.String()
+  tool('session_read','Read exact original entries around an entryId returned by session_find, from the same file. Bounded: before/after 0..6 neighbours (shortened); before:0, after:0 with offset pages through one entry. Read-only.',T.Object({
+    file:T.String(),entryId:T.String(),before:T.Optional(T.Number()),after:T.Optional(T.Number()),offset:T.Optional(T.Number())
+  }),async(p)=>readEntries(config,p));
+  tool('session_consult','Ask ONE bounded question against saved session evidence in a tool-free model call. Pass entryId from session_find to consult a window of original entries around it; whole-session consultation fails on long sessions. Never changes or messages the source session.',T.Object({
+    file:T.String(),checkpoint:T.Optional(T.String()),question:T.String(),entryId:T.Optional(T.String())
   }),async(p,ctx,{signal})=>{
     const adapter=answer??(async({system,prompt,signal})=>{
       assert(ctx.model && typeof ctx.modelRegistry?.complete==='function','This host lacks the targeted modelRegistry.complete API; use the supported Pi baseline');
