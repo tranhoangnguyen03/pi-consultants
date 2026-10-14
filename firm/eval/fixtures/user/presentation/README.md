@@ -1,4 +1,4 @@
-# pi-tidy
+# pi-tidy-fixture-example
 
 **Note:** experimental. Requires PiG 0.3 compatibility layer for some RPC modes (see the compatibility matrix below). Tested against backend adapter v2 only. Behaviour under Windows process groups is undefined.
 
@@ -28,5 +28,5 @@ pi-tidy hooks the editor save event, builds a context envelope from the session 
 ## Install
 
 ```sh
-pi install npm:pi-tidy
+pi install npm:pi-tidy-fixture-example
 ```
