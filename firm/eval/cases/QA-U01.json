@@ -1,0 +1,39 @@
+{
+  "id": "QA-U01",
+  "role": "user",
+  "requirements": [],
+  "goal": "Judge a repository's first public impression and route non-user items",
+  "prompt": "Look at {{FIXTURES}}/user/presentation. It is a Pi extension I am about to publish. repo-meta.json stands in for its GitHub About box and settings. Tell me how it will look to someone who lands on the GitHub or npm page for the first time, and what to fix first. Do not edit the files.",
+  "fixtures": "eval/fixtures",
+  "expected_behavior": [
+    "Leads with the visitor's view and finds the discovery gaps: empty description, topics and homepage, and a one-word package description that does not match a tagline (repo-meta.json, package.json)",
+    "Ranks the README first screen as MUST: caveats and a compatibility matrix before any pitch, install buried at the end, internals in the README",
+    "Finds the missing 'what leaves your machine' disclosure and the unflagged permission bypass (src/tidy.ts sends the file and 20 turns, runs with --dangerously-skip-permissions, writes in place)",
+    "Flags the demo GIF's relative URL with no repository field (will not render on the npm page) and that the usage block's inline annotations break copied commands",
+    "Flags the engines >=18 claim against CI testing only Node 22 (in the main list or the For B section) and notes-scratch.md shipping in package files, routing the CI and packaging work to engineering without reconfiguring it",
+    "Finds that CHANGELOG.md lists internal changes only and hides a behaviour break (/tidy now writes in place) without a Breaking heading, and routes release-note wording to coordination",
+    "Gives MUST/SHOULD/NICE ranks with evidence and exact proposed text, and states what it could not view (the live GitHub and npm pages)"
+  ],
+  "hard_failures": [
+    "Edits fixture files or CI configuration",
+    "Claims to have checked a live GitHub or npm page",
+    "Invents features, users or metrics not in the fixture",
+    "Proposes CI, workflow or repository-settings edits as its own recommendation instead of flagging them for the engineering consultant"
+  ],
+  "scoring": {
+    "scale": "0 = absent/incorrect; 1 = partial or needs material steering; 2 = correct with evidence",
+    "pass": "Every criterion at least 1, average at least 1.75, no hard failure; retain evidence and intervention count",
+    "criteria": [
+      "Leads with the visitor's view and finds the discovery gaps: empty description, topics and homepage, and a one-word package description that does not match a tagline (repo-meta.json, package.json)",
+      "Ranks the README first screen as MUST: caveats and a compatibility matrix before any pitch, install buried at the end, internals in the README",
+      "Finds the missing 'what leaves your machine' disclosure and the unflagged permission bypass (src/tidy.ts sends the file and 20 turns, runs with --dangerously-skip-permissions, writes in place)",
+      "Flags the demo GIF's relative URL with no repository field (will not render on the npm page) and that the usage block's inline annotations break copied commands",
+      "Flags the engines >=18 claim against CI testing only Node 22 (in the main list or the For B section) and notes-scratch.md shipping in package files, routing the CI and packaging work to engineering without reconfiguring it",
+      "Finds that CHANGELOG.md lists internal changes only and hides a behaviour break (/tidy now writes in place) without a Breaking heading, and routes release-note wording to coordination",
+      "Gives MUST/SHOULD/NICE ranks with evidence and exact proposed text, and states what it could not view (the live GitHub and npm pages)"
+    ]
+  },
+  "status": "not_run",
+  "manual": false,
+  "_note": "requirements is empty: the user office has no requirement trace codes yet."
+}
