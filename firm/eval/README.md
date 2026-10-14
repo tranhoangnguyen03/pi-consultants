@@ -22,7 +22,7 @@ Tests focus on useful input/output and workflow invariants. They do not test eve
 
 ## Layer 2 — consultant task quality
 
-There are 11 case definitions in `cases/`: eight opt-in single-run model scenarios plus one two-session memory scenario and two live/manual acceptance cases. Each supplies the user prompt, fixtures, required behavior, critical failures and evidence-based scoring. All begin as `not_run`.
+There are 12 case definitions in `cases/`: nine opt-in single-run model scenarios (engineering, coordination and user) plus one two-session memory scenario and two live/manual acceptance cases. Each supplies the user prompt, fixtures, required behavior, critical failures and evidence-based scoring. All begin as `not_run`.
 
 To invoke a model in a disposable fixture workspace:
 

@@ -1,0 +1,9 @@
+{
+  "_note": "Stands in for the GitHub About box and repository settings, which a fixture cannot carry.",
+  "description": "",
+  "homepage": "",
+  "topics": [],
+  "socialPreview": null,
+  "mergeMethods": ["merge", "squash", "rebase"],
+  "deleteBranchOnMerge": false
+}
