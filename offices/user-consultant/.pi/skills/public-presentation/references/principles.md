@@ -13,11 +13,18 @@ The reader is a developer with ten seconds who is deciding whether the product i
 
 ## Checklist
 
+**Discovery (repository About box and package metadata)**
+- MUST The repository description, the package description and the README tagline are the same sentence. It names the ecosystem or host (if any) and the benefit, and every claim in it is true for every feature it lists.
+- MUST Topics or keywords cover the ecosystem's discovery tags plus a few domain tags; the package keywords include them.
+- MUST A homepage is set (the package page or a docs site).
+- SHOULD A custom social preview image with the name, the tagline and one product visual.
+
 **First screen (about 30 lines)**
-- MUST In this order: name, 3–5 badges (version, CI, licence; no vanity badges), one-line tagline, one sentence of context for anything the reader may not know, hero visual by about line 40, install command, a short "try it" table.
+- MUST In this order: name, 3–5 badges (version, CI, license; no vanity badges), one-line tagline, one sentence of context for anything the reader may not know, hero visual by about line 40, install command, a short "try it" table.
 - MUST No caveats, experimental-runtime notes or compatibility matrices before the install block.
 - MUST Every command shown runs exactly as copied: descriptions go in a separate column, never inline in a code block, and placeholders are labelled.
-- SHOULD Name the first-run diagnostic command, if there is one, right after install.
+- SHOULD Name the first-run diagnostic command, if there is one, right after install, and say what it checks and that it sends no user content.
+- SHOULD If the name is not self-explanatory, explain it in one line.
 
 **Body and docs**
 - MUST The README stays near 300 lines or fewer; reference material lives in docs/ with an index.
@@ -26,6 +33,7 @@ The reader is a developer with ten seconds who is deciding whether the product i
 - MUST A feature that needs non-default setup says so where the feature is introduced.
 - SHOULD Limits are one section of about 10 bullets, each "limit → workaround".
 - SHOULD Demo visuals are reproducible from a script kept in the repository.
+- NICE Light and dark image variants.
 
 **Trust and safety**
 - MUST A "what leaves your machine" section: per feature, what is sent, to whom, and what persists where. The first screen links to it.
@@ -36,13 +44,16 @@ The reader is a developer with ten seconds who is deciding whether the product i
 **Versions and releases**
 - MUST A one-line stability statement (for 0.x: what may break, where breaks are listed).
 - MUST Breaking changes are listed under a "Breaking" heading with migration steps.
-- SHOULD Each release opens with 2–4 plain-language highlights.
+- MUST Each release opens with 2–4 plain-language highlights of what users can now do, followed by the detailed changelog or a link to it.
+- SHOULD Changelog entries are 1–2 lines each; internal renames and test refactors stay in pull requests.
+- NICE Write down what 1.0 (or the next stability milestone) means.
 
 **Repository** (flag present/missing only; route to engineering)
 - About 15 root entries or fewer, so the README is reachable without scrolling past files.
 - No scratch or personal files committed; the package allowlist ships only runtime and user docs.
 - CI covers the minimum runtime version claimed and every supported OS; release-guarding jobs are required checks.
 - Dependency updates are automated; a security policy and issue forms exist; merge settings and stale branches are tidy.
+- Optional hardening (NICE): actions pinned to commit SHAs, code scanning, an OpenSSF Scorecard.
 
 ## README skeleton
 
@@ -67,4 +78,5 @@ Open with a one-line verdict from the visitor's point of view. Then rank gaps:
 
 - **MUST / SHOULD / NICE**, then what the visitor experiences, the evidence (file and line, or the live page), and the exact proposed change or text.
 - Separate confirmed gaps from things you could not view.
-- End with **For B** (repository and CI items, ready to paste) and **For C** (release-note or announcement wording, ready to paste). Omit an empty section.
+- End with **For B (engineering)**: repository, CI and settings items, ready to paste; and **For C (coordination)**: release-note, changelog or announcement wording, ready to paste. Omit an empty section.
+- A gap that is both user-facing and a CI matter (for example a runtime-version claim CI does not test) can be ranked in the main list with the CI part noted for B.
