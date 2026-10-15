@@ -20,7 +20,20 @@ test('Composition runner isolates inherited credentials and resolves local outpu
  assert.deepEqual(invocation('snapshot','/project',[],{office:'/office'}).args,['snapshot','/project','--output','/project/.hyperframes/snapshots']);
  assert(invocation('preview','/project',[],{office:'/office'}).args.includes('--no-open'));
  assert.throws(()=>invocation('publish','/project',[],{office:'/office'}),/Use:/);
- assert.throws(()=>invocation('render','/project',['-o'],{office:'/office'}),/Output path/);
+ assert.throws(()=>invocation('render','/project',['-o'],{office:'/office'}),/Path required/);
+ for(const flag of ['--output','-o','--variables-file','--batch','--frames-cache-dir','--against']){
+  for(const options of [[flag,'relative file'],[`${flag}=relative file`]]){
+   const args=invocation('snapshot','/project',options,{office:'/office',caller:'/caller'}).args;
+   const normalized=flag==='-o'?'--output':flag;
+   assert(args.includes('/caller/relative file')||args.includes(`${normalized}=/caller/relative file`));
+   if(flag==='-o'||flag==='--output')assert(!args.includes('/project/.hyperframes/snapshots'));
+  }
+  for(const options of [[flag],[`${flag}=`],[flag,'--fps']])assert.throws(()=>invocation('render','/project',options,{office:'/office'}),/Path required/);
+ }
+ for(const flag of ['--docker','--docker=true'])assert.throws(()=>invocation('render','/project',[flag],{office:'/office'}),/Docker/);
+ const network=invocation('version','/project',[],{office:'/office',caller:'/caller',environment:{HTTPS_PROXY:'http://approved-proxy',NODE_EXTRA_CA_CERTS:'ca.pem',OPENAI_API_KEY:'secret'}}).env;
+ assert.equal(network.HTTPS_PROXY,'http://approved-proxy');assert.equal(network.NODE_EXTRA_CA_CERTS,'/caller/ca.pem');assert.equal(network.OPENAI_API_KEY,undefined);
+ assert.equal(network.TMPDIR,'/office/.hq/tools/hyperframes-0.8.161/tmp');
 });
 test('Composition references are fixed and every office carries the same portable method',async t=>{
  const sums=(await fs.readFile(path.join(skill,'references/upstream/SHA256SUMS'),'utf8')).trim().split('\n');

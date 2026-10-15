@@ -15,12 +15,14 @@ const runDir=path.resolve(opts.output??path.join(root,'.runtime/agent-evals'),ru
 const fixtureDir=path.join(runDir,'fixtures');await fs.cp(path.join(root,'eval/fixtures'),fixtureDir,{recursive:true});
 const hq=path.join(runDir,'hq'),agent=path.join(runDir,'auth-agent');await mkdir(agent);await mkdir(path.join(hq,'.pi/extensions'));
 for(const folder of ['src','extensions'])await fs.cp(path.join(root,folder),path.join(hq,folder),{recursive:true});
+const shared=await fs.readdir(path.join(root,'skills/shared')),specialist=await fs.readdir(path.join(root,'skills',c.role));
+assert(!shared.some(name=>specialist.includes(name)),'Shared and role skill names must not collide');
 await fs.cp(path.join(root,'skills/shared'),path.join(hq,'.pi/skills'),{recursive:true});
 await fs.cp(path.join(root,'skills',c.role),path.join(hq,'.pi/skills'),{recursive:true});
 await fs.writeFile(path.join(hq,'AGENTS.md'),await agentsMd(root,JSON.parse(await fs.readFile(path.join(root,'offices.json'),'utf8')).find(o=>o.role===c.role)));
 await atomic(path.join(hq,'.pi/extensions/consultant.ts'),"export {default} from '../../extensions/index.ts';\n");
 await atomic(path.join(hq,'.pi/hq.json'),{version:2,role:c.role,hq:'..',stateDir:'../.hq',sessionRoots:[],projectRoots:[fixtureDir],localReadRoots:[fixtureDir,'skills'],attachmentRoots:[],policy:{}});
-await atomic(path.join(hq,'.pi/settings.json'),{sessionDir:'.hq/sessions',extensions:['-builtin:mcp'],defaultTools:c.role==='engineering'?['read','bash','edit','write','grep','find','ls']:['read','grep','find','ls']});
+await atomic(path.join(hq,'.pi/settings.json'),{sessionDir:'.hq/sessions',extensions:['-builtin:mcp'],defaultTools:['read','bash','edit','write','grep','find','ls']});
 const defaults=await readJSON(path.resolve(opts['auth-agent'],'settings.json'),{}),selected={defaultProjectTrust:'always'};
 for(const k of ['defaultProvider','defaultModel','defaultThinkingLevel'])if(defaults[k]!==undefined)selected[k]=defaults[k];
 await atomic(path.join(agent,'settings.json'),selected);await atomic(path.join(agent,'mcp.json'),{mcpServers:{}});
