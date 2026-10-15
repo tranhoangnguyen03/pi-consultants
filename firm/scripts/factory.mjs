@@ -31,6 +31,9 @@ export async function buildOffice(root,{folder,role,identity,...office},toolset,
    maxSessionFiles:500,maxSessionBytes:16777216,maxConsultChars:80000,policy:{}};
  await fs.mkdir(path.join(target,'.pi/extensions'),{recursive:true});
  await fs.mkdir(path.join(target,'.pi/prompts'),{recursive:true});
+ const shared=await fs.readdir(path.join(root,'skills/shared')),specialist=await fs.readdir(path.join(root,'skills',role));
+ assert(!shared.some(name=>specialist.includes(name)),'Shared and role skill names must not collide');
+ await fs.cp(path.join(root,'skills/shared'),path.join(target,'.pi/skills'),{recursive:true});
  await fs.cp(path.join(root,'skills',role),path.join(target,'.pi/skills'),{recursive:true});
  await atomic(path.join(target,'.pi/settings.json'),settings);
  await atomic(path.join(target,'.pi/hq.json'),config);

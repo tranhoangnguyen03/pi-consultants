@@ -15,6 +15,7 @@ const runDir=path.resolve(opts.output??path.join(root,'.runtime/agent-evals'),ru
 const fixtureDir=path.join(runDir,'fixtures');await fs.cp(path.join(root,'eval/fixtures'),fixtureDir,{recursive:true});
 const hq=path.join(runDir,'hq'),agent=path.join(runDir,'auth-agent');await mkdir(agent);await mkdir(path.join(hq,'.pi/extensions'));
 for(const folder of ['src','extensions'])await fs.cp(path.join(root,folder),path.join(hq,folder),{recursive:true});
+await fs.cp(path.join(root,'skills/shared'),path.join(hq,'.pi/skills'),{recursive:true});
 await fs.cp(path.join(root,'skills',c.role),path.join(hq,'.pi/skills'),{recursive:true});
 await fs.writeFile(path.join(hq,'AGENTS.md'),await agentsMd(root,JSON.parse(await fs.readFile(path.join(root,'offices.json'),'utf8')).find(o=>o.role===c.role)));
 await atomic(path.join(hq,'.pi/extensions/consultant.ts'),"export {default} from '../../extensions/index.ts';\n");

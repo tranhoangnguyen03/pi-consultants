@@ -19,7 +19,7 @@ test('[EV-I01] Each standalone HQ repository exposes local settings, role-select
   const config=await loadHQConfig(path.join(repo,'.pi/hq.json'));assert.equal(config.role,role);assert.equal(config.hq,repo);assert.equal(config.stateDir,path.join(repo,'.hq'));assert.deepEqual(config.sessionRoots,[path.join(repo,'.hq/sessions')]);
   const settings=JSON.parse(await fs.readFile(path.join(repo,'.pi/settings.json'),'utf8'));assert.equal(settings.sessionDir,'.hq/sessions');assert(!JSON.stringify(settings).includes('PI_CODING_AGENT_DIR'));
   assert(!settings.packages.some(x=>String(x).includes('pi-profile-switch')));
-  const skills=await fs.readdir(path.join(repo,'.pi/skills'));assert.equal(skills.length,(await fs.readdir(path.join(root,'skills',role))).length);assert.equal(skills.includes('asd-ste100'),role==='engineering');assert.equal((await fs.readdir(path.join(repo,'.pi/prompts'))).length,3);
+  const skills=await fs.readdir(path.join(repo,'.pi/skills'));assert.deepEqual(skills.sort(),[...await fs.readdir(path.join(root,'skills',role)),...await fs.readdir(path.join(root,'skills/shared'))].sort());assert.equal(skills.includes('asd-ste100'),role==='engineering');assert.equal((await fs.readdir(path.join(repo,'.pi/prompts'))).length,3);
   const r=run(repo,['configure','--projects',p.d,'--sessions',source]);assert.equal(r.status,0,r.stderr);
  }
  assert.equal(hash(await fs.readFile(global)),before);
