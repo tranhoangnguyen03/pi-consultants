@@ -1,7 +1,5 @@
 {
   "version": "0.3.0",
-  "sourceRevision": "4b3f6377c225129ecd4cd1e37a8dd074defb8353",
-  "sourceDirty": false,
   "role": "coordination",
   "folder": "project-consultant",
   "entry": ".pi/extensions/consultant.ts",
@@ -43,7 +41,7 @@
     ".pi/skills/stakeholder-steering/SKILL.md": "2c377bee6be3813d4bf6f675002c60584acb707da2162b8d55e82867c7d48c7f",
     ".pi/toolset.json": "3086bf6da4a0907307ad49a154c04a515b7861c7bc01390d565c9e9fb326731a",
     ".runtime/bin/explore.mjs": "0b3513d84a2c7b6dfebd1707b46ecaa9221a2e86cb5501e1dcc00924f5b1fd06",
-    ".runtime/bin/hq.mjs": "7abfaad3d046c8bea45c0f5d7c3806edc9f4813350ce3814848b8d7c62eaa0e4",
+    ".runtime/bin/hq.mjs": "d45a9a23078bba9bd68589948bfc0a58ab79f6b2cfa1b3775b2853bab4b13b31",
     ".runtime/bin/upgrade-case.mjs": "d6679907d9fa4abe2dc7f7671c3d8463dbac96ee4607cd379d40e69bf8535cbe",
     ".runtime/extensions/index.ts": "f6066dcfc25e8b353239b5d01701949742965cf7f8b985175097412de2b563df",
     ".runtime/src/actions.mjs": "3dc438ddc24c7778e17145c6b0e721a530ba8b739f6ca6dcbe7a52537407d948",
