@@ -186,7 +186,20 @@ npm run demo    # offline walkthrough with synthetic data; no model or Pi proces
 npm run eval    # offline checks of the office startup layout
 ```
 
-From the repository root, `npm run drift` fails if the shipped offices differ from what `firm/` builds; rebuild them with `npm run setup -- --rebuild` before a release.
+From the repository root, `npm run verify` runs the tests, the structure check and `drift` — the same command CI runs, and the only one you need before a PR.
+
+**Contributor rule:** `offices/` is generated. Edit `firm/`, then rebuild and commit `offices/` **in the same PR**:
+
+```sh
+npm run setup -- --rebuild
+npm run verify
+```
+
+Forgetting the rebuild fails CI, not silently. Never edit a file under `offices/` by hand: `drift` rejects any committed file the factory does not produce, because Pi auto-loads `.pi/extensions/` and `.pi/skills/` as code. `firm/package.json` is the only version source; a version bump forces a rebuild because the version lands in each office's generated `package.json`.
+
+**Reviewers read `firm/` only.** `offices/**` is marked generated, and CI proves it matches what `firm/` builds, so the generated diff needs no line-by-line reading. When a change touches a third-party pin (`firm/toolset.json`, or the composition lockfile), check the upstream release for that exact version and name it in the release notes — CI enforces that pins are exact, not that anyone looked.
+
+Releases are a tag plus a GitHub release on a `main` commit, cut when there is something to announce; `main` is live for `git pull` regardless. `main` takes PRs only. Users who want a fixed version can `git checkout vX.Y.Z`.
 
 `firm/scripts/live-pi-smoke.mjs` starts real Pi in an office without sending a prompt. Pi startup can still connect your inherited integrations. See `firm/README.md` and `firm/eval/README.md` for details.
 

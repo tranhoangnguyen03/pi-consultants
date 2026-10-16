@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "setup": "node firm/scripts/setup.mjs",
-    "drift": "node firm/scripts/drift.mjs"
+    "drift": "node firm/scripts/drift.mjs",
+    "verify": "npm test --prefix firm && npm run check --prefix firm && npm run drift"
   }
 }
