@@ -185,6 +185,10 @@ Running the same command later updates those offices from your `firm/`. This kee
 
 Every update keeps each office's private files (`.hq/`, `organization/PLAYBOOK.md`, `organization/PLAYBOOK.local.md`, `.env`, `.pi/hq.local.json`, `.pi/mcp.json`) and files you added. If you edited a shipped file, setup stops and lists it, changing nothing. Move your change into `firm/`, or rerun with `--force` to save the edited files into `.hq/setup-backup/` and replace them. There is no automatic migration of case records between versions.
 
+## Continuous integration
+
+PRs must pass deterministic verification (tests, skill routing, TypeScript entry syntax, privacy checks, and generated-office drift). After each merge into `main`, GitHub Actions tests real, pinned Pi on Ubuntu and macOS without model calls. See [CI checks and release guidance](docs/CI.md). Consultant quality evaluations are deliberately excluded.
+
 ## For maintainers
 
 The factory source is in `firm/`. Its tests run offline and need no Pi credentials:
