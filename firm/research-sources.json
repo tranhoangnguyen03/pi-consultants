@@ -1,0 +1,24 @@
+{
+  "purpose": "Pinned upstream sources; a separate maintainer command vendors these skills. No runtime auto-update.",
+  "kDense": {
+    "repository": "https://github.com/K-Dense-AI/scientific-agent-skills",
+    "commit": "593377bb048752abb0152deab9fbb1083a6087df",
+    "license": "MIT",
+    "skills": [
+      "paper-lookup",
+      "literature-review",
+      "scientific-critical-thinking",
+      "hypothesis-generation",
+      "experimental-design",
+      "statistical-analysis",
+      "scientific-writing"
+    ]
+  },
+  "last30days": {
+    "repository": "https://github.com/mvanhorn/last30days-skill",
+    "commit": "13a6cc5fd1f2d8a9b8420bbba6742599b2f4a077",
+    "license": "MIT",
+    "skill": "last30days",
+    "adaptation": "Original upstream instructions preserved as UPSTREAM-SKILL.md; local entrypoint and safe runner restrict credentials, sources and caches; five demo media assets excluded."
+  }
+}
