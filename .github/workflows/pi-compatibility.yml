@@ -17,10 +17,6 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 25
-    env:
-      # Never inherit credentials, trusted project files, or private sessions from an operator.
-      PI_CODING_AGENT_DIR: ${{ runner.temp }}/pi-ci-agent
-      PI_COMPAT_REPORT_DIR: ${{ runner.temp }}/pi-compat-reports
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,6 +29,10 @@ jobs:
       - name: Show host version
         run: pi --version
       - name: Check native office startup, commands, isolation, and relocation
+        env:
+          # An isolated agent directory, with no operator tokens or prior trust decisions.
+          PI_CODING_AGENT_DIR: ${{ runner.temp }}/pi-ci-agent
+          PI_COMPAT_REPORT_DIR: ${{ runner.temp }}/pi-compat-reports
         run: node firm/scripts/ci-pi-compatibility.mjs
       - name: Retain bounded probe reports
         if: always()
