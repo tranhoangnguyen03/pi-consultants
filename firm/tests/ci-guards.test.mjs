@@ -13,5 +13,5 @@ test('private-state guard blocks credentials without rejecting public examples',
  for(const p of ['offices/a/.hq/cases/secret.json','offices/a/.pi/hq.local.json','offices/a/.pi/mcp.json','offices/a/organization/PLAYBOOK.md','.env','src/.env.production','id_ed25519'])assert.ok(forbiddenPath(p),p);
  for(const p of ['offices/a/organization/PLAYBOOK.example.md','offices/a/.pi/mcp.json.example','.env.example','firm/skills/shared/readchk/NOTICE.md'])assert.equal(forbiddenPath(p),null,p);
  assert.deepEqual(secretMatches('example: xxx'),[]);
- assert.deepEqual(secretMatches('-----BEGIN PRIVATE KEY-----'),['private key']);
+ assert.deepEqual(secretMatches(['-----BEGIN','PRIVATE KEY-----'].join(' ')),['private key']);
 });
