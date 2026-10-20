@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "role": "research",
+  "office": {
+    "letter": "E",
+    "title": "RESEARCH",
+    "tagline": "discover · investigate · hypothesize · experiment · explain",
+    "banner": [
+      "   ╭────────╮  ",
+      "   │  ◉  ◉  │  ",
+      "   │   ∑    │  ",
+      "   ╰──┬───╯  ",
+      "      ╰╮     "
+    ]
+  },
+  "hq": "..",
+  "stateDir": "../.hq",
+  "kitRoot": "..",
+  "sessionRoots": [],
+  "projectRoots": [],
+  "localReadRoots": [],
+  "attachmentRoots": [],
+  "maxSessionFiles": 500,
+  "maxSessionBytes": 16777216,
+  "maxConsultChars": 80000,
+  "policy": {}
+}
