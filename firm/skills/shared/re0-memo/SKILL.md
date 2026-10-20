@@ -4,7 +4,7 @@ description: After meaningful consulting work, extract supported lessons and fai
 ---
 # Learn from the completed assignment
 
-Adapted from Paperthin. See ../PAPERTHIN-NOTICE.md for attribution.
+Adapted from Paperthin. See ../readchk/NOTICE.md for attribution.
 
 ## Use
 After a substantial delivered, failed, disputed, or disappointing work cycle when the outcome offers a reusable lesson. Skip trivial exchanges.

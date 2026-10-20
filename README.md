@@ -129,7 +129,7 @@ The firm includes four locally adapted [Paperthin](https://github.com/LilMGenius
 - All three consultants: `readchk` checks intent on complex work; `shower` cold-reads important handoffs when a real independent reviewer is available; `re0-memo` records useful assignment lessons within the owning office's case.
 - Coordination consultant only: `prism` provides human-invoked cross-lens review without automatic agent sessions.
 
-Ask the consultant in plain language, or use an available Pi skill command such as `/skill:prism` in the coordination office. These skills do not grant extra authority, replace case storage, message other offices, or publish private records. `shower` must state when independent review did not run. See the [Paperthin MIT notice](firm/skills/shared/PAPERTHIN-NOTICE.md).
+Ask the consultant in plain language, or use an available Pi skill command such as `/skill:prism` in the coordination office. These skills do not grant extra authority, replace case storage, message other offices, or publish private records. `shower` must state when independent review did not run. See the [Paperthin MIT notice](firm/skills/shared/readchk/NOTICE.md).
 
 These are pilot methods. Compare real outcomes before broad adoption.
 

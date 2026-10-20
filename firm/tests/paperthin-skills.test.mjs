@@ -17,8 +17,8 @@ test('Paperthin pilot distribution and build manifests',async()=>{
    assert.equal(marker.generated[rel],hash(deployed),rel);
    assert.ok(src.startsWith(`---\nname: ${name}\ndescription: `));
   }
-  const noticePath='.pi/skills/PAPERTHIN-NOTICE.md',text=await read(path.join(root,noticePath));
-  assert.equal(text,await read(path.join(firm,'skills/shared/PAPERTHIN-NOTICE.md')));
+  const noticePath='.pi/skills/readchk/NOTICE.md',text=await read(path.join(root,noticePath));
+  assert.equal(text,await read(path.join(firm,'skills/shared/readchk/NOTICE.md')));
   assert.equal(marker.generated[noticePath],hash(text));
   const prismRel='.pi/skills/prism/SKILL.md';
   if(office==='project-consultant'){

@@ -4,7 +4,7 @@ description: Test a significant handoff artifact with genuinely fresh, context-f
 ---
 # Cold-read an important handoff
 
-Adapted from Paperthin. See ../PAPERTHIN-NOTICE.md for attribution.
+Adapted from Paperthin. See ../readchk/NOTICE.md for attribution.
 
 ## Use
 Before consequential handoff, publication, or implementation from a design. Not required for each small edit.

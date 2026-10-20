@@ -4,7 +4,7 @@ description: For long, ambiguous, costly, or high-impact requests, check the int
 ---
 # Confirm the intended work, without needless questions
 
-Adapted from Paperthin. See ../PAPERTHIN-NOTICE.md for attribution.
+Adapted from Paperthin. See NOTICE.md for attribution.
 
 ## Use
 Apply before substantial work when a misunderstanding would change the result. Skip trivial and clear requests.

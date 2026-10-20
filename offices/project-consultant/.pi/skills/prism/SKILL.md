@@ -5,7 +5,7 @@ disable-model-invocation: true
 ---
 # Cross-lens review without averaging opinions
 
-Adapted from Paperthin. See the bundled PAPERTHIN-NOTICE.md for attribution.
+Adapted from Paperthin. See the bundled readchk/NOTICE.md for attribution.
 
 ## Use
 Only when requested, for a contested plan, significant artifact, or decision needing different expert views.
