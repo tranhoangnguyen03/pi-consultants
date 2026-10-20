@@ -27,3 +27,9 @@ HQ_PROBE_ROOT=/absolute/path/to/HQ HQ_PROBE_REPORT=/tmp/hq-startup.json node scr
 ```
 
 No model prompt is sent. Normal Pi startup can connect inherited integrations. Real-session recall qualification remains separate.
+
+## Paperthin skill pilot
+
+The canonical files are `skills/shared/{readchk,shower,re0-memo}/SKILL.md` and `skills/coordination/prism/SKILL.md`. The shared `PAPERTHIN-NOTICE.md` carries upstream copyright and MIT license. `prism` is user-invoked and distributed only to coordination.
+
+Regenerate with `npm run setup -- --rebuild`, then run `npm run verify` at the repo root. `tests/paperthin-skills.test.mjs` verifies the distribution and manifest hashes. This adds no runtime dependency or new cross-office coordination mechanism.

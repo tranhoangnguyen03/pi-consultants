@@ -122,6 +122,17 @@ Ask the project consultant to plan named branches when you want to visit and ste
 
 This practice uses [pi-intercom](https://github.com/nicobailon/pi-intercom), an optional package you install and enable separately in the participating sessions. It is **not** the customer-support Intercom connector listed below. The sessions must share a broker and routing scope. Before relying on it, test one kickoff and handback; `human-first` busy delivery is recommended but must be configured explicitly. This kit supplies the [coordination method](firm/skills/coordination/parallel-branches/SKILL.md), not a session launcher, mandatory dependency, or proof of live delivery in your setup.
 
+## Paperthin skill pilot
+
+The firm includes four locally adapted [Paperthin](https://github.com/LilMGenius/paperthin) methods, not a new runtime or multi-agent framework.
+
+- All three consultants: `readchk` checks intent on complex work; `shower` cold-reads important handoffs when a real independent reviewer is available; `re0-memo` records useful assignment lessons within the owning office's case.
+- Coordination consultant only: `prism` provides human-invoked cross-lens review without automatic agent sessions.
+
+Ask the consultant in plain language, or use an available Pi skill command such as `/skill:prism` in the coordination office. These skills do not grant extra authority, replace case storage, message other offices, or publish private records. `shower` must state when independent review did not run. See the [Paperthin MIT notice](firm/skills/shared/PAPERTHIN-NOTICE.md).
+
+These are pilot methods. Compare real outcomes before broad adoption.
+
 ## The shared toolset
 
 Every office ships the same tools, listed in its `.pi/toolset.json`. Pi installs the pinned packages the first time you start in a trusted office.
