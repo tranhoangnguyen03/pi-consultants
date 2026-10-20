@@ -57,3 +57,29 @@ test('Approved playbook check: installing the shared playbook never loses an exi
  assert.equal(await fs.readFile(path.join(d,'organization/PLAYBOOK.local.md'),'utf8'),'# D only\n');
  assert.match(setup(out,'--playbook',shared).stdout,/playbook already current/);
 });
+
+test('Office Admin: --status inspects without mutating and --skill updates only named skills',async t=>{
+ const {out,d}=await built(t);
+ await fs.rm(path.join(out,'engineering-consultant'),{recursive:true,force:true});
+ const agents=path.join(d,'AGENTS.md'),skillFile=path.join(d,'.pi/skills/composition/SKILL.md');
+ const marker=JSON.parse(await fs.readFile(path.join(d,'HQ-ROLE.json'),'utf8'));
+ await fs.writeFile(agents,'older shipped agents');marker.generated['AGENTS.md']=hash('older shipped agents');
+ await fs.rm(path.join(d,'.pi/skills/composition'),{recursive:true,force:true});
+ for(const k of Object.keys(marker.generated))if(k.startsWith('.pi/skills/composition/'))delete marker.generated[k];
+ await fs.writeFile(path.join(d,'HQ-ROLE.json'),JSON.stringify(marker));
+ const st=setup(out,'--status');assert.equal(st.status,0,st.stderr);
+ assert.match(st.stdout,/engineering-consultant: not present/);
+ assert.match(st.stdout,/user-consultant: v0\.3\.0 \(\d+ behind, 0 edited; playbook: missing\)/);
+ assert.equal(await fs.access(path.join(out,'engineering-consultant')).then(()=>true,()=>false),false,'--status must not create missing offices');
+ const roll=setup(out,'--skill','composition');assert.equal(roll.status,0,roll.stderr);
+ assert.match(roll.stdout,/engineering-consultant: skipped \(not present\)/);
+ assert.match(roll.stdout,/user-consultant: skills updated \(composition\)/);
+ assert.equal(await fs.readFile(agents,'utf8'),'older shipped agents','--skill must not replace non-skill files');
+ assert.equal(await fs.access(skillFile).then(()=>true,()=>false),true);
+ assert.match(setup(out,'--only','user','--skill','composition').stdout,/user-consultant: unchanged/);
+ await fs.appendFile(skillFile,'\nlocal skill edit\n');
+ assert.notEqual(setup(out,'--only','user','--skill','composition').status,0,'stop on edited skill file');
+ const forced=setup(out,'--only','user','--skill','composition','--force');assert.equal(forced.status,0,forced.stderr);
+ const [stamp]=await fs.readdir(path.join(d,'.hq/setup-backup'));
+ assert.match(await fs.readFile(path.join(d,'.hq/setup-backup',stamp,'.pi/skills/composition/SKILL.md'),'utf8'),/local skill edit/);
+});
