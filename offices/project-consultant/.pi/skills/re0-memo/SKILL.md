@@ -1,5 +1,5 @@
 ---
-name: re0-memo
+name: consultant-re0-memo
 description: After meaningful consulting work, extract supported lessons and failure patterns into the owning office's existing case notes. Do not auto-publish or consolidate cases across offices.
 ---
 # Learn from the completed assignment

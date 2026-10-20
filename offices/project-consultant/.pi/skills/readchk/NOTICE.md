@@ -2,8 +2,11 @@ Paperthin-derived methods: attribution and MIT license
 
 Pi Consultants adapts four skills (readchk, shower, re0-memo, prism) from:
 https://github.com/LilMGenius/paperthin
-Original author: LilMGenius. Adaptations are local to Pi Consultants and
-do not imply upstream testing, endorsement, or automatic updates.
+Commit: 7d5dc6235990230e45a24a25c527d81701da5458 (2026-09-30)
+Original author: LilMGenius. Local skill names are prefixed (consultant-readchk,
+consultant-shower, consultant-re0-memo, coordination-prism) to avoid colliding
+with a separately installed upstream copy. Adaptations are local to Pi
+Consultants and do not imply upstream testing, endorsement, or automatic updates.
 
 MIT License
 

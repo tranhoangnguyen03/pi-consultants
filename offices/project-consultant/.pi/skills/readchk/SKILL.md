@@ -1,5 +1,5 @@
 ---
-name: readchk
+name: consultant-readchk
 description: For long, ambiguous, costly, or high-impact requests, check the intended outcome against existing context before acting. Ask only when a material choice remains unresolved.
 ---
 # Confirm the intended work, without needless questions

@@ -126,10 +126,10 @@ This practice uses [pi-intercom](https://github.com/nicobailon/pi-intercom), an 
 
 The firm includes four locally adapted [Paperthin](https://github.com/LilMGenius/paperthin) methods, not a new runtime or multi-agent framework.
 
-- All three consultants: `readchk` checks intent on complex work; `shower` cold-reads important handoffs when a real independent reviewer is available; `re0-memo` records useful assignment lessons within the owning office's case.
-- Coordination consultant only: `prism` provides human-invoked cross-lens review without automatic agent sessions.
+- All three consultants: `consultant-readchk` checks intent on complex work; `consultant-shower` cold-reads important handoffs when a real independent reviewer is available; `consultant-re0-memo` records useful assignment lessons within the owning office's case.
+- Coordination consultant only: `coordination-prism` provides human-invoked cross-lens review without automatic agent sessions.
 
-Ask the consultant in plain language, or use an available Pi skill command such as `/skill:prism` in the coordination office. These skills do not grant extra authority, replace case storage, message other offices, or publish private records. `shower` must state when independent review did not run. See the [Paperthin MIT notice](firm/skills/shared/readchk/NOTICE.md).
+Ask the consultant in plain language for the three shared methods, or run `/skill:coordination-prism` in the coordination office (`coordination-prism` is command-only so the model never runs it automatically). Skill names are prefixed so they do not collide with a global Paperthin installation. These skills do not grant extra authority, replace case storage, message other offices, or publish private records. `consultant-shower` must state when independent review did not run. See the [Paperthin MIT notice](firm/skills/shared/readchk/NOTICE.md).
 
 These are pilot methods. Compare real outcomes before broad adoption.
 
@@ -220,4 +220,5 @@ MIT. See [`LICENSE`](LICENSE). Third-party material keeps its own license and at
 
 - The engineering consultant's Simplified Technical English skill (`firm/skills/engineering/asd-ste100/`) comes from [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill) under the MIT license (copyright Dustin Yuchen Teng). See its `LICENSE` and `SOURCE.md`, and keep both with any copy.
 - The shared composition skill includes seven unchanged HyperFrames technical references (copyright HeyGen, Inc., Apache-2.0). Keep its `SOURCE.md` and `references/upstream/LICENSE` with copies. The CLI is downloaded separately from its lockfile; dependencies/assets retain their own licences, including optional LGPL image binaries.
+- The four Paperthin pilot skills (`firm/skills/shared/{readchk,shower,re0-memo}/` and `firm/skills/coordination/prism/`) are adapted from [LilMGenius/paperthin](https://github.com/LilMGenius/paperthin) under the MIT license (copyright LilMGenius). Keep `firm/skills/shared/readchk/NOTICE.md` with copies.
 - The third-party Pi/MCP toolset is not bundled. Pi or `npx` downloads each item from its author at the pinned version, under its own license: [`pi-change-working-dir`](https://github.com/fitchmultz/pi-change-working-dir), `pi-web-access`, `pi-docparser`, `pi-agent-browser`, [`diagram-design`](https://github.com/cathrynlavery/diagram-design) and `@microsoft/clarity-mcp-server` (MIT), and [`chrome-devtools-mcp`](https://github.com/ChromeDevTools/chrome-devtools-mcp) (Apache-2.0). Remote connectors are services run by their vendors under their own terms.

@@ -1,11 +1,11 @@
 ---
-name: prism
+name: coordination-prism
 description: On explicit user request, review one plan or artifact through distinct failure modes, preserve material disagreement, and name the smallest test or decision that resolves it. No agent fan-out.
 disable-model-invocation: true
 ---
 # Cross-lens review without averaging opinions
 
-Adapted from Paperthin. See the bundled readchk/NOTICE.md for attribution.
+Adapted from Paperthin. See ../readchk/NOTICE.md for attribution.
 
 ## Use
 Only when requested, for a contested plan, significant artifact, or decision needing different expert views.

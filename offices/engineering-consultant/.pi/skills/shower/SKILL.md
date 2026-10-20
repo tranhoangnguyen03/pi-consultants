@@ -1,5 +1,5 @@
 ---
-name: shower
+name: consultant-shower
 description: Test a significant handoff artifact with genuinely fresh, context-free eyes when a separate authorized reviewer is available. Report missing assumptions and never label same-session review independent.
 ---
 # Cold-read an important handoff
