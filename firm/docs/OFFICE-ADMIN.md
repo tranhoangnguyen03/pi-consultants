@@ -5,7 +5,7 @@ Office Admin duties belong to the **Firm Maintainer** working from the repositor
 ## Where things live
 
 - **Tracked architecture & admin docs (`firm/docs/`):** `FRAMEWORK.md`, `FACTORY-CONTRACT.md`, `CASE-ORGANIZATION-SYSTEM.md`, `AGENT-FIRST-PRINCIPLES.md`, `SOLUTIONS.md`, and this `OFFICE-ADMIN.md`. These version-control in the same commit and branch as `firm/` code.
-- **Private admin state (`.hq/admin/`, gitignored):** local maintainer checkpoints (`CHECKPOINT.md`), decision log (`DIRECTION.md`), rollout records and trial artifacts. Because `.hq/` is in `.gitignore`, private operational records never leak into public commits or PRs.
+- **Private admin state (`.hq/admin/`, gitignored):** local maintainer checkpoints (`CHECKPOINT.md`), decision log (`DIRECTION.md`), rollout records and trial artifacts. `.hq/` is in `.gitignore`, which prevents accidental staging in git commits and PRs.
 - **Office backups (`<office>/.hq/setup-backup/<timestamp>/`, gitignored):** automatic backups created by `setup.mjs` before replacing conflicting files or updating `organization/PLAYBOOK.md`.
 
 ## Core Office Admin commands
@@ -36,9 +36,10 @@ npm run setup -- --out /path/to/offices-parent --skill composition --yes
 npm run setup -- --out /path/to/offices-parent --only user --skill composition,public-presentation --yes
 ```
 
-- Skips offices in `--out` that are not present (unless `--only` explicitly requested a missing office).
+- Requires `--out DIR` (in-repo `./offices/` always use `--rebuild` so the repository passes `npm run drift`).
+- Skips offices in `--out` that are not present or whose role does not carry the requested skill (unless `--only` explicitly requested that office).
 - Stops if a target skill file was locally edited (`--force` backs up edited files into `<office>/.hq/setup-backup/<timestamp>/` first).
-- Updates the skill hashes and `practiceOverlays` in `<office>/HQ-ROLE.json`.
+- Updates the skill hashes and `practiceOverlays` in `<office>/HQ-ROLE.json`. A subsequent full update replaces `HQ-ROLE.json` with the clean full-build manifest.
 
 ### 3. Full office update or template rebuild
 
@@ -51,10 +52,11 @@ npm run setup -- --out /path/to/offices-parent --only user --skill composition,p
   ```sh
   npm run setup -- --out /path/to/offices-parent --yes
   ```
-- **Sync organization playbook across offices (`--playbook`):**
+- **Full update plus organization playbook sync (`--playbook`):**
   ```sh
   npm run setup -- --out /path/to/offices-parent --playbook /path/to/PLAYBOOK.md --yes
   ```
+  *(Note: combining `--out` with `--playbook` without `--skill` performs a full office update before installing the playbook. To sync a playbook alongside a skill-only rollout, pass `--skill NAME --playbook FILE`.)*
 
 ### 4. Per-office diagnostics, configuration and migration
 

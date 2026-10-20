@@ -59,27 +59,43 @@ test('Approved playbook check: installing the shared playbook never loses an exi
 });
 
 test('Office Admin: --status inspects without mutating and --skill updates only named skills',async t=>{
- const {out,d}=await built(t);
+ const {out,d}=await built(t),{version}=JSON.parse(await fs.readFile(path.join(root,'package.json'),'utf8'));
+ assert.notEqual(run('setup.mjs',['--skill','composition']).status,0,'in-repo offices require --rebuild, not --skill');
+ assert.notEqual(setup(out,'--skill',' , ').status,0,'reject empty --skill');
+ assert.notEqual(setup(out,'--status','--force').status,0,'reject --status with update flags');
  await fs.rm(path.join(out,'engineering-consultant'),{recursive:true,force:true});
  const agents=path.join(d,'AGENTS.md'),skillFile=path.join(d,'.pi/skills/composition/SKILL.md');
  const marker=JSON.parse(await fs.readFile(path.join(d,'HQ-ROLE.json'),'utf8'));
  await fs.writeFile(agents,'older shipped agents');marker.generated['AGENTS.md']=hash('older shipped agents');
  await fs.rm(path.join(d,'.pi/skills/composition'),{recursive:true,force:true});
  for(const k of Object.keys(marker.generated))if(k.startsWith('.pi/skills/composition/'))delete marker.generated[k];
+ marker.generated['.pi/skills/composition/retired-already-gone.md']='deadbeef';
  await fs.writeFile(path.join(d,'HQ-ROLE.json'),JSON.stringify(marker));
+ const snapBefore=await inventoryOf(out);
  const st=setup(out,'--status');assert.equal(st.status,0,st.stderr);
+ assert.deepEqual(await inventoryOf(out),snapBefore,'--status must not mutate any existing or missing office');
  assert.match(st.stdout,/engineering-consultant: not present/);
- assert.match(st.stdout,/user-consultant: v0\.3\.0 \(\d+ behind, 0 edited; playbook: missing\)/);
- assert.equal(await fs.access(path.join(out,'engineering-consultant')).then(()=>true,()=>false),false,'--status must not create missing offices');
- const roll=setup(out,'--skill','composition');assert.equal(roll.status,0,roll.stderr);
+ assert.match(st.stdout,new RegExp(`user-consultant: v${version.replaceAll('.','\\.')} \\(\\d+ behind, 0 edited; playbook: missing\\)`));
+ const roll=setup(out,'--skill','composition,public-presentation');assert.equal(roll.status,0,roll.stderr);
  assert.match(roll.stdout,/engineering-consultant: skipped \(not present\)/);
- assert.match(roll.stdout,/user-consultant: skills updated \(composition\)/);
+ assert.match(roll.stdout,/project-consultant: skills updated \(composition\)/);
+ assert.match(roll.stdout,/user-consultant: skills updated \(composition, public-presentation\)/);
  assert.equal(await fs.readFile(agents,'utf8'),'older shipped agents','--skill must not replace non-skill files');
  assert.equal(await fs.access(skillFile).then(()=>true,()=>false),true);
+ const postMarker=JSON.parse(await fs.readFile(path.join(d,'HQ-ROLE.json'),'utf8'));
+ assert.equal('.pi/skills/composition/retired-already-gone.md' in postMarker.generated,false,'remove retired missing keys');
+ assert.deepEqual(postMarker.practiceOverlays?.map(o=>o.skill),['composition','public-presentation']);
+ assert.match(setup(out,'--status').stdout,/overlays: composition,public-presentation/);
  assert.match(setup(out,'--only','user','--skill','composition').stdout,/user-consultant: unchanged/);
+ assert.match(setup(out,'--skill','public-presentation').stdout,/project-consultant: skipped \(not for role\)/);
+ assert.notEqual(setup(out,'--only','coordination','--skill','public-presentation').status,0,'fail when --only targets role without skill');
  await fs.appendFile(skillFile,'\nlocal skill edit\n');
+ assert.match(setup(out,'--status').stdout,/1 edited/);
  assert.notEqual(setup(out,'--only','user','--skill','composition').status,0,'stop on edited skill file');
  const forced=setup(out,'--only','user','--skill','composition','--force');assert.equal(forced.status,0,forced.stderr);
  const [stamp]=await fs.readdir(path.join(d,'.hq/setup-backup'));
  assert.match(await fs.readFile(path.join(d,'.hq/setup-backup',stamp,'.pi/skills/composition/SKILL.md'),'utf8'),/local skill edit/);
+ // A subsequent full update reconciles HQ-ROLE.json (clears practiceOverlays) so drift passes.
+ const full=setup(out);assert.equal(full.status,0,full.stderr);
+ assert.equal(run('drift.mjs',[out]).status,0,'drift passes after full update clears skill overlays');
 });
