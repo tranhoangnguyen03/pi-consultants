@@ -87,8 +87,12 @@ test('Office Admin: --status inspects without mutating and --skill updates only 
  assert.deepEqual(postMarker.practiceOverlays?.map(o=>o.skill),['composition','public-presentation']);
  assert.match(setup(out,'--status').stdout,/overlays: composition,public-presentation/);
  assert.match(setup(out,'--only','user','--skill','composition').stdout,/user-consultant: unchanged/);
- assert.match(setup(out,'--skill','public-presentation').stdout,/project-consultant: skipped \(not for role\)/);
+ assert.match(setup(out,'--only','user,coordination','--skill','public-presentation').stdout,/project-consultant: skipped \(not for role\)\nuser-consultant: unchanged/);
+ assert.notEqual(setup(out,'--only','engineering,user','--skill','composition').status,0,'fail upfront when --only includes a missing office');
  assert.notEqual(setup(out,'--only','coordination','--skill','public-presentation').status,0,'fail when --only targets role without skill');
+ const shared=path.join(path.dirname(out),'admin-playbook.md');await fs.writeFile(shared,'# Org rules\n');
+ const withPb=setup(out,'--skill','public-presentation','--playbook',shared);assert.equal(withPb.status,0,withPb.stderr);
+ assert.equal(await fs.readFile(path.join(out,'project-consultant/organization/PLAYBOOK.md'),'utf8'),'# Org rules\n','--playbook still syncs existing offices skipped for role skill');
  await fs.appendFile(skillFile,'\nlocal skill edit\n');
  assert.match(setup(out,'--status').stdout,/1 edited/);
  assert.notEqual(setup(out,'--only','user','--skill','composition').status,0,'stop on edited skill file');

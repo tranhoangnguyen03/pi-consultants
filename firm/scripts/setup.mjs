@@ -21,6 +21,7 @@ for(let i=2;i<process.argv.length;i++){
 }
 const target=path.resolve(opts.out??path.join(path.dirname(root),'offices'));
 const exists=p=>fs.access(p).then(()=>true,()=>false);
+const hasSkill=async(role,s)=>await exists(path.join(root,'skills/shared',s,'SKILL.md'))||await exists(path.join(root,'skills',role,s,'SKILL.md'));
 const sha=async p=>(await exists(p))?hash(await fs.readFile(p)):null;
 const backupOf=dir=>path.join(dir,'.hq/setup-backup',STAMP);
 const STAMP=new Date().toISOString().replaceAll(':','-');
@@ -37,7 +38,7 @@ async function status(dir,office,toolset){
   const current={};for(const p of new Set([...Object.keys(old),...Object.keys(next)]))current[p]=await sha(path.join(dir,p));
   const conflicts=Object.keys(current).filter(p=>current[p]!==null&&current[p]!==next[p]&&(p in old?current[p]!==old[p]:true));
   const markerBehind=marker.version!==freshMarker.version||(!marker.practiceOverlays?.length&&canonical(marker)!==canonical(freshMarker))?1:0;
-  const behind=Object.keys(next).filter(p=>current[p]!==next[p]&&!conflicts.includes(p)).length+Object.keys(old).filter(p=>!(p in next)&&current[p]!==null).length+markerBehind;
+  const behind=Object.keys(next).filter(p=>current[p]!==next[p]&&!conflicts.includes(p)).length+Object.keys(old).filter(p=>!(p in next)&&current[p]!==null&&!conflicts.includes(p)).length+markerBehind;
   const pb=await exists(path.join(dir,'organization/PLAYBOOK.md'))?'playbook: present':'playbook: missing';
   const overlays=marker.practiceOverlays?.length?`; overlays: ${marker.practiceOverlays.map(o=>o.skill??o.name??'custom').join(',')}`:'';
   return `v${marker.version??'unknown'} (${!behind&&!conflicts.length?'up to date':`${behind} behind, ${conflicts.length} edited`}; ${pb}${overlays})`;
@@ -48,15 +49,12 @@ async function status(dir,office,toolset){
 async function update(dir,office,toolset,skillNames){
  const marker=await readJSON(path.join(dir,'HQ-ROLE.json'),null);
  assert(marker?.generated&&marker.role===office.role,`${dir} is not a factory-built ${office.role} office; refusing to update it`);
+ const activeSkills=skillNames?(await Promise.all(skillNames.map(async s=>await hasSkill(office.role,s)?s:null))).filter(Boolean):null;
+ if(skillNames&&!activeSkills.length)return 'skipped (not for role)';
  const tmp=await fs.mkdtemp(path.join(os.tmpdir(),'hq-setup-'));
  try{
   const fresh=await buildOffice(root,office,toolset,path.join(tmp,office.folder));
   const freshMarker=await readJSON(path.join(fresh,'HQ-ROLE.json'));
-  const activeSkills=skillNames?.filter(s=>Object.keys(freshMarker.generated).some(p=>p.startsWith(`.pi/skills/${s}/`)));
-  if(skillNames){
-   if(only)for(const s of skillNames)assert(activeSkills.includes(s),`Skill ${s} is not available for ${office.role}`);
-   if(!activeSkills.length)return 'skipped (not for role)';
-  }
   const inScope=activeSkills?p=>activeSkills.some(s=>p.startsWith(`.pi/skills/${s}/`)):()=>true;
   const next=Object.fromEntries(Object.entries(freshMarker.generated).filter(([p])=>inScope(p)));
   const old=Object.fromEntries(Object.entries(marker.generated).filter(([p])=>inScope(p)));
@@ -66,7 +64,7 @@ async function update(dir,office,toolset,skillNames){
   const conflicts=Object.keys(current).filter(p=>current[p]!==null&&current[p]!==next[p]&&(p in old?current[p]!==old[p]:true));
   const removedKeys=Object.keys(old).filter(p=>!(p in next));
   const stale=removedKeys.filter(p=>current[p]!==null);
-  const filesMatch=!conflicts.length&&!removedKeys.length&&Object.keys(next).every(p=>current[p]===next[p]);
+  const filesMatch=!conflicts.length&&!removedKeys.length&&Object.keys(next).every(p=>current[p]===next[p]&&old[p]===next[p]);
   if(filesMatch&&(activeSkills?activeSkills.every(s=>marker.practiceOverlays?.some(o=>o.skill===s&&o.version===freshMarker.version)):canonical(marker)===canonical(freshMarker)))return 'unchanged';
   if(conflicts.length&&!flags.has('force')){
    console.error(`${office.folder}: stopped, nothing changed. These shipped files were edited or are in the way:\n  ${conflicts.join('\n  ')}\nMove your changes into firm/ and run setup again, or rerun with --force to back them up into .hq/setup-backup/ and replace them.`);
@@ -131,11 +129,10 @@ assert(!flags.has('status')||(!opts.skill&&!opts.playbook&&!flags.has('rebuild')
 const selected=offices.filter(o=>!only||only.includes(o.role));
 assert(selected.length,`No office matches --only ${opts.only}. Roles: ${offices.map(o=>o.role).join(', ')}`);
 if(skillNames){
- for(const s of skillNames){
-  const ok=await exists(path.join(root,'skills/shared',s,'SKILL.md'))||(await Promise.all(selected.map(o=>exists(path.join(root,'skills',o.role,s,'SKILL.md'))))).some(Boolean);
-  assert(ok,`Skill ${s} is not available for ${selected.map(o=>o.role).join(', ')}`);
- }
+ for(const s of skillNames)assert((await Promise.all(selected.map(o=>hasSkill(o.role,s)))).some(Boolean),`Skill ${s} is not available for ${selected.map(o=>o.role).join(', ')}`);
+ if(only)for(const o of selected)assert(await exists(path.join(target,o.folder)),`Office not found: ${path.join(target,o.folder)}`);
 }
+if(opts.playbook)assert(await exists(path.resolve(opts.playbook)),`Playbook not found: ${path.resolve(opts.playbook)}`);
 if(flags.has('status')){
  for(const office of selected)console.log(`${office.folder}: ${await status(path.join(target,office.folder),office,toolset)}`);
  process.exit(process.exitCode??0);
@@ -144,15 +141,10 @@ await fs.mkdir(target,{recursive:true});
 const done=[];
 for(const office of selected){
  const dir=path.join(target,office.folder);
- let result;
- if(skillNames){
-  assert(!only||await exists(dir),`Office not found: ${dir}`);
-  result=await exists(dir)?await update(dir,office,toolset,skillNames):'skipped (not present)';
- }else{
-  result=!await exists(dir)?(await buildOffice(root,office,toolset,dir),'built')
-   :(opts.out||flags.has('rebuild'))?await update(dir,office,toolset):'kept as shipped (git pull updates it; --rebuild regenerates it)';
- }
- console.log(`${office.folder}: ${result}`);if(!result.startsWith('stopped')&&!result.startsWith('skipped'))done.push([dir,office]);
+ const result=skillNames?(await exists(dir)?await update(dir,office,toolset,skillNames):'skipped (not present)')
+  :!await exists(dir)?(await buildOffice(root,office,toolset,dir),'built')
+  :(opts.out||flags.has('rebuild'))?await update(dir,office,toolset):'kept as shipped (git pull updates it; --rebuild regenerates it)';
+ console.log(`${office.folder}: ${result}`);if(result!=='stopped'&&result!=='skipped (not present)')done.push([dir,office]);
 }
 const interactive=!flags.has('yes')&&!skillNames&&process.stdin.isTTY;
 const rl=interactive?readline.createInterface({input:process.stdin,output:process.stdout}):null;
