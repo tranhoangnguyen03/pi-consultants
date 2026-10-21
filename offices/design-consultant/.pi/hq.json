@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "role": "design",
+  "office": {
+    "letter": "F",
+    "title": "DESIGN & FRONT-END",
+    "tagline": "shape · build · inspect · refine",
+    "banner": [
+      "  ╭─────────╮  ",
+      "  │ ◇   ◇   │  ",
+      "  │  ┌───┐  │  ",
+      "  │  └───┘  │  ",
+      "  ╰─────────╯  "
+    ]
+  },
+  "hq": "..",
+  "stateDir": "../.hq",
+  "kitRoot": "..",
+  "sessionRoots": [],
+  "projectRoots": [],
+  "localReadRoots": [],
+  "attachmentRoots": [],
+  "maxSessionFiles": 500,
+  "maxSessionBytes": 16777216,
+  "maxConsultChars": 80000,
+  "policy": {}
+}
