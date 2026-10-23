@@ -56,6 +56,42 @@ test('Research vendoring preserves the local literature-review method across rep
   assert.equal(await fs.readFile(path.join(firm,'skills/research/literature-review/SKILL.md'),'utf8'),expected);
  }
 });
+test('last30days launches with isolated credentials and disables the upstream Keychain source',async t=>{
+ const d=await temp(t),office=path.join(d,'office'),bin=path.join(d,'bin');
+ const scripts=path.join(office,'.pi/skills/last30days/scripts');
+ await fs.mkdir(scripts,{recursive:true});await fs.mkdir(bin);
+ await fs.copyFile(path.join(root,'scripts/research-last30days-runner.mjs'),path.join(scripts,'hq-safe-run.mjs'));
+ const python=path.join(bin,'python3.14');
+ await fs.writeFile(python,`#!${process.execPath}\nconst {spawnSync}=require('node:child_process');
+if(process.argv[2]==='-c')console.log(${JSON.stringify(python)});
+else{
+ const helpers=Object.fromEntries(['security','gh','pass'].map(name=>[name,spawnSync(name,[],{encoding:'utf8'}).error?.code]));
+ console.log(JSON.stringify({cwd:process.cwd(),args:process.argv.slice(2),env:process.env,helpers}));
+}\n`);
+ await fs.chmod(python,0o700);
+ const accessed=path.join(d,'host-credentials-accessed');
+ for(const name of ['security','gh','pass']){
+  const helper=path.join(bin,name);
+  await fs.writeFile(helper,`#!${process.execPath}\nrequire('node:fs').writeFileSync(${JSON.stringify(accessed)},'unexpected credential lookup');console.log('fake-host-secret');\n`);
+  await fs.chmod(helper,0o700);
+ }
+ const env={PATH:bin,OPENAI_API_KEY:'fake-secret',GITHUB_TOKEN:'fake-secret',LAST30DAYS_SKIP_KEYCHAIN:'0',LAST30DAYS_KEYCHAIN_ALIASES:'host-alias',GH_CONFIG_DIR:'/host/gh',LAST30DAYS_PASS_PREFIX:'host/'};
+ for(const input of ['public topic','--preflight']){
+  const result=spawnSync(process.execPath,[path.join(scripts,'hq-safe-run.mjs'),input],{cwd:d,env,encoding:'utf8'});
+  assert.equal(result.status,0,result.stderr);
+  const child=JSON.parse(result.stdout),base=path.join(office,'.hq/last30days');
+  assert.equal(child.cwd,office);assert.equal(child.env.HOME,path.join(base,'home'));
+  assert.equal(child.env.LAST30DAYS_CONFIG_DIR,path.join(base,'config'));
+  assert.equal(child.env.LAST30DAYS_SKIP_KEYCHAIN,'1');
+  assert.equal(child.env.PATH,path.join(base,'bin'));
+  assert.deepEqual(child.helpers,{security:'ENOENT',gh:'ENOENT',pass:'ENOENT'});
+  assert.equal(await fs.access(accessed).then(()=>true,()=>false),false);
+  for(const key of ['OPENAI_API_KEY','GITHUB_TOKEN','LAST30DAYS_KEYCHAIN_ALIASES','GH_CONFIG_DIR','LAST30DAYS_PASS_PREFIX'])assert.equal(child.env[key],undefined,key);
+  assert.equal(child.env.FROM_BROWSER,'off');assert.equal(child.env.AGENTCOOKIE,'off');
+  assert.equal(child.env.BROWSER_CONSENT,'false');
+  assert.deepEqual(child.args,[path.join(scripts,'last30days.py'),...(input==='--preflight'?['--preflight']:[input,'--no-browser-cookies','--search','reddit,hackernews,github,polymarket,devto','--emit=json','--save-dir',path.join(base,'reports')])]);
+ }
+});
 test('last30days direct engine is not the HQ entrypoint; safe runner rejects unsupported flags',async()=>{
  const rootSkill=path.join(root,'skills/research/last30days');
  const text=await fs.readFile(path.join(rootSkill,'SKILL.md'),'utf8');

@@ -29,6 +29,7 @@ const env={
  FROM_BROWSER:'off',
  BROWSER_CONSENT:'false',
  LAST30DAYS_TRUST_PROJECT_CONFIG:'0',
+ LAST30DAYS_SKIP_KEYCHAIN:'1',
  INCLUDE_SOURCES:'reddit,hackernews,github,polymarket,devto'
 };
 for(const k of ['SYSTEMROOT','WINDIR','SSL_CERT_FILE','REQUESTS_CA_BUNDLE'])if(process.env[k])env[k]=process.env[k];
@@ -37,13 +38,16 @@ fs.mkdirSync(env.LAST30DAYS_CONFIG_DIR,{recursive:true,mode:0o700});
 fs.mkdirSync(env.LAST30DAYS_MEMORY_DIR,{recursive:true,mode:0o700});
 let python;
 for(const name of ['python3.14','python3.13','python3.12','python3']){
- const r=spawnSync(name,['-c','import sys; raise SystemExit(0 if sys.version_info >= (3,12) else 1)'],{env,timeout:10000});
- if(r.status===0){python=name;break;}
+ const r=spawnSync(name,['-c','import sys; print(sys.executable); raise SystemExit(0 if sys.version_info >= (3,12) else 1)'],{env,encoding:'utf8',timeout:10000});
+ if(r.status===0&&path.isAbsolute(r.stdout.trim())){python=r.stdout.trim();break;}
 }
 if(!python){
  console.error('last30days needs Python 3.12+; normal Research HQ tools remain available.');
  process.exit(2);
 }
+// The keyless engine must not discover host credential helpers such as gh or pass.
+env.PATH=path.join(base,'bin');
+fs.mkdirSync(env.PATH,{recursive:true,mode:0o700});
 const script=path.join(here,'last30days.py');
 const args=[script,...(isPreflight?['--preflight']:[cmd[0],'--no-browser-cookies','--search','reddit,hackernews,github,polymarket,devto','--emit=json','--save-dir',env.LAST30DAYS_MEMORY_DIR])];
 const r=spawnSync(python,args,{cwd:hq,env,stdio:'inherit',timeout:300000});
