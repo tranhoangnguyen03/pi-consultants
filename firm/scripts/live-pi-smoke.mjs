@@ -26,9 +26,9 @@ export default function(pi) {
 let child;let stdout='',stderr='';let exit=null,error=null;
 try{
  const env={...process.env};delete env.CONSHQ_CONFIG;delete env.CONSHQ_HOME;delete env.PI_PROFILE_SWITCH_DIR;
- child=spawn(process.env.PI_BINARY??'pi',['--offline','--mode','rpc'],{cwd:root,env,stdio:['pipe','pipe','pipe']});
+ child=spawn(process.env.PI_BINARY??'pi',(process.env.PI_PROBE_CI==='1'?['--approve','--no-mcp','--mode','rpc']:['--offline','--mode','rpc']),{cwd:root,env,stdio:['pipe','pipe','pipe']});
  child.stdout.on('data',b=>stdout+=b.toString());child.stderr.on('data',b=>stderr+=b.toString());child.on('error',e=>error=e);child.on('exit',code=>exit=code);
- const deadline=Date.now()+45000;
+ const deadline=Date.now()+(process.env.PI_PROBE_CI==='1'?180000:45000);
  while(Date.now()<deadline&&!error&&exit===null&&!await fs.access(report).then(()=>true,()=>false))await new Promise(r=>setTimeout(r,100));
  if(error)throw error;
  assert(await fs.access(report).then(()=>true,()=>false),`No native startup probe. Pi must be installed, compatible, and this HQ trusted; check dependency installation. ${stderr}`);
@@ -40,11 +40,11 @@ try{
  check('Note attribution required in actual host schema',result.noteSchema?.required?.includes('attribution'),'Schema inspection, not model behavior');
  check('Note scope required in actual host schema',result.noteSchema?.required?.includes('scope'),'Schema inspection, not model behavior');
  for(const tool of ['hq_navigate','hq_engagement','hq_paper','hq_case','hq_note','hq_brief','session_find','session_read','session_consult','hq_actions','hq_execute','change_dir'])check(`Registered ${tool}`,result.tools.includes(tool),'Actual host registry');
- for(const name of await fs.readdir(path.join(root,'.pi/skills'))){const s=await fs.readFile(path.join(root,'.pi/skills',name,'SKILL.md'),'utf8');const title=s.match(/^name: (.+)$/m)[1];check(`Available skill ${title}`,result.systemPrompt.includes(title),'Native skill catalogue in system prompt');}
+ for(const name of await fs.readdir(path.join(root,'.pi/skills'))){const s=await fs.readFile(path.join(root,'.pi/skills',name,'SKILL.md'),'utf8');const title=s.match(/^name: (.+)$/m)[1],userOnly=/^disable-model-invocation: true$/m.test(s);check(`Available skill ${title}`,userOnly?result.commands.includes(`skill:${title}`)&&!result.systemPrompt.includes(`<name>${title}</name>`):result.systemPrompt.includes(title),userOnly?'User-only skill command registry':'Native skill catalogue in system prompt');}
  for(const command of ['hq','consult','case-recap','close-consultation'])check(`Available command ${command}`,result.commands.includes(command),'Actual host command registry');
  const after=await fingerprints();check('Daily-driver source files unchanged',JSON.stringify(before)===JSON.stringify(after),'Native auth refresh files are deliberately excluded from this comparison');
  const summary={at:new Date().toISOString(),role:marker.role,scope:'Actual local Pi startup via RPC output mode, no model prompt sent',checks,
- limitations:['Interactive plain-pi trust/visual UX is a separate manual check.','MCP servers may connect during startup; no connector operations were requested.','Arbitrary inherited extension behavior is outside this test.']};
+ limitations:['Interactive plain-pi trust/visual UX is a separate manual check.',process.env.PI_PROBE_CI==='1'?'MCP is disabled in CI; project packages may download during first startup.':'MCP servers may connect during startup; no connector operations were requested.','Arbitrary inherited extension behavior is outside this test.']};
  await atomic(process.env.HQ_PROBE_REPORT??path.join(root,'eval/results/native-pi-startup.json'),summary);console.log(JSON.stringify(summary,null,2));process.exitCode=checks.every(c=>c.passed)?0:1;
 }catch(e){console.error(`Native Pi check FAILED / unavailable: ${e.message}`);process.exitCode=1;
 }finally{
