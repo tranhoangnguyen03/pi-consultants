@@ -29,7 +29,7 @@ node offices/research-consultant/.pi/skills/last30days/scripts/hq-safe-run.mjs -
 
 ## Maintenance and evidence
 
-The skills are vendored at pinned commits. Maintainers may deliberately update `firm/research-sources.json`, review upstream changes, and run `node firm/scripts/vendor-research.mjs`; then regenerate offices and run `npm run verify`. There are no runtime updates.
+The skills are vendored at pinned commits. Maintainers may deliberately update `firm/research-sources.json`, review upstream changes, and run `node firm/scripts/vendor-research.mjs`; then regenerate offices and run `npm run verify`. The script reapplies the local source-independence guidance from `firm/research-additions/literature-review.md`; maintain that addition there rather than editing the vendored copy. There are no runtime updates.
 
 Save significant findings and source references with existing HQ cases and papers. Keep experiment code/data in an authorized project workspace, with relevant commands, versions, and artifacts referenced from the case. Do not claim that a cited finding was independently verified when it was only reported by a source.
 

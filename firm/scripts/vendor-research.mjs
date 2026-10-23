@@ -31,6 +31,12 @@ try {
   await fs.cp(path.join(kd,'skills',skill),dest,{recursive:true});
   await fs.copyFile(path.join(kd,'LICENSE.md'),path.join(dest,'UPSTREAM-LICENSE.md'));
  }
+ const review=path.join(roleDir,'literature-review/SKILL.md');
+ const content=await fs.readFile(review,'utf8');
+ const anchor='\n## Best Practices\n';
+ if(!content.includes(anchor))throw Error('Literature-review insertion point changed; review the local source-independence addition.');
+ const addition=await fs.readFile(path.join(root,'research-additions/literature-review.md'),'utf8');
+ await fs.writeFile(review,content.replace(anchor,'\n'+addition+anchor));
  const dest=path.join(roleDir,'last30days');
  await fs.cp(path.join(l30,'skills/last30days'),dest,{recursive:true});
  await fs.copyFile(path.join(l30,'LICENSE'),path.join(dest,'UPSTREAM-LICENSE'));
