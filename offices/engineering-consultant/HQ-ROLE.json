@@ -65,6 +65,7 @@
     "LICENSE": "2f80ad90b0b3ead0ac928340c096946b482180ede21944cdb6420fbb609c738f",
     "README.md": "632e6968cb3a1941e2dc3d1455fcbaf931079bfc69dbf94ed762fb62cf9bba71",
     "organization/PLAYBOOK.example.md": "71909cc0666b7c50e6f44f6c079a4d8409fee9786f2643481fe8d37ed2982537",
-    "package.json": "e23bc9f31ea6beb92da1b5e92f0bc8f9d02f32db89d129783cf2e7928db1c0b5"
+    "package.json": "e23bc9f31ea6beb92da1b5e92f0bc8f9d02f32db89d129783cf2e7928db1c0b5",
+    ".pi/skills/codebase-orientation/SKILL.md": "e0843c190964c193746e01d21b6df4d44855e16cf60e90150063d95d40e275ec"
   }
 }
