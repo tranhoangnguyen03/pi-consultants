@@ -118,7 +118,7 @@ Useful commands inside an office:
 - `/mcp`: shows connectors; sign in to the ones you switched on.
 - `pi --continue` (from the office folder): resumes the most recent conversation.
 
-The other offices work the same way: `cd ~/pi-consultants/offices/project-consultant`, `cd ~/pi-consultants/offices/user-consultant`, `cd ~/pi-consultants/offices/research-consultant`, or `cd ~/pi-consultants/offices/design-consultant`, then `pi`. See [Research Scientist E](docs/research-consultant.md) and [Design & Front-end F](docs/design-consultant.md) for role-specific guidance. See [Research Scientist E](docs/research-consultant.md) for optional tools and the safe recent-search mode.
+The other offices work the same way: `cd ~/pi-consultants/offices/project-consultant`, `cd ~/pi-consultants/offices/user-consultant`, `cd ~/pi-consultants/offices/research-consultant`, or `cd ~/pi-consultants/offices/design-consultant`, then `pi`. See [Research Scientist E](docs/research-consultant.md) for optional tools and the safe recent-search mode, and [Design & Front-end F](docs/design-consultant.md) for role-specific guidance.
 
 ## Optional: human-steered parallel sessions
 
