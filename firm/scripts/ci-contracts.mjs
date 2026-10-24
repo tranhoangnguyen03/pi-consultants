@@ -13,14 +13,18 @@ const read=async file=>fs.readFile(file,'utf8');
 export function skillHeader(text,where='SKILL.md'){
  const match=text.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
  if(!match)throw new Error(`${where}: missing complete frontmatter`);
- const props={};
+ const props={};let inMetadata=false;
  for(const line of match[1].split(/\r?\n/)){
   if(!line.trim())continue;
-  const m=line.match(/^([a-z][a-z0-9-]*):\s+(.+)$/);
+  // Routing uses top-level fields, not the upstream metadata mapping.
+  if(inMetadata&&/^ +\S/.test(line))continue;
+  const m=line.match(/^([a-z][a-z0-9-]*):\s*(.*)$/);
   if(!m)throw new Error(`${where}: invalid frontmatter line: ${line}`);
   const [,key,value]=m;
   if(Object.hasOwn(props,key))throw new Error(`${where}: duplicate frontmatter key ${key}`);
+  if(!value&&key!=='metadata')throw new Error(`${where}: empty frontmatter field ${key}`);
   props[key]=value.trim().replace(/^["']([\s\S]*)["']$/,'$1');
+  inMetadata=key==='metadata'&&!value;
  }
  if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(props.name??''))throw new Error(`${where}: invalid skill name`);
  if(!props.description?.trim()||props.description.length>1024)throw new Error(`${where}: missing or overlong description`);

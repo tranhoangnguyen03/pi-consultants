@@ -1,6 +1,6 @@
 # Pi Consultants
 
-Three AI consultants for [Pi](https://pi.dev), the terminal coding agent. Each one runs in its own folder, called an **office**, and its notes stay there between conversations. You keep doing your everyday work in your usual Pi session. When you want a second opinion, a careful review, help with the people side of a project, or a hard look at how your product works for its users, you open a consultant in another terminal.
+Four AI consultants for [Pi](https://pi.dev), the terminal coding agent. Each one runs in its own folder, called an **office**, and its notes stay there between conversations. You keep doing your everyday work in your usual Pi session. When you want a second opinion, a careful review, help with the people side of a project, or a hard look at how your product works for its users, you open a consultant in another terminal.
 
 The offices are **ready to use** in this repository's `offices/` folder. Clone it, run one setup command, and start Pi in an office.
 
@@ -13,13 +13,14 @@ The offices are **ready to use** in this repository's `offices/` folder. Clone i
 - **It brings its own tools.** Every office ships the same toolset: web search and reading, documents, a browser, diagrams, Chrome DevTools audits, and optional connectors for the services you use. Your personal Pi setup is a bonus, not a requirement.
 - **Local and private.** Offices are ordinary folders on your machine. There is no shared server or firm-wide memory, and the consultants don't share records.
 
-## The three consultants
+## The four consultants
 
 | Office folder | Consultant | Ask it about |
 |---|---|---|
 | `offices/engineering-consultant/` | **Engineering consultant (B)** | Code and design review, debugging and verification, test strategy, performance, simplification, documentation, and usability for people and for AI agents. |
 | `offices/project-consultant/` | **Coordination and communication consultant (C)** | Priorities, commitments, stakeholders, meeting decisions, dependencies, release handoffs, and clear writing for the people involved. |
 | `offices/user-consultant/` | **User consultant (D)** | Everyone who uses your product, people and the AI agents people assign tasks to: user research and synthesis, usability, UI critique, accessibility, behaviour analytics, journey maps, interface writing, agent experience, delegation to agents, and how a repository or package page looks to a first-time visitor. |
+| `offices/research-consultant/` | **Research scientist (E)** | Literature, scientific reasoning, hypotheses, experiment design and analysis, recent practitioner reports, and clear findings. |
 
 You don't need to pick a skill or fill in a form. Describe your concern in plain language and the consultant decides how to approach it. Every consultant has normal Pi powers: it can read files, run commands and edit files on your machine, and work in your repositories and connected services. Their specialty decides which tools they reach for, not which they may use. Before any outside action (pushing, posting, messaging, changing a ticket) a consultant gives you a heads-up. Any consultant can also prepare an exact outgoing action for you to approve with `/hq approve` first, then keep a receipt (the optional outbox).
 
@@ -66,7 +67,7 @@ cd ~/pi-consultants
 npm run setup
 ```
 
-The three offices are already in the repository. Setup asks a few questions for each one; press Enter to skip any:
+The four offices are already in the repository. Setup asks a few questions for each one; press Enter to skip any:
 
 - **Your organization's shared playbook?** Give the path to one playbook file and setup installs it in every office (next step). Or skip, and it offers to copy the example for you to edit.
 - **Project folders** the consultant works in, for example `~/code/my-project`. Folders must exist.
@@ -114,7 +115,7 @@ Useful commands inside an office:
 - `/mcp`: shows connectors; sign in to the ones you switched on.
 - `pi --continue` (from the office folder): resumes the most recent conversation.
 
-The other offices work the same way: `cd ~/pi-consultants/offices/project-consultant` or `cd ~/pi-consultants/offices/user-consultant`, then `pi`.
+The other offices work the same way: `cd ~/pi-consultants/offices/project-consultant`, `cd ~/pi-consultants/offices/user-consultant`, or `cd ~/pi-consultants/offices/research-consultant`, then `pi`. See [Research Scientist E](docs/research-consultant.md) for optional tools and the safe recent-search mode.
 
 ## Optional: human-steered parallel sessions
 
