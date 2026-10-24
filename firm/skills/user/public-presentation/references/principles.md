@@ -13,23 +13,25 @@ The reader is a developer with ten seconds who is deciding whether the product i
 
 ## Checklist
 
+Rank gaps by actual user consequence, not by template compliance. Accuracy, permissions, privacy and copyable commands are requirements. Layout, badge counts, visuals and length targets below are defaults to adapt to the audience and product; their absence alone is not a MUST finding.
+
 **Discovery (repository About box and package metadata)**
-- MUST The repository description, the package description and the README tagline are the same sentence. It names the ecosystem or host (if any) and the benefit, and every claim in it is true for every feature it lists.
-- MUST Topics or keywords cover the ecosystem's discovery tags plus a few domain tags; the package keywords include them.
-- MUST A homepage is set (the package page or a docs site).
+- MUST Repository, package and README descriptions make compatible, accurate claims. Name the ecosystem or host where readers need it; wording may differ to fit the surface.
+- SHOULD Topics or keywords cover relevant ecosystem and domain discovery tags, where the platform supports them.
+- SHOULD Set a useful homepage when a package page or docs site exists.
 - SHOULD A custom social preview image with the name, the tagline and one product visual.
 
 **First screen (about 30 lines)**
-- MUST In this order: name, 3–5 badges (version, CI, license; no vanity badges), one-line tagline, one sentence of context for anything the reader may not know, hero visual by about line 40, install command, a short "try it" table.
-- MUST No caveats, experimental-runtime notes or compatibility matrices before the install block.
+- SHOULD Make the name, benefit, necessary context, install path and a first useful task easy to find. Badges, a hero visual and a "try it" table are optional aids, not a required order or count.
+- MUST Put consequential compatibility, permission or safety warnings before the step they affect. Keep detailed reference material out of the first-run path where a link is enough.
 - MUST Every command shown runs exactly as copied: descriptions go in a separate column, never inline in a code block, and placeholders are labelled.
 - SHOULD Name the first-run diagnostic command, if there is one, right after install, and say what it checks and that it sends no user content.
 - SHOULD If the name is not self-explanatory, explain it in one line.
 
 **Body and docs**
-- MUST The README stays near 300 lines or fewer; reference material lives in docs/ with an index.
-- MUST Each feature has a short block or table row that links to its own documentation section.
-- MUST Requirements list each external tool with an install link, its minimum version where known, the default choice, and supported operating systems.
+- SHOULD Keep the README focused on discovery and first success; about 300 lines is a useful review prompt, not a hard limit. Link to reference material and a clear docs entry point when needed.
+- SHOULD Link features to detailed guidance where readers need more than the introduction.
+- MUST State prerequisites and compatibility limits before users need them. SHOULD Link required external tools to installation guidance and give minimum versions where known.
 - MUST A feature that needs non-default setup says so where the feature is introduced.
 - SHOULD Limits are one section of about 10 bullets, each "limit → workaround".
 - SHOULD Demo visuals are reproducible from a script kept in the repository.
@@ -44,7 +46,7 @@ The reader is a developer with ten seconds who is deciding whether the product i
 **Versions and releases**
 - MUST A one-line stability statement (for 0.x: what may break, where breaks are listed).
 - MUST Breaking changes are listed under a "Breaking" heading with migration steps.
-- MUST Each release opens with 2–4 plain-language highlights of what users can now do, followed by the detailed changelog or a link to it.
+- SHOULD Open releases with a few plain-language highlights, followed by details or a changelog link. Small releases need no fixed highlight count.
 - SHOULD Changelog entries are 1–2 lines each; internal renames and test refactors stay in pull requests.
 - NICE Write down what 1.0 (or the next stability milestone) means.
 
@@ -78,5 +80,5 @@ Open with a one-line verdict from the visitor's point of view. Then rank gaps:
 
 - **MUST / SHOULD / NICE**, then what the visitor experiences, the evidence (file and line, or the live page), and the exact proposed change or text.
 - Separate confirmed gaps from things you could not view.
-- End with **For B (engineering)**: repository, CI and settings items, ready to paste; and **For C (coordination)**: release-note, changelog or announcement wording, ready to paste. Omit an empty section.
+- Include **For B (engineering)** and **For C (coordination)** sections only when findings need that specialist's attention. Make them ready to paste; do not require a handoff or another session for a task the current consultant can complete within scope.
 - A gap that is both user-facing and a CI matter (for example a runtime-version claim CI does not test) can be ranked in the main list with the CI part noted for B.

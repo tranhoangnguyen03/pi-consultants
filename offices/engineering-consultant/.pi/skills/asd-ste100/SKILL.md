@@ -11,10 +11,9 @@ This skill borrows that same discipline for a different reader: an **AI agent or
 
 ## When to Use This Skill
 
-- An agent's output (explanation, instruction, log message, tool description) reads as dense, jargon-heavy, or ambiguous.
-- Text will be consumed by another agent, a translation pipeline, or a non-native English reader, and misparsing has a real cost.
-- You are writing a prompt, system message, or tool description and want to remove ambiguity before a model ever sees it.
-- You want a **before/after** comparison showing exactly which rule was violated and how the rewrite fixes it. Ask for it — the default output is the rewritten text alone (see Output Format).
+Use this optional final pass for consequential tool descriptions, instructions for another agent, error/recovery procedures, or a replacement for an instruction that was misunderstood. Also use it when explicitly requested.
+
+Do not automatically apply it to consultation replies, code reviews, design discussions, case notes or analytical reports. Use it there only when their wording is the problem. Read the task and source meaning before rewriting; clarity work cannot authorize a change in policy or claims.
 
 This skill is not for creative or marketing copy — STE is deliberately flat and literal. Do not apply it to text where voice, nuance, or persuasion is the point.
 
@@ -24,7 +23,7 @@ Pick a mode before rewriting. If the user does not say which, infer it from the 
 
 **Strict** — procedures, error messages, tool and function descriptions, inter-agent instructions, safety text. Anywhere a wrong reading has a cost. Apply every rule below, including the hard length caps and one-word-one-meaning discipline.
 
-**STE-flavored** — READMEs, PR descriptions, changelogs, explanatory prose. Apply the structural rules in full and treat the lexical rules as advisory (see Core Rewrite Rules for that split). In practice that means keeping the sentence length caps, active voice, simple tenses, no phrasal verbs, no semicolons, no nominalization and no marketing adjectives, while dropping the one-word-one-meaning lockdown: prose needs some range, and a strict rewrite of prose reads as a personality transplant rather than a clarification.
+**STE-flavored** — explanatory prose only when explicitly requested or when it contains consequential agent-facing instructions within the scope above. A README, PR description or changelog is not an automatic trigger. Apply the structural rules in full and treat the lexical rules as advisory (see Core Rewrite Rules for that split). In practice that means keeping the sentence length caps, active voice, simple tenses, no phrasal verbs, no semicolons, no nominalization and no marketing adjectives, while dropping the one-word-one-meaning lockdown: prose needs some range, and a strict rewrite of prose reads as a personality transplant rather than a clarification.
 
 The two modes and the structural/lexical split are the same distinction seen from two directions. The split says which rules this skill can verify without ASD's dictionary. The modes say which of them to enforce for a given kind of text.
 
@@ -96,7 +95,7 @@ These six habits cover most of what makes machine-written English hard to parse.
 
 ## Output Format
 
-**Default: the rewritten text, and nothing else.** Most callers want a result they can paste straight into a tool description, an error string, or a prompt. Print the simplified text on its own. Do not add a preamble about this skill, a mode announcement, a violation count, a summary of what changed, a rule table, or a closing offer to explain further.
+**Default for the rewritten artifact: the text alone.** This does not suppress the task's required verification, limitations or completion report. Most callers want an artifact they can paste straight into a tool description, an error string, or a prompt. Print the simplified text on its own. Do not add a preamble about this skill, a mode announcement, a violation count, a summary of what changed, a rule table, or a closing offer to explain further.
 
 The one permitted addition: if step 4 kept a longer phrasing on purpose, add a single line after the text, prefixed `Kept as-is:`, naming the phrase and the precision that would have been lost. Omit the line when there is nothing to report.
 
@@ -119,7 +118,7 @@ Follow the table with a one-line note on anything you deliberately did **not** s
 - Rewrite ambiguous or dense English into short, single-meaning, active-voice sentences.
 - Return the rewritten text alone by default, and name the rules it applied when the user asks.
 - Preserve every fact, condition, and scope qualifier in the original.
-- Preserve the strength of every hedge, and add no claim the source did not make.
+- Preserve the strength of every hedge and recommendation, and add no claim the source did not make.
 - Suggest a one-line glossary entry for domain terms that must stay.
 
 **Will not:**

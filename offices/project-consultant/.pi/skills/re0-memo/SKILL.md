@@ -18,7 +18,7 @@ After a substantial delivered, failed, disputed, or disappointing work cycle whe
 6. Use supersession to update outdated conclusions without deleting case history.
 
 ## Limits
-Do not access another office's private notes. Do not create a second memo database, task tracker, knowledge server, or Git publication step. Firm-wide collection and review remain separate Knowledge Office duties. Recording lessons is not acceptance or engagement closure.
+Do not access another office's private notes. Do not create a second memo database, task tracker, knowledge server, or Git publication step. Firm-wide collection or practice changes require separate maintainer review and human approval. Recording lessons is not acceptance or engagement closure.
 
 ## Result
 Short account of outcomes, evidence-backed lessons, failure patterns, future checks, and open questions. If nothing useful was learned, record nothing.
