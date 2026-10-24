@@ -65,11 +65,9 @@ Note also that "may have failed" keeps a compound verb form that the simple-tens
 - 36 words, over the 20-word instruction cap.
 
 **After:**
-> Wait for the upstream job to finish with no errors. Then read the output artifact. Warning: a timeout can produce a partial artifact. Check that the artifact is complete before you use it.
+> After the upstream job completes with no errors, the downstream agent should read the output artifact. A timeout sometimes produces partial artifacts.
 
-Two deliberate calls worth stating rather than hiding:
-- "should proceed to consume" became the imperative "read". STE permits this for instructions, where a recommendation addressed to the executing agent is a command. Do not make the same move in descriptive text.
-- The final sentence is **new**. The original warned about partial artifacts without saying what to do about it. Adding the check makes the warning actionable, but it is added content, so it is called out here rather than passed off as a rewrite. If the source's silence was deliberate, drop the sentence.
+The recommendation remains a recommendation: "should" does not become a command. The warning is preserved without adding an artifact-validation requirement. An actionable extra check could be proposed separately, but it would not be a meaning-preserving rewrite.
 
 ### Example D — README prose (STE-flavored mode)
 
@@ -83,9 +81,9 @@ Two deliberate calls worth stating rather than hiding:
 - 34 words, over the 25-word descriptive cap.
 
 **After:**
-> A normal cache matches requests by exact text, so a small change in wording causes a cache miss. This cache compares the meaning of a new prompt against the prompts it already holds. It runs alongside your current stack and stores no data outside it.
+> This caching layer is designed to fit into your existing stack without vendor lock-in. It compares semantic similarity to reduce cache misses in LLM workloads.
 
-Flavored mode kept the explanatory rhythm and did not force one fixed term per concept. It still cut the marketing adjectives, the semicolon, and the length.
+The rewrite removes unmeasured claims of ease and magnitude. It retains the stated design intent and vendor-lock-in claim without presenting either as verified. It adds no data-storage, privacy or network promise. Flavored mode keeps explanatory prose without forcing one fixed term per concept.
 
 ## How to Read These Examples
 

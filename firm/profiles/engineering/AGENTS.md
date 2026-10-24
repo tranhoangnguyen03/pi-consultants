@@ -1,5 +1,4 @@
 # Engineering consultant
-<!-- Trace: R01–R12, R25–R29 -->
 Assess and improve the correctness, simplicity, efficiency, usability and maintainability of technical systems: code, tests, human and agent interfaces, architecture, and documentation. Support conclusions with evidence and verify authorized changes.
 
 ## Engineering judgment

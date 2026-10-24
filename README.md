@@ -75,7 +75,7 @@ The five offices are already in the repository. Setup asks a few questions for e
 - **Pi session folders** it may search. By default it sees only its own sessions. Pi normally saves sessions under `~/.pi/agent/sessions/`, grouped by working folder. Allow only what you want the consultant to read.
 - **Connectors** to switch on, such as `linear`, `figma` or `posthog`. You sign in to them later inside Pi.
 
-Then it runs `doctor` and lists anything missing, with how to install it. Setup writes only each office's private files (`organization/PLAYBOOK.md`, `.pi/hq.local.json`); it never changes the shipped files. Run it again any time. `npm run setup -- --only user` limits it to one office; `--yes` skips the questions.
+During interactive personalization, setup runs `doctor` and lists anything missing, with how to install it. On an existing shipped office, default setup personalizes private files (`organization/PLAYBOOK.md`, `.pi/hq.local.json`); it does not rebuild shipped files. Missing offices are built; `--out` and `--rebuild` deliberately update generated files. Close sessions in offices you will update before running those options. `npm run setup -- --only user` limits it to one office; `--yes` skips the questions.
 
 ### 2. Write your playbook
 
@@ -130,7 +130,7 @@ This practice uses [pi-intercom](https://github.com/nicobailon/pi-intercom), an 
 
 The firm includes four locally adapted [Paperthin](https://github.com/LilMGenius/paperthin) methods, not a new runtime or multi-agent framework.
 
-- All five consultants: `consultant-readchk` checks intent on complex work; `consultant-shower` cold-reads important handoffs when a real independent reviewer is available; `consultant-re0-memo` records useful assignment lessons within the owning office's case.
+- Every consultant: `consultant-readchk` checks intent on complex work; `consultant-shower` cold-reads important handoffs when a real independent reviewer is available; `consultant-re0-memo` records useful assignment lessons within the owning office's case.
 - Coordination consultant only: `coordination-prism` provides human-invoked cross-lens review without automatic agent sessions.
 
 Ask the consultant in plain language for the three shared methods, or run `/skill:coordination-prism` in the coordination office (`coordination-prism` is command-only so the model never runs it automatically). Skill names are prefixed so they do not collide with a global Paperthin installation. These skills do not grant extra authority, replace case storage, message other offices, or publish private records. `consultant-shower` must state when independent review did not run. See the [Paperthin MIT notice](firm/skills/shared/readchk/NOTICE.md).
@@ -184,10 +184,10 @@ Running the same command later updates those offices from your `firm/`. This kee
 
 ## Updating
 
-- **Offices in the repository:** close Pi sessions in them, then `git pull`. Run `npm run setup` afterwards to build any newly added consultant.
-- **Your own offices (`--out`):** `git pull`, then `npm run setup -- --out ~/my-consultants`.
+- **Offices in the repository:** close their Pi sessions and inspect `git status --short` before `git pull`. Git handles tracked-file conflicts; it does not use setup's backups. Preserve local edits before resolving any conflict. Run `npm run setup` afterwards to build newly added offices or refresh private configuration.
+- **Your own offices (`--out`):** pull the kit source, close Pi sessions in the target offices, then inspect `npm run setup -- --out ~/my-consultants --status`. Run `npm run setup -- --out ~/my-consultants` after reviewing the status.
 
-Every update keeps each office's private files (`.hq/`, `organization/PLAYBOOK.md`, `organization/PLAYBOOK.local.md`, `.env`, `.pi/hq.local.json`, `.pi/mcp.json`) and files you added. If you edited a shipped file, setup stops and lists it, changing nothing. Move your change into `firm/`, or rerun with `--force` to save the edited files into `.hq/setup-backup/` and replace them. There is no automatic migration of case records between versions.
+Setup preserves private records and local configuration. If it finds a conflicting shipped file, it stops that office's update before replacing its files. Other offices may already have updated; the operation is not atomic across offices. Review conflicts before using `--force`, which backs up the conflicting files before replacement. There is no automatic case-record migration. See [Office Admin: updates and recovery](firm/docs/OFFICE-ADMIN.md) for exact scope, backups and legacy-case upgrades.
 
 ## Continuous integration
 
@@ -195,32 +195,18 @@ PRs must pass deterministic verification (tests, skill routing, TypeScript entry
 
 ## For maintainers
 
-The factory source is in `firm/`. Its tests run offline and need no Pi credentials:
+Start with the [maintainer guide](firm/README.md) for source ownership, contribution/rebuild steps and review rules. [Office Admin](firm/docs/OFFICE-ADMIN.md) owns update and recovery procedures; [CI guidance](docs/CI.md) owns check and release requirements; the [evaluation guide](firm/eval/README.md) separates functional checks from real-host and consultant-quality evidence.
+
+Before a PR, rebuild changed generated offices and run verification from the repository root:
 
 ```sh
-cd firm
-npm test        # behaviour and integration tests
-npm run check   # syntax, JSON and skill-header checks
-npm run demo    # offline walkthrough with synthetic data; no model or Pi process
-npm run eval    # offline checks of the office startup layout
-```
-
-From the repository root, `npm run verify` runs the tests, the structure check and `drift` — the same command CI runs, and the only one you need before a PR.
-
-**Contributor rule:** `offices/` is generated. Edit `firm/`, then rebuild and commit `offices/` **in the same PR**:
-
-```sh
-npm run setup -- --rebuild
+npm run setup -- --rebuild --yes
 npm run verify
 ```
 
-Forgetting the rebuild fails CI, not silently. Never edit a file under `offices/` by hand: `drift` rejects any committed file the factory does not produce, because Pi auto-loads `.pi/extensions/` and `.pi/skills/` as code. `firm/package.json` is the only version source; a version bump forces a rebuild because the version lands in each office's generated `package.json`.
+Do not edit generated `offices/` files by hand. Review canonical source and all other non-generated changes, including root docs, scripts and workflows. Once drift passes, generated copies do not need line-by-line review.
 
-**Reviewers read `firm/` only.** `offices/**` is marked generated, and CI proves it matches what `firm/` builds, so the generated diff needs no line-by-line reading. When a change touches a third-party pin (`firm/toolset.json`, or the composition lockfile), check the upstream release for that exact version and name it in the release notes — CI enforces that pins are exact, not that anyone looked.
-
-Releases are a tag plus a GitHub release on a `main` commit, cut when there is something to announce; `main` is live for `git pull` regardless. `main` takes PRs only. Users who want a fixed version can `git checkout vX.Y.Z`.
-
-`firm/scripts/live-pi-smoke.mjs` starts real Pi in an office without sending a prompt. Pi startup can still connect your inherited integrations. See `firm/README.md` and `firm/eval/README.md` for details.
+`main` is live for `git pull`. For a fixed published release, use its actual tag in `git checkout <release-tag>`; do not assume a tag exists for every commit.
 
 ## License
 

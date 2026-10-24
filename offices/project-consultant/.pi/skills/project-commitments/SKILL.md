@@ -1,6 +1,6 @@
 ---
 name: coordination-project-commitments
-description: Use when tracker state, PRs, conversations, dates or expectations disagree.
+description: Use when tracker state, PRs, conversations, dates or expectations disagree, or a changed decision affects existing commitments.
 ---
 # Reconcile project state and commitments
 
@@ -12,5 +12,4 @@ When the user changes a consequential decision, trace the effect on relevant pla
 
 This is a light adaptation of [Agency Agents — Chief of Staff](https://github.com/msitarzewski/agency-agents/blob/main/specialized/specialized-chief-of-staff.md) (MIT), not an autonomous chief-of-staff role.
 
-## Working contract
-Use the general consultation entry point in AGENTS.md. This is a method, not a compulsory workflow. Combine it with another method only when that improves the requested outcome. Respect review versus revision authority. Check the current case and retain only material findings, decisions and open questions. Report actual evidence and limitations.
+Follow the shared practice in AGENTS.md; use this method only when it helps the task.

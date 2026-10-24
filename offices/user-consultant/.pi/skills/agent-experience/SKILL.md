@@ -1,6 +1,6 @@
 ---
 name: user-agent-experience
-description: Use when AI agents use the product, through an API, CLI, MCP server, documentation, web UI or files, to do work a person assigned them.
+description: Use when AI agents use the product through an API, CLI, MCP server, documentation, web UI or files, or when reviewing first-run developer and agent onboarding.
 ---
 # Evaluate the product for its agent users
 
@@ -12,5 +12,6 @@ For a developer tool, SDK, API, CLI, or Pi extension, trace the path from a genu
 
 This focus is adapted from [Agency Agents — DX Engineer](https://github.com/msitarzewski/agency-agents/blob/main/product/product-dx-engineer.md) (MIT); retain the existing human-and-agent experience scope.
 
-## Working contract
-Use the general consultation entry point in AGENTS.md. This is a method, not a compulsory workflow. Combine it with another method only when that improves the requested outcome. Respect review versus revision authority. Check the current case and retain only material findings, decisions and open questions. Report actual evidence and limitations.
+For human developer onboarding, combine with user-usability-evaluation and, where the entry point is a repository or package page, user-public-presentation. Keep human walkthrough evidence separate from observed agent trajectories.
+
+Follow the shared practice in AGENTS.md; use this method only when it helps the task.

@@ -38,7 +38,7 @@
     ".pi/skills/impeccable/SOURCE.md": "61ee38edcd5757eb0bed36b9971a46e525501f628d80423f55b73a460989b043",
     ".pi/skills/impeccable/references/working-methods.md": "bad4d84a18b9c60f0d3aa1f6f0050f5034d5dee7a0e8618b5e9196271771cd0c",
     ".pi/skills/impeccable/scripts/impeccable.mjs": "e2b61b92766815dd5cbdbcf2625c959b53727f13ef8a82f0a4d59c3fa6334766",
-    ".pi/skills/re0-memo/SKILL.md": "e7f12a87ee373ca8b6a2248b8a8138957c8698aa7caa3a82f6f5a6a5c7fa7c6e",
+    ".pi/skills/re0-memo/SKILL.md": "1de832e2d4de8dd07dc9cfd6af5c93f15dcf56f72815ad90ac3531e70ab5f726",
     ".pi/skills/readchk/NOTICE.md": "535343f22a217820cab33907f312d4cc2d302d883a9d3216c12798dc49e62b0f",
     ".pi/skills/readchk/SKILL.md": "ffc9e4a3d80342ed858f4715769f6c3f76a9b4d84deb7102880c850dfcb13019",
     ".pi/skills/shower/SKILL.md": "174dcd6d7ddc4c51a6060a1a0851ef8580855b97c6dda58e9e90948ef8fef0cb",
@@ -57,9 +57,9 @@
     ".runtime/src/sessions.mjs": "0f4e232f8060dabeb3d62cddd774e844bcbcbd5062a429a9dedc9e2b2460ca56",
     ".runtime/src/upgrade.mjs": "79e10286baecd0f5e5613124fd0617e48b10b99f9be9ef3de46109c38fd1de93",
     ".runtime/src/util.mjs": "7bac0378e305f11a8ba33e1e8e942bf1c80a6ddde1c9a95848de86c5e5c8d021",
-    "AGENTS.md": "1224f5077a7a3fd0de32f6def379c2f77b25954843ef6d872282c78ce839b19b",
+    "AGENTS.md": "2c51546f7f5b010a9f293de7f6c95a2609ebc0e3ba546147bcc72af5fc29fd69",
     "LICENSE": "2f80ad90b0b3ead0ac928340c096946b482180ede21944cdb6420fbb609c738f",
-    "README.md": "632e6968cb3a1941e2dc3d1455fcbaf931079bfc69dbf94ed762fb62cf9bba71",
+    "README.md": "b451ea9290cf9d8481ea0d5192358d9ddd60034224e5860cd08cd84d9bdc96e7",
     "organization/PLAYBOOK.example.md": "71909cc0666b7c50e6f44f6c079a4d8409fee9786f2643481fe8d37ed2982537",
     "package.json": "562c99a01644f7cc5899f1c3bfbb5213807949d255614302ee608a3cc322a79b"
   }
