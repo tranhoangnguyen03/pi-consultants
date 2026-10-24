@@ -45,6 +45,21 @@
     ]
   },
   {
+    "folder": "research-consultant",
+    "role": "research",
+    "letter": "E",
+    "identity": "consultant E, the research scientist",
+    "title": "RESEARCH",
+    "tagline": "discover · investigate · hypothesize · experiment · explain",
+    "banner": [
+      "   ╭────────╮  ",
+      "   │  ◉  ◉  │  ",
+      "   │   ∑    │  ",
+      "   ╰──┬───╯  ",
+      "      ╰╮     "
+    ]
+  },
+  {
     "folder": "design-consultant",
     "role": "design",
     "letter": "F",

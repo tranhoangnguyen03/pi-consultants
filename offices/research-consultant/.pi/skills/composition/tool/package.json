@@ -1,0 +1,7 @@
+{
+  "name": "consultant-composition-tool",
+  "private": true,
+  "dependencies": {
+    "hyperframes": "0.8.161"
+  }
+}
