@@ -34,3 +34,7 @@ No model prompt is sent. Normal Pi startup can connect inherited integrations. R
 The canonical files are `skills/shared/{readchk,shower,re0-memo}/SKILL.md` (`consultant-readchk`, `consultant-shower`, `consultant-re0-memo`) and `skills/coordination/prism/SKILL.md` (`coordination-prism`). The shared `skills/shared/readchk/NOTICE.md` carries upstream copyright, commit pin, and MIT license. `coordination-prism` is user-invoked (`/skill:coordination-prism`) and distributed only to coordination.
 
 Regenerate with `npm run setup -- --rebuild`, then run `npm run verify` at the repo root. This adds no runtime dependency or new cross-office coordination mechanism.
+
+## Design office: Impeccable workbench
+
+The design role alone receives `skills/design/impeccable/`: a pinned on-demand detector adapter and selected Impeccable-inspired tactics. Its output remains a normal consultation; lasting project choices and feedback stay in F's HQ cases, not in Impeccable's PRODUCT.md/DESIGN.md project workspace. The script uses ignored `<F-HQ>/.hq/tools/`, disables telemetry and adds no Pi hook or MCP dependency. See the design office guide and skill SOURCE.md.
