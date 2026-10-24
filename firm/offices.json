@@ -58,5 +58,20 @@
       "   ╰──┬───╯  ",
       "      ╰╮     "
     ]
+  },
+  {
+    "folder": "design-consultant",
+    "role": "design",
+    "letter": "F",
+    "identity": "consultant F, the design and front-end consultant",
+    "title": "DESIGN & FRONT-END",
+    "tagline": "shape · build · inspect · refine",
+    "banner": [
+      "  ╭─────────╮  ",
+      "  │ ◇   ◇   │  ",
+      "  │  ┌───┐  │  ",
+      "  │  └───┘  │  ",
+      "  ╰─────────╯  "
+    ]
   }
 ]

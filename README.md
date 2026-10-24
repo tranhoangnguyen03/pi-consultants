@@ -1,6 +1,6 @@
 # Pi Consultants
 
-Four AI consultants for [Pi](https://pi.dev), the terminal coding agent. Each one runs in its own folder, called an **office**, and its notes stay there between conversations. You keep doing your everyday work in your usual Pi session. When you want a second opinion, a careful review, help with the people side of a project, or a hard look at how your product works for its users, you open a consultant in another terminal.
+Five AI consultants for [Pi](https://pi.dev), the terminal coding agent. Each one runs in its own folder, called an **office**, and its notes stay there between conversations. You keep doing your everyday work in your usual Pi session. When you want a second opinion, a careful review, help with the people side of a project, or a hard look at how your product works for its users, you open a consultant in another terminal.
 
 The offices are **ready to use** in this repository's `offices/` folder. Clone it, run one setup command, and start Pi in an office.
 
@@ -13,7 +13,7 @@ The offices are **ready to use** in this repository's `offices/` folder. Clone i
 - **It brings its own tools.** Every office ships the same toolset: web search and reading, documents, a browser, diagrams, Chrome DevTools audits, and optional connectors for the services you use. Your personal Pi setup is a bonus, not a requirement.
 - **Local and private.** Offices are ordinary folders on your machine. There is no shared server or firm-wide memory, and the consultants don't share records.
 
-## The four consultants
+## The five consultants
 
 | Office folder | Consultant | Ask it about |
 |---|---|---|
@@ -21,6 +21,7 @@ The offices are **ready to use** in this repository's `offices/` folder. Clone i
 | `offices/project-consultant/` | **Coordination and communication consultant (C)** | Priorities, commitments, stakeholders, meeting decisions, dependencies, release handoffs, and clear writing for the people involved. |
 | `offices/user-consultant/` | **User consultant (D)** | Everyone who uses your product, people and the AI agents people assign tasks to: user research and synthesis, usability, UI critique, accessibility, behaviour analytics, journey maps, interface writing, agent experience, delegation to agents, and how a repository or package page looks to a first-time visitor. |
 | `offices/research-consultant/` | **Research scientist (E)** | Literature, scientific reasoning, hypotheses, experiment design and analysis, recent practitioner reports, and clear findings. |
+| `offices/design-consultant/` | **Design & front-end consultant (F)** | Visual direction, interaction design, front-end implementation, responsive layouts, interface polish, and browser-based review. |
 
 You don't need to pick a skill or fill in a form. Describe your concern in plain language and the consultant decides how to approach it. Every consultant has normal Pi powers: it can read files, run commands and edit files on your machine, and work in your repositories and connected services. Their specialty decides which tools they reach for, not which they may use. Before any outside action (pushing, posting, messaging, changing a ticket) a consultant gives you a heads-up. Any consultant can also prepare an exact outgoing action for you to approve with `/hq approve` first, then keep a receipt (the optional outbox).
 
@@ -67,7 +68,7 @@ cd ~/pi-consultants
 npm run setup
 ```
 
-The four offices are already in the repository. Setup asks a few questions for each one; press Enter to skip any:
+The five offices are already in the repository. Setup asks a few questions for each one; press Enter to skip any:
 
 - **Your organization's shared playbook?** Give the path to one playbook file and setup installs it in every office (next step). Or skip, and it offers to copy the example for you to edit.
 - **Project folders** the consultant works in, for example `~/code/my-project`. Folders must exist.
@@ -108,6 +109,8 @@ Always start Pi **from inside the office folder**. That is how Pi finds the cons
 Please review the error handling in ~/code/my-project/src/api and tell me what you'd fix first.
 ```
 
+After Pi starts in a consultant office, you may use `/cd /path/to/project` to work in that project without moving the consultant's HQ, skills or case records. For instance, start in `offices/design-consultant`, then `/cd ~/code/my-app`. The Impeccable detector uses the visited project's working directory.
+
 Useful commands inside an office:
 
 - `/consult`, `/case-recap`, `/close-consultation`: prompts for opening a consultation, recapping a project's history and wrapping one up.
@@ -115,7 +118,7 @@ Useful commands inside an office:
 - `/mcp`: shows connectors; sign in to the ones you switched on.
 - `pi --continue` (from the office folder): resumes the most recent conversation.
 
-The other offices work the same way: `cd ~/pi-consultants/offices/project-consultant`, `cd ~/pi-consultants/offices/user-consultant`, or `cd ~/pi-consultants/offices/research-consultant`, then `pi`. See [Research Scientist E](docs/research-consultant.md) for optional tools and the safe recent-search mode.
+The other offices work the same way: `cd ~/pi-consultants/offices/project-consultant`, `cd ~/pi-consultants/offices/user-consultant`, `cd ~/pi-consultants/offices/research-consultant`, or `cd ~/pi-consultants/offices/design-consultant`, then `pi`. See [Research Scientist E](docs/research-consultant.md) for optional tools and the safe recent-search mode, and [Design & Front-end F](docs/design-consultant.md) for role-specific guidance.
 
 ## Optional: human-steered parallel sessions
 
@@ -127,7 +130,7 @@ This practice uses [pi-intercom](https://github.com/nicobailon/pi-intercom), an 
 
 The firm includes four locally adapted [Paperthin](https://github.com/LilMGenius/paperthin) methods, not a new runtime or multi-agent framework.
 
-- All three consultants: `consultant-readchk` checks intent on complex work; `consultant-shower` cold-reads important handoffs when a real independent reviewer is available; `consultant-re0-memo` records useful assignment lessons within the owning office's case.
+- All five consultants: `consultant-readchk` checks intent on complex work; `consultant-shower` cold-reads important handoffs when a real independent reviewer is available; `consultant-re0-memo` records useful assignment lessons within the owning office's case.
 - Coordination consultant only: `coordination-prism` provides human-invoked cross-lens review without automatic agent sessions.
 
 Ask the consultant in plain language for the three shared methods, or run `/skill:coordination-prism` in the coordination office (`coordination-prism` is command-only so the model never runs it automatically). Skill names are prefixed so they do not collide with a global Paperthin installation. These skills do not grant extra authority, replace case storage, message other offices, or publish private records. `consultant-shower` must state when independent review did not run. See the [Paperthin MIT notice](firm/skills/shared/readchk/NOTICE.md).
