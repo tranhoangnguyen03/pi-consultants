@@ -38,3 +38,19 @@ The shared browser, Chrome DevTools, diagram and composition tools are included;
 ## Verification
 
 Maintainers edit `firm/`, rebuild with `npm run setup -- --rebuild --yes`, then run `npm run verify`. Live authenticated Pi and browser/model-quality evaluation remain separate qualification steps.
+
+## Impeccable workbench (F only)
+
+F carries the `design-impeccable` skill: selected [Impeccable](https://github.com/pbakaus/impeccable) design tactics plus its pinned **deterministic UI detector**. This is a scoped adapter, not a full upstream skill installation.
+
+```sh
+# First scan downloads the binary into F's ignored .hq/tools.
+node offices/design-consultant/.pi/skills/impeccable/scripts/impeccable.mjs detect /path/to/project src/
+node offices/design-consultant/.pi/skills/impeccable/scripts/impeccable.mjs detect /path/to/project https://example.com
+```
+
+Use an absolute script path when outside the firm checkout. `detect` emits JSON; exit 0 means no primary findings, 2 means findings, 1 means an operational failure. First use requires network access. The adapter pins npm `impeccable@4.7.1` and engine `0.1.17`, installs with npm lifecycle scripts disabled, uses an isolated HQ home/cache, strips model credentials, and **forces telemetry off**. It does not write `PRODUCT.md`, `DESIGN.md` or an `.impeccable/` project-memory tree.
+
+Design context, accepted direction, feedback and rationale use existing `hq_paper`, `hq_note` and `hq_brief` records. F picks and runs its own methods without interrupting you for intermediate approval. For substantial UI, it presents the rendered **quality gate** for acceptance or rework, then obtains **delivery gate** authorization for a push, deploy or other outside action unless the present mandate already granted it.
+
+Upstream `init`, `document`, `critique-storage`, `live`, `generate`, hooks and separate critique subagents are **not installed** here; these require further Pi and project-state testing. F can already generate alternatives with the normal browser/frontend tools. This integration does not claim full Impeccable parity.
