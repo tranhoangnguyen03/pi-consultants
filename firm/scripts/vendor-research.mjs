@@ -37,6 +37,14 @@ try {
  if(!content.includes(anchor))throw Error('Literature-review insertion point changed; review the local source-independence addition.');
  const addition=await fs.readFile(path.join(root,'research-additions/literature-review.md'),'utf8');
  await fs.writeFile(review,content.replace(anchor,'\n'+addition+anchor));
+ const thinking=path.join(roleDir,'scientific-critical-thinking/SKILL.md');
+ const thinkingContent=await fs.readFile(thinking,'utf8');
+ const visualStart=thinkingContent.indexOf('\n## Visual Aids (Optional)\n');
+ const visualEnd=thinkingContent.indexOf('\n## Core Capabilities\n',visualStart);
+ if(visualStart<0||visualEnd<0)throw Error('Critical-thinking visual section changed; review the local diagram guidance.');
+ const visuals=await fs.readFile(path.join(root,'research-additions/scientific-critical-thinking-visuals.md'),'utf8');
+ const adaptedThinking=thinkingContent.slice(0,visualStart)+'\n'+visuals+thinkingContent.slice(visualEnd);
+ await fs.writeFile(thinking,adaptedThinking.replace(/^compatibility: .+$/m,'compatibility: Analytical guidance needs no network. Optional diagrams use the installed diagram-design skill.'));
  const dest=path.join(roleDir,'last30days');
  await fs.cp(path.join(l30,'skills/last30days'),dest,{recursive:true});
  await fs.copyFile(path.join(l30,'LICENSE'),path.join(dest,'UPSTREAM-LICENSE'));

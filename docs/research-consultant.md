@@ -19,7 +19,7 @@ The skills and their supporting scripts are committed and installed locally by t
 
 Research works with the ordinary Pi, browser, shell, and document tools. Some specialist K-Dense scripts require Python 3.11+ or 3.12+, network access, and optional packages installed in a task-specific environment. They are not installed for every user or office. If an optional package is absent, the agent should report the limitation and use available methods.
 
-The local `last30days` safe runner needs Python 3.12+. It uses only public keyless sources and keeps its home, configuration, cache, and reports under the research HQ's ignored `.hq/last30days/` folder. It does not read browser cookies, inherit host API tokens, enable paid providers, auto-run its setup wizard, or publish reports. It disables upstream Keychain lookup and hides host credential helpers (`gh`, `pass`, and `security`) from the engine; GitHub uses its unauthenticated API tier. It omits five upstream sample media assets unrelated to research execution. Coverage varies with network/provider limits. Do not run its upstream engine or authenticated setup directly inside this baseline office. It is a source of community signals, not scientific verification.
+The local `last30days` safe runner needs Python 3.12+. It uses only public keyless sources and keeps its home, configuration, cache, and reports under the research HQ's ignored `.hq/last30days/` folder. It does not read browser cookies, inherit host API tokens, enable paid providers, auto-run its setup wizard, or publish reports. It disables upstream Keychain lookup and hides host credential helpers (`gh`, `pass`, and `security`) from the engine; GitHub uses its unauthenticated API tier. It omits five upstream sample media assets unrelated to research execution. Coverage varies with network/provider limits. The runner rejects upstream command topics such as `setup`, `doctor`, `library feed`, and queue commands. Do not run its upstream engine or authenticated setup directly inside this baseline office. It is a source of community signals, not scientific verification.
 
 To check the last30days runner (replace the path with your HQ):
 
@@ -29,7 +29,7 @@ node offices/research-consultant/.pi/skills/last30days/scripts/hq-safe-run.mjs -
 
 ## Maintenance and evidence
 
-The skills are vendored at pinned commits. Maintainers may deliberately update `firm/research-sources.json`, review upstream changes, and run `node firm/scripts/vendor-research.mjs`; then regenerate offices and run `npm run verify`. The script reapplies the local source-independence guidance from `firm/research-additions/literature-review.md`; maintain that addition there rather than editing the vendored copy. There are no runtime updates.
+The skills are vendored at pinned commits. Maintainers may deliberately update `firm/research-sources.json`, review upstream changes, and run `node firm/scripts/vendor-research.mjs`; then regenerate offices and run `npm run verify`. The script reapplies the local source-independence and diagram guidance from `firm/research-additions/`; maintain those additions there rather than editing the vendored copies. There are no runtime updates.
 
 Save significant findings and source references with existing HQ cases and papers. Keep experiment code/data in an authorized project workspace, with relevant commands, versions, and artifacts referenced from the case. Do not claim that a cited finding was independently verified when it was only reported by a source.
 

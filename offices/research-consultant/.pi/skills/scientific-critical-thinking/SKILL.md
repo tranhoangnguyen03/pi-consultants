@@ -3,7 +3,7 @@ name: scientific-critical-thinking
 description: Evaluates scientific claims and evidence quality. Applies to experimental design validity, biases and confounders, statistical interpretation, evidence grading frameworks (GRADE, Cochrane Risk of Bias), and teaching critical analysis. Supports evidence appraisal and identifying flaws; formal peer review writing belongs to peer-review.
 allowed-tools: Read Write Edit
 license: MIT license
-compatibility: Analytical guidance needs no network. Optional figures via the scientific-schematics skill require OPENROUTER_API_KEY and outbound API access to OpenRouter.
+compatibility: Analytical guidance needs no network. Optional diagrams use the installed diagram-design skill.
 metadata:
   version: "1.5"
   last-reviewed: "2026-10-01"
@@ -56,26 +56,9 @@ are teaching examples, not empirical findings or validated patient-specific advi
 
 Only add figures when the **user explicitly requests** a diagram (for example, a GRADE flowchart, bias decision tree, or evidence-quality framework).
 
-**When figures help:**
-- Critical thinking framework diagrams
-- Bias identification decision trees
-- Evidence quality assessment flowcharts
-- GRADE or risk-of-bias evaluation frameworks
+Use the installed **diagram-design** skill for evidence maps, flowcharts, and other diagrams. Resolve its instructions from the current office's skill catalogue; do not assume that your working directory is the office or the firm repository. Review every label against the assessed evidence. A diagram illustrates the assessment; it is not additional scientific evidence.
 
-**How to create figures:**
-- **Preferred:** Use the **scientific-schematics** skill for AI-generated diagrams from a natural-language description
-- **Alternative:** Build figures in your usual tools (draw.io, PowerPoint, matplotlib, etc.)
-
-Run from the repository root, with `OPENROUTER_API_KEY` set:
-
-```bash
-python skills/scientific-schematics/scripts/generate_schematic.py "Illustrative GRADE appraisal: define outcome and comparison, assess certainty domains with reasons; keep recommendation decisions separate" -o figures/grade_flowchart.png --doc-type report
-```
-
-This optional command's CLI was checked with `--help`; paid generation was not exercised
-for this example. Follow that skill's current dependencies and review every generated label.
-
-**Disclosure:** AI schematic generation sends your prompt to [OpenRouter](https://openrouter.ai/) (a third-party API). Do not include unpublished sensitive details unless that transmission is appropriate for your project.
+If you use an external image-generation service, obtain authorization before sending private or unpublished research material. No paid image-generation service is required for this workflow.
 
 ---
 

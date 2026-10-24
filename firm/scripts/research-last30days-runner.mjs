@@ -13,6 +13,12 @@ if(cmd.length!==1||(!cmd[0]?.trim())||(cmd[0].startsWith('-')&&cmd[0]!=='--prefl
  process.exit(2);
 }
 const isPreflight=cmd[0]==='--preflight';
+// The upstream engine also dispatches commands from positional topic text.
+const topic=cmd[0].trim().toLowerCase();
+if(['setup','doctor','library feed','library search','queue list','queue cover'].includes(topic)||topic.startsWith('library search ')||topic.startsWith('queue cover ')){
+ console.error('Only public research topics and --preflight are supported; upstream commands are disabled.');
+ process.exit(2);
+}
 const env={
  PATH:process.env.PATH||'/usr/bin:/bin',
  HOME:path.join(base,'home'),

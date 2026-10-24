@@ -27,14 +27,23 @@ test('Research Scientist E is a generated independent HQ with exactly eight spec
  await fs.access(path.join(source,'last30days/UPSTREAM-LICENSE'));
  await fs.access(path.join(source,'last30days/UPSTREAM-SKILL.md'));
 });
-test('Research vendoring preserves the local literature-review method across repeated refreshes',async t=>{
+test('Research vendoring preserves local literature-review and diagram guidance across repeated refreshes',async t=>{
  const d=await temp(t),upstream=path.join(d,'upstream'),firm=path.join(d,'firm');
  const addition=await fs.readFile(path.join(root,'research-additions/literature-review.md'),'utf8');
  const expected=await fs.readFile(path.join(root,'skills/research/literature-review/SKILL.md'),'utf8');
  assert(expected.includes(addition+'\n'));
+ const visuals=await fs.readFile(path.join(root,'research-additions/scientific-critical-thinking-visuals.md'),'utf8');
+ const expectedThinking=await fs.readFile(path.join(root,'skills/research/scientific-critical-thinking/SKILL.md'),'utf8');
+ assert(expectedThinking.includes(visuals));
+ assert.match(visuals,/diagram-design/);
+ assert(!visuals.includes('skills/scientific-schematics/'));
+ const upstreamThinking=expectedThinking
+  .replace(visuals,'## Visual Aids (Optional)\n\nUpstream diagram guidance.\n\n---\n')
+  .replace(/^compatibility: .+$/m,'compatibility: Optional figures require scientific-schematics and OPENROUTER_API_KEY.');
  for(const name of required){
   const dir=path.join(upstream,'skills',name);await fs.mkdir(dir,{recursive:true});
-  await fs.writeFile(path.join(dir,'SKILL.md'),name==='literature-review'?expected.replace(addition+'\n',''):`# ${name}\n`);
+  const content=name==='literature-review'?expected.replace(addition+'\n',''):name==='scientific-critical-thinking'?upstreamThinking:`# ${name}\n`;
+  await fs.writeFile(path.join(dir,'SKILL.md'),content);
  }
  await fs.mkdir(path.join(upstream,'skills/last30days/scripts'));
  await fs.writeFile(path.join(upstream,'skills/last30days/scripts/last30days.py'),'# Fixture engine\n');
@@ -54,6 +63,7 @@ test('Research vendoring preserves the local literature-review method across rep
   const result=spawnSync(process.execPath,[path.join(firm,'scripts/vendor-research.mjs')],{encoding:'utf8',timeout:30000});
   assert.equal(result.status,0,result.stderr);
   assert.equal(await fs.readFile(path.join(firm,'skills/research/literature-review/SKILL.md'),'utf8'),expected);
+  assert.equal(await fs.readFile(path.join(firm,'skills/research/scientific-critical-thinking/SKILL.md'),'utf8'),expectedThinking);
  }
 });
 test('last30days launches with isolated credentials and disables the upstream Keychain source',async t=>{
@@ -76,7 +86,7 @@ else{
   await fs.chmod(helper,0o700);
  }
  const env={PATH:bin,OPENAI_API_KEY:'fake-secret',GITHUB_TOKEN:'fake-secret',LAST30DAYS_SKIP_KEYCHAIN:'0',LAST30DAYS_KEYCHAIN_ALIASES:'host-alias',GH_CONFIG_DIR:'/host/gh',LAST30DAYS_PASS_PREFIX:'host/'};
- for(const input of ['public topic','--preflight']){
+ for(const input of ['public topic','setup guide','doctor appointments','library searching','queue coverage','--preflight']){
   const result=spawnSync(process.execPath,[path.join(scripts,'hq-safe-run.mjs'),input],{cwd:d,env,encoding:'utf8'});
   assert.equal(result.status,0,result.stderr);
   const child=JSON.parse(result.stdout),base=path.join(office,'.hq/last30days');
@@ -90,6 +100,18 @@ else{
   assert.equal(child.env.FROM_BROWSER,'off');assert.equal(child.env.AGENTCOOKIE,'off');
   assert.equal(child.env.BROWSER_CONSENT,'false');
   assert.deepEqual(child.args,[path.join(scripts,'last30days.py'),...(input==='--preflight'?['--preflight']:[input,'--no-browser-cookies','--search','reddit,hackernews,github,polymarket,devto','--emit=json','--save-dir',path.join(base,'reports')])]);
+ }
+});
+test('last30days rejects upstream command topics before Python or filesystem side effects',async t=>{
+ const d=await temp(t),scripts=path.join(d,'office/.pi/skills/last30days/scripts');
+ await fs.mkdir(scripts,{recursive:true});
+ const runner=path.join(scripts,'hq-safe-run.mjs');
+ await fs.copyFile(path.join(root,'scripts/research-last30days-runner.mjs'),runner);
+ for(const input of ['setup',' Setup ','SETUP','doctor','library feed','library search','library search topic','queue list','queue cover','queue cover topic']){
+  const result=spawnSync(process.execPath,[runner,input],{env:{PATH:''},encoding:'utf8'});
+  assert.equal(result.status,2,input);
+  assert.match(result.stderr,/upstream commands are disabled/,input);
+  assert.equal(await fs.access(path.join(d,'office/.hq')).then(()=>true,()=>false),false,input);
  }
 });
 test('last30days direct engine is not the HQ entrypoint; safe runner rejects unsupported flags',async()=>{
