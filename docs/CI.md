@@ -24,7 +24,7 @@ No model calls, Pi binary, connector login, or unpinned third-party install is r
 
 Triggered by every push to `main` (normally a PR merge) and by manual dispatch. Runs independently on Ubuntu and macOS, each with Node 24.15 and a **pinned Pi 1.3.0** installation. The job:
 1. Uses a temporary Pi agent configuration with no operator tokens or session history.
-2. Creates standalone copies of the three built offices.
+2. Creates standalone copies of the five built offices.
 3. Runs `firm/scripts/live-pi-smoke.mjs` against **real Pi** in RPC mode. In CI it uses `--approve --no-mcp` so local bundled resources load but no MCP connections start. Pi may download the already-pinned packages during startup. No prompt is sent to a model.
 4. Checks native tool/command/skill registration, role instructions, isolation sentinels, and another startup after relocating an office.
 5. Retains machine-readable probe reports for 14 days.
