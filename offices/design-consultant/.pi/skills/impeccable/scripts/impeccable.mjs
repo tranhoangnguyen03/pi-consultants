@@ -11,7 +11,7 @@ const toolRoot=path.join(officeRoot,'.hq','tools','impeccable-'+PIN.package);
 const packageFile=path.join(toolRoot,'node_modules','impeccable','package.json');
 const runnerFile=path.join(toolRoot,'node_modules','impeccable','cli','bin','cli.js');
 
-function safeEnv(source=process.env){
+function safeEnv(source=process.env,caller=process.cwd()){
  const home=path.join(toolRoot,'home');
  const env={
   PATH:source.PATH??'',HOME:home,USERPROFILE:home,
@@ -24,8 +24,11 @@ function safeEnv(source=process.env){
   IMPECCABLE_HOME:path.join(toolRoot,'state'),
   IMPECCABLE_NO_TELEMETRY:'1',DO_NOT_TRACK:'1'
  };
- for(const k of ['HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','NO_PROXY','http_proxy','https_proxy','all_proxy','no_proxy','NODE_EXTRA_CA_CERTS','SSL_CERT_FILE','SYSTEMROOT','WINDIR','COMSPEC']){
+ for(const k of ['HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','NO_PROXY','http_proxy','https_proxy','all_proxy','no_proxy','SYSTEMROOT','WINDIR','COMSPEC']){
   if(source[k])env[k]=source[k];
+ }
+ for(const k of ['NODE_EXTRA_CA_CERTS','SSL_CERT_FILE']){
+  if(source[k])env[k]=path.resolve(caller,source[k]);
  }
  return env;
 }
@@ -121,10 +124,10 @@ export function run(argv,{spawn=spawnSync,environment=process.env,caller=process
   ({cwd,targets}=detectInvocation(args,caller,realOffice));
  }else if(args.length){throw new Error(verb+' takes no arguments');}
  prepare();
- const env=safeEnv(environment);
+ const env=safeEnv(environment,caller);
  if(!assertVersion()){
   const cmd=['install','--prefix',toolRoot,'--no-save','--no-package-lock','--ignore-scripts','--no-audit','--no-fund','--no-update-notifier','impeccable@'+PIN.package];
-  const r=spawn('npm',cmd,{cwd:toolRoot,env,stdio:['inherit',2,2]});
+  const r=spawn(process.platform==='win32'?'npm.cmd':'npm',cmd,{cwd:toolRoot,env,stdio:['inherit',2,2]});
   if(r.error)throw r.error;
   if(r.status!==0)throw new Error('Impeccable download/install failed (exit '+(r.status??'signal')+'). No change made to the client project.');
   if(!assertVersion())throw new Error('Impeccable install succeeded but pinned CLI was not found.');

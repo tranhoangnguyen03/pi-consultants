@@ -29,13 +29,14 @@ test('[EV-F02] F-only Impeccable adapter isolates runtime, disables telemetry an
   "console.log('MOCK_INSTALLED');"
  ].join('\n')+'\n';
  await fs.writeFile(path.join(bin,'npm'),mock,{mode:0o755});
- const env={PATH:bin+path.delimiter+process.env.PATH,OPENAI_API_KEY:'secret',IMPECCABLE_NO_TELEMETRY:'0'};
+ const env={PATH:bin+path.delimiter+process.env.PATH,OPENAI_API_KEY:'secret',IMPECCABLE_NO_TELEMETRY:'0',NODE_EXTRA_CA_CERTS:'ca.pem'};
  const run=(...a)=>spawnSync(process.execPath,[script,...a],{cwd:tmp,env,encoding:'utf8'});
  const travel=(...a)=>spawnSync(process.execPath,[script,...a],{cwd:project,env,encoding:'utf8'});
  const a=run('detect',project,'index.html');assert.equal(a.status,0,a.stderr);assert.match(a.stderr,/MOCK_INSTALLED/);
  const result=JSON.parse(a.stdout);
  assert.deepEqual(result.args,['detect','--json','index.html']);
  assert.equal(result.cwd,project);assert.equal(result.env.OPENAI_API_KEY,undefined);
+ assert.equal(result.env.NODE_EXTRA_CA_CERTS,path.join(tmp,'ca.pem'));
  assert.equal(result.env.IMPECCABLE_NO_TELEMETRY,'1');assert.equal(result.env.DO_NOT_TRACK,'1');
  assert(result.env.HOME.startsWith(path.join(hq,'.hq/tools')));
  assert(result.env.IMPECCABLE_HOME.startsWith(path.join(hq,'.hq/tools')));

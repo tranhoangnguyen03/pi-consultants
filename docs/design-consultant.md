@@ -26,6 +26,7 @@ Use the office travel tool to work in a project. Configure project roots and the
 | `design-direction` | Choose or compare visual approaches for real product context. |
 | `design-frontend-implementation` | Build components and flows in the project's existing stack. |
 | `design-visual-review` | Inspect rendered screens, try interactions and refine the result. |
+| `design-impeccable` | Run the pinned Impeccable UI detector and targeted finishing passes. |
 
 Methods are selected as needed, not a required sequence. All use the standard consultation and authority rules.
 
@@ -33,7 +34,7 @@ Methods are selected as needed, not a required sequence. All use the standard co
 
 F can build and edit locally on an explicit implementation request. Review alone does not authorize edits; publishing, pushing or changing shared design files requires the normal outside-action authorization. D owns user research and evidence-led usability findings; B owns broad engineering review. F need not hand work to either office, and cannot read their private cases.
 
-The shared browser, Chrome DevTools, diagram and composition tools are included; optional Figma remains disabled until configured. No new runtime, frontend framework or Impeccable engine is installed. F must state when a live browser, backend, screen-reader or real user test was unavailable.
+The shared browser, Chrome DevTools, diagram and composition tools are included; optional Figma remains disabled until configured. No new runtime or frontend framework is installed; the optional Impeccable detector installs on first use into F's private `.hq/tools/`. F must state when a live browser, backend, screen-reader or real user test was unavailable.
 
 ## Verification
 
