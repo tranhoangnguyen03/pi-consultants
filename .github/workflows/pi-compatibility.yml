@@ -1,0 +1,44 @@
+name: Pi compatibility
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pi-compatibility-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-pi:
+    name: Pi 1.3.0 / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15'
+      - name: Install pinned Pi
+        run: npm install --global --ignore-scripts @earendil-works/pi-coding-agent@1.3.0
+      - name: Show host version
+        run: pi --version
+      - name: Check native office startup, commands, isolation, and relocation
+        env:
+          # An isolated agent directory, with no operator tokens or prior trust decisions.
+          PI_CODING_AGENT_DIR: ${{ runner.temp }}/pi-ci-agent
+          PI_COMPAT_REPORT_DIR: ${{ runner.temp }}/pi-compat-reports
+        run: node firm/scripts/ci-pi-compatibility.mjs
+      - name: Retain bounded probe reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pi-compatibility-${{ matrix.os }}
+          path: ${{ runner.temp }}/pi-compat-reports/*.json
+          if-no-files-found: ignore
+          retention-days: 14
