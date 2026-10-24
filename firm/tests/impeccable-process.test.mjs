@@ -45,7 +45,7 @@ test('[EV-F02] F-only Impeccable adapter isolates runtime, disables telemetry an
  for(const verb of ['init','document','live','generate','critique-storage']){
   const bad=run(verb,project);assert.equal(bad.status,1);assert.match(bad.stderr,/intentionally excludes/);
  }
- const invalid=run('detect',project);assert.equal(invalid.status,1);assert.match(invalid.stderr,/Usage/);
+ const invalid=travel('detect');assert.equal(invalid.status,1);assert.match(invalid.stderr,/Supply a file|Usage/);
  for(const p of ['PRODUCT.md','DESIGN.md','.impeccable'])assert.equal(await fs.access(path.join(project,p)).then(()=>true,()=>false),false);
  for(const o of offices.filter(o=>o.role!=='design')){
   const other=path.join(root,'skills',o.role,'impeccable');
