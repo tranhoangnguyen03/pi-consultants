@@ -31,6 +31,7 @@ test('[EV-F02] F-only Impeccable adapter isolates runtime, disables telemetry an
  await fs.writeFile(path.join(bin,'npm'),mock,{mode:0o755});
  const env={PATH:bin+path.delimiter+process.env.PATH,OPENAI_API_KEY:'secret',IMPECCABLE_NO_TELEMETRY:'0'};
  const run=(...a)=>spawnSync(process.execPath,[script,...a],{cwd:tmp,env,encoding:'utf8'});
+ const travel=(...a)=>spawnSync(process.execPath,[script,...a],{cwd:project,env,encoding:'utf8'});
  const a=run('detect',project,'index.html');assert.equal(a.status,0,a.stderr);assert.match(a.stderr,/MOCK_INSTALLED/);
  const result=JSON.parse(a.stdout);
  assert.deepEqual(result.args,['detect','--json','index.html']);
@@ -54,4 +55,54 @@ test('[EV-F02] F-only Impeccable adapter isolates runtime, disables telemetry an
  for(const rule of ['hq_paper','hq_note','quality gate','Delivery gate','telemetry'])assert(hqSkill.toLowerCase().includes(rule.toLowerCase()),rule);
  const marker=JSON.parse(await fs.readFile(path.join(hq,'HQ-ROLE.json'),'utf8'));
  assert(marker.generated['.pi/skills/impeccable/scripts/impeccable.mjs']);
+ // Running from an HQ that Pi has /cd'd into the client repo needs no project argument.
+ const traveled=travel('detect','--scope','type','index.html');
+ assert.equal(traveled.status,0,traveled.stderr);
+ assert.deepEqual(JSON.parse(traveled.stdout).args,['detect','--json','--scope','type','index.html']);
+ assert.equal(JSON.parse(traveled.stdout).cwd,project);
+ const explicit=run('detect','--project',project,'--viewport=390x844','index.html');
+ assert.equal(explicit.status,0,explicit.stderr);
+ assert.deepEqual(JSON.parse(explicit.stdout).args,['detect','--json','--viewport=390x844','index.html']);
+
+ // Option values are not source targets. Fail closed rather than printing [] with exit 0.
+ for(const opts of [
+  ['--scope','type'],['--scope=type'],
+  ['--viewport','390x844'],['--viewport=390x844'],
+  ['--target','Dashboard'],['--target=Dashboard']
+ ]){
+  const missing=travel('detect',...opts);
+  assert.equal(missing.status,1,opts.join(' ')+': '+missing.stderr);
+  assert.match(missing.stderr,/target|Supply/i);
+  assert.equal(missing.stdout.trim(),'');
+ }
+ // CDP is intentionally the upstream special case: a running local app is the target.
+ const cdp=travel('detect','--cdp','9222','--target','Dashboard');
+ assert.equal(cdp.status,0,cdp.stderr);
+ assert.deepEqual(JSON.parse(cdp.stdout).args,['detect','--json','--cdp','9222','--target','Dashboard']);
+ assert.equal(travel('detect','index.html','--cdp','9222').status,1);
+
+ // macOS /tmp -> /private/tmp and symlinked HQ folders must invoke, never silently exit 0.
+ const alias=path.join(tmp,'F HQ alias');
+ await fs.symlink(hq,alias,'dir');
+ const linkedScript=path.join(alias,'.pi/skills/impeccable/scripts/impeccable.mjs');
+ const linked=spawnSync(process.execPath,[linkedScript,'detect','index.html','--finding'],{cwd:project,env,encoding:'utf8'});
+ assert.equal(linked.status,2,linked.stderr);
+ assert.deepEqual(JSON.parse(linked.stdout).args,['detect','--json','index.html','--finding']);
+
+ // Source copies must fail before creating tool storage or attempting a download.
+ const sourceScript=path.join(root,'skills/design/impeccable/scripts/impeccable.mjs');
+ const source=spawnSync(process.execPath,[sourceScript,'version'],{cwd:tmp,env,encoding:'utf8'});
+ assert.equal(source.status,1,source.stderr);
+ assert.match(source.stderr,/generated consultant office/);
+
+ // The office and all descendants (including symlink aliases) are not scan projects.
+ for(const destination of [hq,path.join(hq,'.pi'),alias,path.join(alias,'.pi')]){
+  const bad=run('detect',destination,'skills');
+  assert.equal(bad.status,1,destination+': '+bad.stderr);
+  assert.match(bad.stderr,/consultant office/i);
+ }
+ const protectedTarget=travel('detect',path.join(alias,'.pi'));
+ assert.equal(protectedTarget.status,1,protectedTarget.stderr);
+ assert.match(protectedTarget.stderr,/private files|consultant office/i);
+
 });

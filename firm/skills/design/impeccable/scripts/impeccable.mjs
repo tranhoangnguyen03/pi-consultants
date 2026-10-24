@@ -43,18 +43,82 @@ function prepare(){
  for(const p of [toolRoot,path.join(toolRoot,'home'),path.join(toolRoot,'tmp')])fs.mkdirSync(p,{recursive:true,mode:0o700});
 }
 
+function withinOffice(candidate,realOffice){
+ return candidate===realOffice||candidate.startsWith(realOffice+path.sep);
+}
+function requireGeneratedOffice(){
+ const hqConfig=path.join(officeRoot,'.pi/hq.json');
+ if(!fs.existsSync(hqConfig))throw new Error('Run the copy shipped in a generated consultant office.');
+ let config;
+ try{config=JSON.parse(fs.readFileSync(hqConfig,'utf8'));}
+ catch{throw new Error('Generated consultant office has unreadable .pi/hq.json.');}
+ if(config.role!=='design')throw new Error('Impeccable integration belongs to the design consultant office.');
+ return fs.realpathSync(officeRoot);
+}
+function detectInvocation(args,caller,realOffice){
+ // Pi starts in the office; /cd moves the execution cwd to the client project.
+ // --project is optional for explicit paths; the older <project> <target> form remains valid.
+ const valueFlags=new Set(['--scope','--viewport','--cdp','--target']);
+ const switches=new Set(['--json','--quiet','--no-advisory','--no-config','--no-inline-ignores','--no-design-system','--no-consent-hiding','--no-overlay-hiding','--fast','--gpt','--gemini']);
+ let project=null,forwarded=[],positional=[],cdp=false,viewport=false,pageTarget=false;
+ for(let i=0;i<args.length;i++){
+  const raw=args[i],flag=raw.startsWith('--')?raw.split('=',1)[0]:null;
+  if(flag==='--project'){
+   const value=raw.includes('=')?raw.slice(raw.indexOf('=')+1):args[++i];
+   if(!value||value.startsWith('--')||project!==null)throw new Error('Use --project <client-directory> once.');
+   project=value;
+   continue;
+  }
+  if(flag&&valueFlags.has(flag)){
+   const value=raw.includes('=')?raw.slice(raw.indexOf('=')+1):args[++i];
+   if(!value||value.startsWith('--'))throw new Error(flag+' requires a value.');
+   if(flag==='--cdp')cdp=true;
+   if(flag==='--viewport')viewport=true;
+   if(flag==='--target')pageTarget=true;
+   if(raw.includes('='))forwarded.push(raw);
+   else forwarded.push(flag,value);
+   continue;
+  }
+  if(flag){
+   if(!switches.has(raw))throw new Error('Unsupported detector flag '+raw+'. Pass an explicit file or URL target.');
+   forwarded.push(raw);continue;
+  }
+  if(raw.startsWith('-'))throw new Error('Unsupported detector flag '+raw);
+  positional.push(raw);forwarded.push(raw);
+ }
+ // Compatibility with previously documented: detect /project src/
+ if(project===null&&positional.length>=2&&path.isAbsolute(positional[0])&&fs.existsSync(positional[0])&&fs.statSync(positional[0]).isDirectory()){
+  project=positional.shift();
+  forwarded.splice(forwarded.indexOf(project),1);
+ }
+ // --cdp is a genuine alternate target: a running local Chromium app.
+ if(cdp){
+  if(positional.length)throw new Error('--cdp scans a running app and takes no file/URL targets.');
+  if(viewport)throw new Error('--viewport cannot be combined with --cdp.');
+ }else{
+  if(pageTarget)throw new Error('--target only selects a page when --cdp is supplied.');
+  if(!positional.length)throw new Error('Supply a file, directory or URL to scan; flag values are not targets.');
+ }
+ const cwd=fs.realpathSync(path.resolve(caller,project??'.'));
+ if(!fs.statSync(cwd).isDirectory())throw new Error('Project must be a directory.');
+ if(withinOffice(cwd,realOffice))throw new Error('Use /cd to travel to a client repo or pass --project; scanning inside the consultant office is forbidden.');
+ for(const target of positional){
+  if(/^https?:\/\//i.test(target))continue;
+  const local=target.startsWith('file://')?fileURLToPath(target):path.resolve(cwd,target);
+  const resolved=fs.existsSync(local)?fs.realpathSync(local):path.resolve(local);
+  if(withinOffice(resolved,realOffice))throw new Error('Cannot scan the consultant office or its private files as a client target.');
+ }
+ return {cwd,targets:forwarded};
+}
+
 export function run(argv,{spawn=spawnSync,environment=process.env,caller=process.cwd()}={}){
  const [verb,...args]=argv;
  if(!['install','version','detect'].includes(verb))throw new Error('Use: impeccable.mjs <install|version|detect>. This adapter intentionally excludes upstream init, document, live, generate and project-state workflows.');
+ // Must fail before prepare()/npm when invoked from firm/ source.
+ const realOffice=requireGeneratedOffice();
  let cwd,targets;
  if(verb==='detect'){
-  if(args.length<2)throw new Error('Usage: impeccable.mjs detect <project-directory> <file|directory|https-URL> [more targets or flags]');
-  const [project,...rest]=args;
-  if(!rest.some(s=>!s.startsWith('-')))throw new Error('Supply a target to detect.');
-  cwd=fs.realpathSync(path.resolve(caller,project));
-  if(!fs.statSync(cwd).isDirectory())throw new Error('Project must be a directory.');
-  if(cwd===officeRoot)throw new Error('Set a client project directory, not the consultant office.');
-  targets=rest;
+  ({cwd,targets}=detectInvocation(args,caller,realOffice));
  }else if(args.length){throw new Error(verb+' takes no arguments');}
  prepare();
  const env=safeEnv(environment);
@@ -76,7 +140,7 @@ export function run(argv,{spawn=spawnSync,environment=process.env,caller=process
  return r.status;
 }
 
-if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+if(process.argv[1]&&fs.realpathSync(process.argv[1])===fileURLToPath(import.meta.url)){
  try{process.exitCode=run(process.argv.slice(2));}
  catch(e){console.error('impeccable-hq: '+e.message);process.exitCode=1;}
 }
