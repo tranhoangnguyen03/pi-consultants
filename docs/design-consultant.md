@@ -43,13 +43,18 @@ Maintainers edit `firm/`, rebuild with `npm run setup -- --rebuild --yes`, then 
 
 F carries the `design-impeccable` skill: selected [Impeccable](https://github.com/pbakaus/impeccable) design tactics plus its pinned **deterministic UI detector**. This is a scoped adapter, not a full upstream skill installation.
 
+Start Pi in `offices/design-consultant`, then use `/cd ~/code/my-project` **inside Pi**. Your project becomes the working directory while F's skills and cases stay at the HQ:
+
 ```sh
-# First scan downloads the binary into F's ignored .hq/tools.
-node offices/design-consultant/.pi/skills/impeccable/scripts/impeccable.mjs detect /path/to/project src/
-node offices/design-consultant/.pi/skills/impeccable/scripts/impeccable.mjs detect /path/to/project https://example.com
+# In the /cd destination (your repo):
+node ~/pi-consultants/offices/design-consultant/.pi/skills/impeccable/scripts/impeccable.mjs detect src/
+node ~/pi-consultants/offices/design-consultant/.pi/skills/impeccable/scripts/impeccable.mjs detect --viewport 390x844 http://localhost:3000
+
+# Optional: scan a project without first using /cd:
+node ~/pi-consultants/offices/design-consultant/.pi/skills/impeccable/scripts/impeccable.mjs detect --project ~/code/my-project src/
 ```
 
-Use an absolute script path when outside the firm checkout. `detect` emits JSON; exit 0 means no primary findings, 2 means findings, 1 means an operational failure. First use requires network access. The adapter pins npm `impeccable@4.7.0` and engine `0.1.16`, installs with npm lifecycle scripts disabled, uses an isolated HQ home/cache, strips model credentials, and **forces telemetry off**. It does not write `PRODUCT.md`, `DESIGN.md` or an `.impeccable/` project-memory tree.
+The old `detect /project src/` form is still accepted. Always use the script in the generated HQ, not `firm/`. Symlinked HQ paths work; attempts to scan F's own office or run flag-only file scans fail with a nonzero exit rather than a false clean result. `detect` emits JSON; exit 0 means no primary findings, 2 means findings, 1 means an operational failure. First use requires network access. The adapter pins npm `impeccable@4.7.0` and engine `0.1.16`, installs with npm lifecycle scripts disabled, uses an isolated HQ home/cache, strips model credentials, and **forces telemetry off**. It does not write `PRODUCT.md`, `DESIGN.md` or an `.impeccable/` project-memory tree.
 
 Design context, accepted direction, feedback and rationale use existing `hq_paper`, `hq_note` and `hq_brief` records. F picks and runs its own methods without interrupting you for intermediate approval. For substantial UI, it presents the rendered **quality gate** for acceptance or rework, then obtains **delivery gate** authorization for a push, deploy or other outside action unless the present mandate already granted it.
 

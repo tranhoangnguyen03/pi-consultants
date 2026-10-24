@@ -15,7 +15,7 @@ test('[EV-F02] F-only Impeccable adapter isolates runtime, disables telemetry an
  const hq=await buildOffice(root,f,toolset,path.join(tmp,'moved F office'));
  const script=path.join(hq,'.pi/skills/impeccable/scripts/impeccable.mjs');
  const project=path.join(tmp,'client project'),bin=path.join(tmp,'bin');
- await fs.mkdir(project);await fs.writeFile(path.join(project,'index.html'),'<h1>hello</h1>');
+ await fs.mkdir(project);await fs.writeFile(path.join(project,'index.html'),'<h1>hello</h1>');await fs.writeFile(path.join(project,'flagged.css'),'.card { font-family: Inter; }');
  await fs.mkdir(bin);
  const mock=[
   '#!'+process.execPath,
@@ -25,7 +25,7 @@ test('[EV-F02] F-only Impeccable adapter isolates runtime, disables telemetry an
   "const p=path.join(prefix,'node_modules','impeccable');",
   "fs.mkdirSync(path.join(p,'cli','bin'),{recursive:true});",
   "fs.writeFileSync(path.join(p,'package.json'),JSON.stringify({version:'4.7.0',optionalDependencies:{'@impeccable/cli-linux-x64':'0.1.16'}}));",
-  "fs.writeFileSync(path.join(p,'cli','bin','cli.js'),\"console.log(JSON.stringify({args:process.argv.slice(2),cwd:process.cwd(),env:process.env}));process.exitCode=process.argv.includes('--finding')?2:0;\");",
+  "fs.writeFileSync(path.join(p,'cli','bin','cli.js'),\"console.log(JSON.stringify({args:process.argv.slice(2),cwd:process.cwd(),env:process.env}));process.exitCode=process.argv.includes('flagged.css')?2:0;\");",
   "console.log('MOCK_INSTALLED');"
  ].join('\n')+'\n';
  await fs.writeFile(path.join(bin,'npm'),mock,{mode:0o755});
@@ -40,8 +40,8 @@ test('[EV-F02] F-only Impeccable adapter isolates runtime, disables telemetry an
  assert(result.env.HOME.startsWith(path.join(hq,'.hq/tools')));
  assert(result.env.IMPECCABLE_HOME.startsWith(path.join(hq,'.hq/tools')));
  assert(!result.env.NODE_OPTIONS);
- const b=run('detect',project,'index.html','--finding');assert.equal(b.status,2);assert.doesNotMatch(b.stderr,/MOCK_INSTALLED/);
- assert.deepEqual(JSON.parse(b.stdout).args,['detect','--json','index.html','--finding']);
+ const b=run('detect',project,'index.html','flagged.css');assert.equal(b.status,2);assert.doesNotMatch(b.stderr,/MOCK_INSTALLED/);
+ assert.deepEqual(JSON.parse(b.stdout).args,['detect','--json','index.html','flagged.css']);
  for(const verb of ['init','document','live','generate','critique-storage']){
   const bad=run(verb,project);assert.equal(bad.status,1);assert.match(bad.stderr,/intentionally excludes/);
  }
@@ -85,9 +85,9 @@ test('[EV-F02] F-only Impeccable adapter isolates runtime, disables telemetry an
  const alias=path.join(tmp,'F HQ alias');
  await fs.symlink(hq,alias,'dir');
  const linkedScript=path.join(alias,'.pi/skills/impeccable/scripts/impeccable.mjs');
- const linked=spawnSync(process.execPath,[linkedScript,'detect','index.html','--finding'],{cwd:project,env,encoding:'utf8'});
+ const linked=spawnSync(process.execPath,[linkedScript,'detect','index.html','flagged.css'],{cwd:project,env,encoding:'utf8'});
  assert.equal(linked.status,2,linked.stderr);
- assert.deepEqual(JSON.parse(linked.stdout).args,['detect','--json','index.html','--finding']);
+ assert.deepEqual(JSON.parse(linked.stdout).args,['detect','--json','index.html','flagged.css']);
 
  // Source copies must fail before creating tool storage or attempting a download.
  const sourceScript=path.join(root,'skills/design/impeccable/scripts/impeccable.mjs');

@@ -18,12 +18,18 @@ Use the brief and case to decide whether to shape, build, critique, polish, hard
 
 ## Run the pinned detector, not the upstream project workflow
 
-From any directory, run the script by its absolute HQ path:
+Start Pi inside F's office, then use `/cd /path/to/client/project` in Pi to travel to your working repository. Your session **still belongs to F's HQ**; the detector uses the visited repo as its scan root. Always call the **absolute path to F's generated skill**:
 
 ```sh
-node <F-HQ>/.pi/skills/impeccable/scripts/impeccable.mjs detect /path/to/client/project src/
-node <F-HQ>/.pi/skills/impeccable/scripts/impeccable.mjs detect /path/to/client/project https://example.com
+# Run from the visited project (after /cd):
+node /absolute/path/to/design-consultant/.pi/skills/impeccable/scripts/impeccable.mjs detect src/
+node /absolute/path/to/design-consultant/.pi/skills/impeccable/scripts/impeccable.mjs detect --scope type src/
+
+# Run from elsewhere:
+node /absolute/path/to/design-consultant/.pi/skills/impeccable/scripts/impeccable.mjs detect --project /path/to/client/project src/
 ```
+
+The earlier `detect /path/to/project src/` form still works. Do not execute the source script in `firm/`: it lacks a generated HQ. Paths inside F's own office, including symlink aliases, cannot be scanned as client targets. Flag values such as `--scope type` and `--viewport 390x844` do not count as scan targets. Upstream `--cdp` legitimately scans an attached local Chromium app without a file target.
 
 The first run downloads pinned `impeccable@4.7.0` and its engine `0.1.16` into F's ignored `.hq/tools/`. It installs no Pi/global skills, disables npm lifecycle scripts and runs the detector with a narrow environment without model credentials. `IMPECCABLE_NO_TELEMETRY=1` and `DO_NOT_TRACK=1` are enforced. Upstream design-world/roll APIs are not used. The script does not write client-project design records or start upstream live mode. `install` and `version` allow explicit tool inspection.
 
