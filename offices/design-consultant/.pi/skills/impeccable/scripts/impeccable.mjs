@@ -5,7 +5,7 @@ import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 
-export const PIN={package:'4.7.1',engine:'0.1.17'};
+export const PIN={package:'4.7.0',engine:'0.1.16'};
 export const officeRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../../..');
 const toolRoot=path.join(officeRoot,'.hq','tools','impeccable-'+PIN.package);
 const packageFile=path.join(toolRoot,'node_modules','impeccable','package.json');
@@ -60,7 +60,7 @@ export function run(argv,{spawn=spawnSync,environment=process.env,caller=process
  const env=safeEnv(environment);
  if(!assertVersion()){
   const cmd=['install','--prefix',toolRoot,'--no-save','--no-package-lock','--ignore-scripts','--no-audit','--no-fund','--no-update-notifier','impeccable@'+PIN.package];
-  const r=spawn('npm',cmd,{cwd:toolRoot,env,stdio:'inherit'});
+  const r=spawn('npm',cmd,{cwd:toolRoot,env,stdio:['inherit',2,2]});
   if(r.error)throw r.error;
   if(r.status!==0)throw new Error('Impeccable download/install failed (exit '+(r.status??'signal')+'). No change made to the client project.');
   if(!assertVersion())throw new Error('Impeccable install succeeded but pinned CLI was not found.');

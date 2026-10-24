@@ -3,7 +3,7 @@
 - Upstream: https://github.com/pbakaus/impeccable
 - Publisher: Paul Bakaus and contributors
 - License: Apache-2.0, https://github.com/pbakaus/impeccable/blob/main/LICENSE
-- Evaluated pin: npm `impeccable@4.7.1`; platform engine `0.1.17` (upstream's optional dependencies).
+- Evaluated pin: npm `impeccable@4.7.0`; platform engine `0.1.16` (upstream's optional dependencies).
 - This office ships an original narrow Node adapter and original guidance, not the upstream skill tree or binary. Exact CLI and engine binaries download on first use.
 - The adapter source `scripts/impeccable.mjs` owns the pin and disabled-telemetry flags; upgrades require review and a new test.
 

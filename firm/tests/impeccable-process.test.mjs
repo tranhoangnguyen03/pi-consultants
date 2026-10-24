@@ -21,24 +21,26 @@ test('[EV-F02] F-only Impeccable adapter isolates runtime, disables telemetry an
   '#!'+process.execPath,
   "const fs=require('node:fs'),path=require('node:path');",
   "const a=process.argv.slice(2),prefix=a[a.indexOf('--prefix')+1];",
+  "require('node:assert/strict')(a.includes('impeccable@4.7.0')&&a.includes('--ignore-scripts'));",
   "const p=path.join(prefix,'node_modules','impeccable');",
   "fs.mkdirSync(path.join(p,'cli','bin'),{recursive:true});",
-  "fs.writeFileSync(path.join(p,'package.json'),JSON.stringify({version:'4.7.1',optionalDependencies:{'@impeccable/cli-linux-x64':'0.1.17'}}));",
+  "fs.writeFileSync(path.join(p,'package.json'),JSON.stringify({version:'4.7.0',optionalDependencies:{'@impeccable/cli-linux-x64':'0.1.16'}}));",
   "fs.writeFileSync(path.join(p,'cli','bin','cli.js'),\"console.log(JSON.stringify({args:process.argv.slice(2),cwd:process.cwd(),env:process.env}));process.exitCode=process.argv.includes('--finding')?2:0;\");",
   "console.log('MOCK_INSTALLED');"
  ].join('\n')+'\n';
  await fs.writeFile(path.join(bin,'npm'),mock,{mode:0o755});
  const env={PATH:bin+path.delimiter+process.env.PATH,OPENAI_API_KEY:'secret',IMPECCABLE_NO_TELEMETRY:'0'};
  const run=(...a)=>spawnSync(process.execPath,[script,...a],{cwd:tmp,env,encoding:'utf8'});
- const a=run('detect',project,'index.html');assert.equal(a.status,0,a.stderr);assert.match(a.stdout,/MOCK_INSTALLED/);
- const result=JSON.parse(a.stdout.split('\n').find(s=>s.startsWith('{')));
+ const a=run('detect',project,'index.html');assert.equal(a.status,0,a.stderr);assert.match(a.stderr,/MOCK_INSTALLED/);
+ const result=JSON.parse(a.stdout);
  assert.deepEqual(result.args,['detect','--json','index.html']);
  assert.equal(result.cwd,project);assert.equal(result.env.OPENAI_API_KEY,undefined);
  assert.equal(result.env.IMPECCABLE_NO_TELEMETRY,'1');assert.equal(result.env.DO_NOT_TRACK,'1');
  assert(result.env.HOME.startsWith(path.join(hq,'.hq/tools')));
  assert(result.env.IMPECCABLE_HOME.startsWith(path.join(hq,'.hq/tools')));
  assert(!result.env.NODE_OPTIONS);
- const b=run('detect',project,'index.html','--finding');assert.equal(b.status,2);assert.doesNotMatch(b.stdout,/MOCK_INSTALLED/);
+ const b=run('detect',project,'index.html','--finding');assert.equal(b.status,2);assert.doesNotMatch(b.stderr,/MOCK_INSTALLED/);
+ assert.deepEqual(JSON.parse(b.stdout).args,['detect','--json','index.html','--finding']);
  for(const verb of ['init','document','live','generate','critique-storage']){
   const bad=run(verb,project);assert.equal(bad.status,1);assert.match(bad.stderr,/intentionally excludes/);
  }

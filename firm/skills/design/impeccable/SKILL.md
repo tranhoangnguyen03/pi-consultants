@@ -25,7 +25,7 @@ node <F-HQ>/.pi/skills/impeccable/scripts/impeccable.mjs detect /path/to/client/
 node <F-HQ>/.pi/skills/impeccable/scripts/impeccable.mjs detect /path/to/client/project https://example.com
 ```
 
-The first run downloads pinned `impeccable@4.7.1` and its engine `0.1.17` into F's ignored `.hq/tools/`. It installs no Pi/global skills, disables npm lifecycle scripts and runs the detector with a narrow environment without model credentials. `IMPECCABLE_NO_TELEMETRY=1` and `DO_NOT_TRACK=1` are enforced. Upstream design-world/roll APIs are not used. The script does not write client-project design records or start upstream live mode. `install` and `version` allow explicit tool inspection.
+The first run downloads pinned `impeccable@4.7.0` and its engine `0.1.16` into F's ignored `.hq/tools/`. It installs no Pi/global skills, disables npm lifecycle scripts and runs the detector with a narrow environment without model credentials. `IMPECCABLE_NO_TELEMETRY=1` and `DO_NOT_TRACK=1` are enforced. Upstream design-world/roll APIs are not used. The script does not write client-project design records or start upstream live mode. `install` and `version` allow explicit tool inspection.
 
 Exit **0** means scan complete without primary findings; **2** means findings; **1** means scan failure. A passing scan is not proof of design quality. Check rendered screens and interactions with F's browser tools; treat detector warnings as signals, not reasons to override an approved brand or design system. State tool unavailability plainly; continue useful review without claiming a detector pass.
 
