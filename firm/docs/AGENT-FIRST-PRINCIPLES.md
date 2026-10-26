@@ -95,7 +95,22 @@ Reduce repeated explanations, unnecessary decisions and coordination for people.
 
 Save consequential lessons, decisions and unresolved issues deliberately. Distinguish reusable guidance, current source truth, attributed findings, working drafts and temporary execution state. Each should have a clear owner and home.
 
-**Design implication:** Keep continuity without duplicate memory stores or a second task tracker.
+**Established ownership principle:**
+
+> **Specialists own their reusable expertise. Missions own their work and decisions. Runs own temporary execution state.**
+
+This records an existing boundary; it is not a newly proposed architecture. In this repository's terms:
+
+- **Practice** holds specialist identity, methods, skills and deliberately promoted reusable lessons. An enduring specialist does not require one continuously running conversation.
+- **Site** holds shared mission work, accepted findings, decisions and deliverables, according to the organization's playbook. A mission may use a repository, tracker or document as its authoritative record; this principle does not require a new ledger or service. Mission continuity must survive changes in the specialists or workers doing the work.
+- **Office** holds the specialist's private, attributed case records, working material and source references. These records support later consultation; they are not a competing source of shared mission truth or an automatic pool of cross-mission knowledge.
+- **Run or session state** holds the working context and execution history of a particular job or conversation. It may persist for resume, recovery or inspection. "Temporary" describes its scope, not a requirement to erase it when work ends. Retention alone does not make it reusable expertise.
+
+Moving a finding into the mission's accepted record and promoting a general lesson into specialist Practice are separate, deliberate actions. Preserve source, scope and attribution; de-identify private case material and retain the existing human-controlled practice-promotion rule. A completed run does not approve either promotion. Use the existing canonical stores and references, not mirrored copies or another memory system.
+
+Credentials and permissions belong to the authorized user and execution environment, not to portable specialist identity. Changing the launch path, runtime or working directory must not change these ownership or authority boundaries, or silently carry unrelated confidential mission context into new work.
+
+**Design implication:** Keep continuity without duplicate memory stores or a second task tracker. Improve how a specialist arrives at a project without relocating ownership to whichever directory or session happens to be active.
 
 ### 13. Improve through real use
 
