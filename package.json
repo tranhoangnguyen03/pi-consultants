@@ -3,11 +3,15 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:launcher": "node --test test/launcher.test.mjs",
     "setup": "node firm/scripts/setup.mjs",
     "drift": "node firm/scripts/drift.mjs",
-    "verify": "npm test --prefix firm && npm run check --prefix firm && npm run ci:contracts && npm run ci:typescript && npm run ci:privacy && npm run drift",
+    "verify": "npm run test:launcher && npm test --prefix firm && npm run check --prefix firm && npm run ci:contracts && npm run ci:typescript && npm run ci:privacy && npm run drift",
     "ci:contracts": "node firm/scripts/ci-contracts.mjs",
     "ci:privacy": "node firm/scripts/ci-private-files.mjs",
     "ci:typescript": "node firm/scripts/ci-typescript.mjs"
+  },
+  "bin": {
+    "pi-consultants": "./bin/pi-consultants.mjs"
   }
 }
