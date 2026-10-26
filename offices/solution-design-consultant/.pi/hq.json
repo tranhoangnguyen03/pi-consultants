@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "role": "solution-design",
+  "office": {
+    "letter": "G",
+    "title": "SOLUTION DESIGN",
+    "tagline": "frame · shape · challenge · refine · hand off",
+    "banner": [
+      "  ╭──────────╮  ",
+      "  │ ◇──────◆ │  ",
+      "  │ │      │ │  ",
+      "  │ ◆──────◇ │  ",
+      "  ╰──────────╯  "
+    ]
+  },
+  "hq": "..",
+  "stateDir": "../.hq",
+  "kitRoot": "..",
+  "sessionRoots": [],
+  "projectRoots": [],
+  "localReadRoots": [],
+  "attachmentRoots": [],
+  "maxSessionFiles": 500,
+  "maxSessionBytes": 16777216,
+  "maxConsultChars": 80000,
+  "policy": {}
+}

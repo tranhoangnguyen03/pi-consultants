@@ -73,5 +73,20 @@
       "  │  └───┘  │  ",
       "  ╰─────────╯  "
     ]
+  },
+  {
+    "folder": "solution-design-consultant",
+    "role": "solution-design",
+    "letter": "G",
+    "identity": "consultant G, the solution design consultant",
+    "title": "SOLUTION DESIGN",
+    "tagline": "frame · shape · challenge · refine · hand off",
+    "banner": [
+      "  ╭──────────╮  ",
+      "  │ ◇──────◆ │  ",
+      "  │ │      │ │  ",
+      "  │ ◆──────◇ │  ",
+      "  ╰──────────╯  "
+    ]
   }
 ]
