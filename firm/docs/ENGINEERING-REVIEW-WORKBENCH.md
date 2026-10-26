@@ -35,7 +35,7 @@ node /path/to/engineering-consultant/.pi/skills/change-review/scripts/review-too
 
 The preflight helper uses read-only Git/gh and never fetches or checks out. Workspace results separate staged, unstaged and untracked paths; merge commits compare against their first parent and expose that comparison base. These are scope inventories, not code verification.
 
-PR mode records base/head SHAs from the metadata response, but `gh pr diff` retrieves the **live** PR diff—not a diff pinned to those SHAs. Recheck `gh pr view --json baseRefOid,headRefOid` before and after diff retrieval; if either SHA changes, reload the scope. For an exact immutable comparison, fetch those commits into an isolated checkout and use Git. Do not describe `gh pr diff` as pinned.
+PR mode records base/head SHAs from the metadata response, but `gh pr diff` retrieves the **live** PR diff—not a diff pinned to those SHAs. Recheck `gh pr view --json baseRefOid,headRefOid` before and after diff retrieval; if either SHA changes, reload the scope. For an exact immutable comparison, fetch those commits into an isolated checkout and use `git diff BASE_SHA...HEAD_SHA` (merge-base comparison), not a two-tip diff. Do not describe `gh pr diff` as pinned.
 
 The tool doctor checks PATH only; "available" does not establish version, authentication, safety or compatibility. The tools can be installed in a project/HQ-local environment after the operator inspects sources, licenses and setup effects. Don't silently add tools to the shared firm/toolset.json: that would affect every consultant.
 

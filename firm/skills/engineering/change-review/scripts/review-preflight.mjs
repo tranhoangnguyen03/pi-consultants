@@ -23,7 +23,7 @@ function parse(argv) {
   return out;
 }
 function run(cmd,args,cwd,{optional=false}={}) {
-  const r=spawnSync(cmd,args,{cwd,encoding:'utf8',timeout:20000,maxBuffer:32*1024*1024,env:{...process.env,GIT_PAGER:'cat'}});
+  const r=spawnSync(cmd,args,{cwd,encoding:'utf8',timeout:20000,maxBuffer:32*1024*1024,env:{...process.env,GIT_PAGER:'cat',GIT_OPTIONAL_LOCKS:'0'}});
   if(r.error||r.status!==0){
     if(optional)return null;
     throw new Error(`${cmd} ${args[0]??''} failed: ${r.error?.message??r.stderr?.trim().slice(0,600)??`exit ${r.status}`}`);
@@ -87,7 +87,7 @@ function preflight(opts){
     data.reported_file_count=pr.changedFiles;
     if(typeof pr.changedFiles==='number'&&pr.changedFiles>data.files.length)data.warnings.push(`GitHub returned ${data.files.length} of ${pr.changedFiles} changed files; use paginated gh api or git to inspect the full set.`);
     if(current!==data.head)data.warnings.push('Local HEAD differs from PR head. Do not use local working-tree contents as the PR revision.');
-    data.hints.push('The head SHA records this metadata snapshot, but gh pr diff returns the LIVE PR diff, not an immutable diff pinned to that SHA. Recheck the PR head before and after retrieving the diff, or compare locally available immutable Git objects when exact revision consistency matters. Recheck again before publishing comments. No checkout was performed.');
+    data.hints.push('The head SHA records this metadata snapshot, but gh pr diff returns the LIVE PR diff, not an immutable diff pinned to that SHA. Recheck the PR head before and after retrieving the diff, or compare locally available immutable Git objects with git diff BASE_SHA...HEAD_SHA (merge-base comparison) when exact revision consistency matters. Recheck again before publishing comments. No checkout was performed.');
   }
   data.file_count=data.files.length;
   data.status=data.files.length?'ready':'empty';

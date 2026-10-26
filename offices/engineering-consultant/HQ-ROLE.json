@@ -23,6 +23,15 @@
     ".pi/skills/asd-ste100/scripts/ste-lint.py": "1b97b2d22ba50cde10654db56e1b98adf96d250dd3c8f693f8a81361b1084e85",
     ".pi/skills/behavioral-assurance/SKILL.md": "e03caa8b3613318ba7ff8af90f6260ff33c1c808ea96f139e3c1997db57ffa4f",
     ".pi/skills/change-review/SKILL.md": "c9f980ad37b99a1cc4fda2d0c256e7b2c0971b9fef76d03643c0b28560717042",
+    ".pi/skills/change-review/SOURCE.md": "1b8d9b8c07219d427ed2e7c500b91ad175c071fa801916715af898e07a1510ab",
+    ".pi/skills/change-review/references/findings-and-continuity.md": "df1d012ecf8583d32e116e50439c164beece471cba89b1cfd22a0d139ab67207",
+    ".pi/skills/change-review/references/impact-and-analysis.md": "ff03cc9b5ab39382287a405e7086235344dcf3765365bd8785a5f6dc425688eb",
+    ".pi/skills/change-review/references/review-judgment.md": "262146b8253e8aaa5f09501346b213f822f0b32dcdadb966dcffdca7a5ce1de6",
+    ".pi/skills/change-review/references/scope-and-context.md": "bf1a68183ac33ee8c6bab5e4cc66d0c285ae0b9fd31e732791f7f7854a3f1499",
+    ".pi/skills/change-review/references/specialists-and-verification.md": "9e361d7b61ed84c8ebbbb6debbbd3b41c54dca8c96324a6a467061ba3565e251",
+    ".pi/skills/change-review/references/tool-setup.md": "c2ab8531df7d69dae987d21f9bed80668e86685e360571b61b9c1ca609f8aa3a",
+    ".pi/skills/change-review/scripts/review-preflight.mjs": "0156cd120ef404e670a43225bbc78deb8d33a6e22d2de7256a8563f2c2b793a3",
+    ".pi/skills/change-review/scripts/review-tool-doctor.mjs": "8222ddb4203da2f1df8902ea20485e9215c0ad76b27376160332394afed3f754",
     ".pi/skills/code-optimize/SKILL.md": "403838ebfece4fd318a6950ea1c884c33250aa0401ba5ac533c3d2b496c03cbd",
     ".pi/skills/codebase-orientation/SKILL.md": "8cb533522ea4b4b90203b3510a4f3e4f601f5672aa55ed88c44fb5324eba810a",
     ".pi/skills/composition/SKILL.md": "6b9ec699c5fc9e0e6176392cf6de14670e3330006644f7bdb14fcd1a3fee71ee",
@@ -66,15 +75,6 @@
     "LICENSE": "2f80ad90b0b3ead0ac928340c096946b482180ede21944cdb6420fbb609c738f",
     "README.md": "b451ea9290cf9d8481ea0d5192358d9ddd60034224e5860cd08cd84d9bdc96e7",
     "organization/PLAYBOOK.example.md": "71909cc0666b7c50e6f44f6c079a4d8409fee9786f2643481fe8d37ed2982537",
-    "package.json": "e23bc9f31ea6beb92da1b5e92f0bc8f9d02f32db89d129783cf2e7928db1c0b5",
-    ".pi/skills/change-review/SOURCE.md": "1b8d9b8c07219d427ed2e7c500b91ad175c071fa801916715af898e07a1510ab",
-    ".pi/skills/change-review/references/findings-and-continuity.md": "df1d012ecf8583d32e116e50439c164beece471cba89b1cfd22a0d139ab67207",
-    ".pi/skills/change-review/references/impact-and-analysis.md": "ff03cc9b5ab39382287a405e7086235344dcf3765365bd8785a5f6dc425688eb",
-    ".pi/skills/change-review/references/review-judgment.md": "262146b8253e8aaa5f09501346b213f822f0b32dcdadb966dcffdca7a5ce1de6",
-    ".pi/skills/change-review/references/scope-and-context.md": "e95ee31ceb3f19ba6cf2cd0a6f33237c842fb66c847265e0a2966dffd28a1a47",
-    ".pi/skills/change-review/references/specialists-and-verification.md": "9e361d7b61ed84c8ebbbb6debbbd3b41c54dca8c96324a6a467061ba3565e251",
-    ".pi/skills/change-review/references/tool-setup.md": "c2ab8531df7d69dae987d21f9bed80668e86685e360571b61b9c1ca609f8aa3a",
-    ".pi/skills/change-review/scripts/review-preflight.mjs": "8c8e245aff7759e6c3e212162874d08b53c7be17a9987f45410f2322822f50b2",
-    ".pi/skills/change-review/scripts/review-tool-doctor.mjs": "8222ddb4203da2f1df8902ea20485e9215c0ad76b27376160332394afed3f754"
+    "package.json": "e23bc9f31ea6beb92da1b5e92f0bc8f9d02f32db89d129783cf2e7928db1c0b5"
   }
 }
