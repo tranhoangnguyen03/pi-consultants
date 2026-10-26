@@ -1,0 +1,36 @@
+# Agent experience design in D and B
+
+D remains the lead for how people and agents experience a product. B remains an independent technical practitioner. This change develops their existing skills; it creates no office, tool, runtime, memory store, mandatory workflow or automatic review gate.
+
+## What D receives
+
+The existing `user-agent-experience` skill now explicitly covers new designs as well as reviews and first use. Its short entry points to four local, on-demand guides:
+
+- [Interfaces](../firm/skills/user/agent-experience/references/designing-agent-interfaces.md): tool boundaries, bounded results, coverage and corrective errors.
+- [Context](../firm/skills/user/agent-experience/references/designing-agent-context.md): discovery, useful handoffs and current versus remembered state.
+- [Delegation](../firm/skills/user/agent-experience/references/designing-delegation.md): direct work versus help, briefs, evidence and coordination cost.
+- [Recovery](../firm/skills/user/agent-experience/references/designing-recovery-and-control.md): uncertain writes, interruption, review and restoration.
+
+Each guide includes a synthetic worked example, trade-offs and a small way to check the design. Examples are not claims about a real product. [The source ledger](../firm/skills/user/agent-experience/SOURCE.md) records inspected material, limits and rejected prescriptions. No upstream tool is installed or required.
+
+B keeps its own technical method, aligned with these choices, and has an optional link to the public firm guides. B does not load D's private records or require D's HQ. D's guides are bundled locally; B's optional deeper reference needs web access. Lack of that access does not block B's self-contained method.
+
+## Normal use
+
+Ask in plain language, for example: “Design the agent-facing interface for this package,” “How should this agent recover after an interrupted write?” or “Would a helper simplify this task, or just add coordination?” The consultant chooses the depth. Review-only work remains read-only under the existing authority rules.
+
+## Practical trials, not a new quality gate
+
+These are suggested future consultations, not automated tests or reported results:
+
+1. A tool returns a partial list without telling the agent. Ask D to design a clearer response and a way to check whether it helps.
+2. A returning agent receives an old summary that omits a correction. Ask D to improve discovery and continuity without adding a second memory store.
+3. A remote write times out after it may have succeeded. Ask D to compare recovery choices and distinguish them from file rollback.
+
+For any trial actually run, retain the task, revision, model/harness, real events, product outcome and human interventions. Compare with the prior method when useful. Do not make a model run or new evaluation program a prerequisite to every small improvement. Deterministic packaging tests do not establish better consultant judgment.
+
+## Maintenance
+
+Edit `firm/skills/`, not generated `offices/`. Rebuild shipped templates with `npm run setup -- --rebuild --yes`, then run `npm run verify`. Existing tests also check guide links, valid examples and generated-file hashes; no paid model calls or live services are added to CI.
+
+For private working offices, follow the Office Admin runbook, stop active sessions and update only authorized targets. This PR updates repository templates, not a user's installed HQ or private case history. Refresh references when a relevant design depends on changed upstream behavior, not through an automatic updater.
