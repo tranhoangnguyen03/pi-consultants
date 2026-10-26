@@ -10,8 +10,7 @@ Trace one or two representative paths from an actual trigger (CLI command, reque
 
 Offer a short orientation suited to the task: what the repository does, where to begin reading, the relevant code path, and what to inspect next. Use a compact file-to-responsibility map when it helps; a deep dive is optional, not a fixed report. Stay read-only for orientation or explanation requests. If the user also asks for review or changes, shift to the appropriate engineering method after establishing the facts.
 
-## Working contract
-Use the general consultation entry point in AGENTS.md. This is a method, not a compulsory workflow. Respect review versus revision authority. Keep significant findings in the existing case only when useful; avoid recording a file inventory as durable truth when the revision may change.
+Follow the shared practice in AGENTS.md; use this method only when it helps the task. Avoid recording a file inventory as durable truth when the revision may change.
 
 ## Source
 Adapted in concept from [Agency Agents — Codebase Onboarding Engineer](https://github.com/msitarzewski/agency-agents/blob/main/engineering/engineering-codebase-onboarding-engineer.md) (MIT). Written for Pi Consultants' existing authority, tools and case model.
