@@ -43,11 +43,15 @@ function preflight(opts){
   const data={schema_version:1,mode:opts.mode,repo:root,current_head:current,base:null,head:null,merge_base:null,files:[],warnings:[],hints:[],source:'git'};
   if(opts.mode==='workspace'){
     data.base=current;data.head='working-tree';
-    data.files=names(git(root,'diff','--no-ext-diff','--no-textconv','--name-only','-z','HEAD'));
+    // A HEAD-to-working-tree diff can be empty when a staged edit was reversed in the worktree.
+    // Inspect both index and worktree changes so neither side is silently omitted.
+    const diffArgs=['--no-ext-diff','--no-textconv','--name-only','-z'];
+    const staged=names(git(root,'diff','--cached',...diffArgs));
+    const unstaged=names(git(root,'diff',...diffArgs));
     const other=names(git(root,'ls-files','--others','--exclude-standard','-z'));
-    data.files=[...new Set([...data.files,...other])].sort();
-    data.untracked_files=other;
-    data.hints.push('Inspect both tracked changes and untracked file contents. The list is not an automated code review.');
+    data.files=[...new Set([...staged,...unstaged,...other])].sort();
+    data.staged_files=staged;data.unstaged_files=unstaged;data.untracked_files=other;
+    data.hints.push('Inspect staged and unstaged diffs separately, plus untracked file contents; a HEAD-to-worktree diff alone may hide index changes. The list is not an automated code review.');
   }else if(opts.mode==='branch'){
     const base=rev(root,opts.base),head=rev(root,opts.head??'HEAD');
     const merge=git(root,'merge-base',base,head).trim();
@@ -57,7 +61,13 @@ function preflight(opts){
     data.hints.push('Compare merge-base to head. Use source and test context beyond changed files when helpful.');
   }else if(opts.mode==='commit'){
     data.head=rev(root,opts.commit);
-    data.files=names(git(root,'diff-tree','--root','--no-commit-id','--name-only','-r','-z',data.head));
+    const parents=git(root,'rev-list','--parents','-n','1',data.head).trim().split(/\s+/).slice(1);
+    data.parents=parents;data.base=parents[0]??null;
+    data.comparison=parents.length>1?'first-parent':parents.length===1?'parent':'root';
+    data.files=names(parents.length
+      ? git(root,'diff','--no-ext-diff','--no-textconv','--name-only','-z',parents[0],data.head)
+      : git(root,'diff-tree','--root','--no-commit-id','--name-only','-r','-z',data.head));
+    if(parents.length>1)data.hints.push('Merge commit: compare the selected commit against its first parent (base); this is not a combined parent diff.');
     data.hints.push('Inspect the chosen commit and its relevant callers, tests and contracts.');
   }else if(opts.mode==='paths'){
     data.head=current;data.source='snapshot';
@@ -77,12 +87,12 @@ function preflight(opts){
     data.reported_file_count=pr.changedFiles;
     if(typeof pr.changedFiles==='number'&&pr.changedFiles>data.files.length)data.warnings.push(`GitHub returned ${data.files.length} of ${pr.changedFiles} changed files; use paginated gh api or git to inspect the full set.`);
     if(current!==data.head)data.warnings.push('Local HEAD differs from PR head. Do not use local working-tree contents as the PR revision.');
-    data.hints.push('Use gh pr diff for the pinned PR; validate current head before publishing comments. No checkout was performed.');
+    data.hints.push('The head SHA records this metadata snapshot, but gh pr diff returns the LIVE PR diff, not an immutable diff pinned to that SHA. Recheck the PR head before and after retrieving the diff, or compare locally available immutable Git objects when exact revision consistency matters. Recheck again before publishing comments. No checkout was performed.');
   }
   data.file_count=data.files.length;
   data.status=data.files.length?'ready':'empty';
   return data;
 }
-const help=`Usage: review-preflight.mjs [workspace|branch|commit|pr|paths] [options]\n\n  workspace                     staged, unstaged and untracked changes (default)\n  branch --base main [--head X] committed changes from merge-base to head\n  commit --commit SHA           files in one commit\n  pr --pr 123                   GitHub PR metadata, no checkout (needs gh)\n  paths --path src [--path docs] snapshot targets, not diff coverage\n  --repo PATH                   target repository directory (defaults to cwd)\n\nRead-only; writes JSON to stdout. Tool failure exits nonzero.\n`;
+const help=`Usage: review-preflight.mjs [workspace|branch|commit|pr|paths] [options]\n\n  workspace                     staged, unstaged and untracked changes (default)\n  branch --base main [--head X] committed changes from merge-base to head\n  commit --commit SHA           files in one commit (merges: first parent)\n  pr --pr 123                   GitHub PR metadata, no checkout (needs gh)\n  paths --path src [--path docs] snapshot targets, not diff coverage\n  --repo PATH                   target repository directory (defaults to cwd)\n\nRead-only; writes JSON to stdout. Tool failure exits nonzero.\n`;
 try{const args=parse(process.argv.slice(2));if(args.help){process.stdout.write(help);}else{process.stdout.write(JSON.stringify(preflight(args),null,2)+'\n');}}
 catch(e){process.stderr.write(`Review preflight: ${e.message}\n${help}`);process.exitCode=2;}

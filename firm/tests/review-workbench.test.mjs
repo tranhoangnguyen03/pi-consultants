@@ -31,6 +31,27 @@ test('single commit and snapshot paths are distinct from a diff',t=>{
  const dir=repo(t);const sha=git(dir,'rev-parse','HEAD');const out=review(dir,'commit','--commit',sha);assert.deepEqual(out.files,['base.ts']);
  const paths=review(dir,'paths','--path','base.ts');assert.equal(paths.source,'snapshot');assert.deepEqual(paths.files,['base.ts']);
 });
+test('workspace does not lose a staged edit reversed in the working tree',t=>{
+ const dir=repo(t),original=fs.readFileSync(path.join(dir,'base.ts'),'utf8');
+ fs.writeFileSync(path.join(dir,'base.ts'),'export const a=42;\n');git(dir,'add','base.ts');
+ fs.writeFileSync(path.join(dir,'base.ts'),original);
+ assert.equal(git(dir,'diff','--name-only','HEAD'),'');
+ assert.match(git(dir,'status','--short'),/MM base\.ts/);
+ const out=review(dir,'workspace');assert.equal(out.status,'ready');assert.deepEqual(out.files,['base.ts']);
+ assert.deepEqual(out.staged_files,['base.ts']);assert.deepEqual(out.unstaged_files,['base.ts']);
+ assert.deepEqual(out.untracked_files,[]);
+});
+test('merge commits compare against first parent rather than returning empty',t=>{
+ const dir=repo(t);git(dir,'branch','-M','main');git(dir,'checkout','-qb','feature');
+ fs.writeFileSync(path.join(dir,'feature.ts'),'export const feature=true;\n');git(dir,'add','.');git(dir,'commit','-qm','feature');
+ git(dir,'checkout','main');fs.writeFileSync(path.join(dir,'main.ts'),'export const main=true;\n');
+ git(dir,'add','.');git(dir,'commit','-qm','main');git(dir,'merge','--no-ff','-m','merge feature','feature');
+ const sha=git(dir,'rev-parse','HEAD'),out=review(dir,'commit','--commit',sha);
+ assert.equal(out.status,'ready');assert.deepEqual(out.files,['feature.ts']);
+ assert.equal(out.head,sha);assert.equal(out.base,git(dir,'rev-parse','HEAD^1'));
+ assert.equal(out.parents.length,2);assert.equal(out.comparison,'first-parent');
+ assert.match(out.hints.join(' '),/first parent/);
+});
 test('bad ref fails clearly and never changes HEAD',t=>{
  const dir=repo(t);const before=git(dir,'rev-parse','HEAD');const r=run(dir,process.execPath,[preflight,'branch','--base','missing']);assert.equal(r.status,2);assert.match(r.stderr,/failed:/);assert.equal(git(dir,'rev-parse','HEAD'),before);
 });
@@ -38,7 +59,7 @@ test('PR metadata warns about incomplete file page and stale local checkout with
  const dir=repo(t);const before=git(dir,'rev-parse','HEAD');const bin=path.join(dir,'fakebin');fs.mkdirSync(bin);
  const exe=path.join(bin,'gh');fs.writeFileSync(exe,'#!/bin/sh\nprintf "%s\\n" \'{"number":123,"url":"https://github.com/a/b/pull/123","title":"test","baseRefOid":"abc","headRefOid":"def","baseRefName":"main","headRefName":"feature","changedFiles":2,"files":[{"path":"src/a.ts"}]}\'\n',{mode:0o755});
  const r=run(dir,process.execPath,[preflight,'pr','--pr','123'],{PATH:`${bin}${path.delimiter}${process.env.PATH??''}`});assert.equal(r.status,0,r.stderr);
- const out=JSON.parse(r.stdout);assert.equal(out.file_count,1);assert.equal(out.reported_file_count,2);assert.equal(out.warnings.length,2);assert.equal(git(dir,'rev-parse','HEAD'),before);
+ const out=JSON.parse(r.stdout);assert.equal(out.file_count,1);assert.equal(out.reported_file_count,2);assert.equal(out.warnings.length,2);assert.match(out.hints.join(' '),/LIVE PR diff/);assert.equal(git(dir,'rev-parse','HEAD'),before);
 });
 test('doctor inspects availability without executing optional binaries',t=>{
  const dir=repo(t);const fake=path.join(dir,'fakebin');fs.mkdirSync(fake);fs.writeFileSync(path.join(fake,'ocr'),'#!/bin/sh\necho used > ./unexpected\n',{mode:0o755});

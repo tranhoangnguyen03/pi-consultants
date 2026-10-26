@@ -14,9 +14,9 @@ node /path/to/engineering-consultant/.pi/skills/change-review/scripts/review-pre
 node /path/to/engineering-consultant/.pi/skills/change-review/scripts/review-preflight.mjs paths --repo /path/to/project --path src
 ~~~
 
-Output contains the target, pinned refs where available, files, warnings and suggestions. It never checks out, fetches, installs or writes anything. Workspace mode includes staged, unstaged and untracked changes. Branch mode uses the merge base and HEAD by default. PR mode uses gh metadata without changing the checkout; remote PR content may not be present locally. Folder mode is a snapshot, not a diff. An empty result is worth reporting, not inventing work.
+Output contains the target, pinned refs where available, files, warnings and suggestions. It never checks out, fetches, installs or writes anything. Workspace mode lists `staged_files`, `unstaged_files` and `untracked_files` separately; inspect the staged and unstaged patches independently, because changes in the index can cancel out in a HEAD-to-worktree diff. Commit mode compares a merge against its first parent and reports that parent as `base`. Branch mode uses the merge base and HEAD by default. PR mode uses gh metadata without changing the checkout; remote PR content may not be present locally. Folder mode is a snapshot, not a diff. An empty result is worth reporting, not inventing work.
 
-The helper is optional. Use git/gh directly when suitable. A PR's metadata file list can be incomplete; when the reported total exceeds the returned list, collect more pages or compare through Git. Before quoting code or posting a comment, check that it belongs to the current PR head. Do not silently switch branches to inspect a PR.
+The helper is optional. Use git/gh directly when suitable. A PR's metadata file list can be incomplete; when the reported total exceeds the returned list, collect more pages or compare through Git. The helper records PR base/head IDs at metadata retrieval time. However, `gh pr diff` reads the **live** PR and cannot pin that head SHA. Recheck both `baseRefOid` and `headRefOid` before and after retrieving the diff, or inspect fetched immutable commits when exact revision consistency matters. Recheck before posting comments. Do not silently switch branches to inspect a PR.
 
 ## OpenCodeReview delegation as support
 
