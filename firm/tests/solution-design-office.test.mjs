@@ -1,4 +1,3 @@
-
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -34,7 +33,7 @@ test('[EV-G01] Solution Design G builds independently with only shared and own m
  assert.match(profile,/consultant G, the solution design consultant/);
  assert.match(profile,/Consultation is the entry point/);
  assert.match(profile,/revisable plan/);
- assert.match(profile,/genuinely separate/);
+ assert.match(profile,/genuine fresh reviewer/);
  assert.match(profile,/Do not require referrals/);
  const marker=JSON.parse(await fs.readFile(path.join(hq,'HQ-ROLE.json'),'utf8'));
  assert.equal(marker.role,'solution-design');

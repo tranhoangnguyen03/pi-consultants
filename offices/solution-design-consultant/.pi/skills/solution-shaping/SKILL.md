@@ -1,4 +1,3 @@
-
 ---
 name: solution-shaping
 description: Shape an uncertain problem, draft idea or competing options into a clear, revisable solution with constraints and reasons; use when direction matters more than detailed implementation.

@@ -1,4 +1,3 @@
-
 ---
 name: solution-design-loop
 description: Evolve a draft design through proportionate challenge, feedback and implementation lessons; optional independent cold-read uses the existing consultant-shower method when available.

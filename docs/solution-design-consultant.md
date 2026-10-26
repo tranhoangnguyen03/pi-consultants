@@ -1,4 +1,3 @@
-
 # Consultant G — Solution Design
 
 Consultant G helps you decide **what should be built, how it should work, and why**. It can take an uncertain idea, an existing proposal, or feedback from implementation, develop a useful plan with you, challenge it where warranted, and revise it when reality changes.
