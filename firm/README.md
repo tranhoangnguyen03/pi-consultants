@@ -59,3 +59,7 @@ Regenerate with `npm run setup -- --rebuild`, then run `npm run verify` at the r
 ## Design office: Impeccable workbench
 
 The design role alone receives `skills/design/impeccable/`: a pinned on-demand detector adapter and selected Impeccable-inspired tactics. Its output remains a normal consultation; lasting project choices and feedback stay in F's HQ cases, not in Impeccable's PRODUCT.md/DESIGN.md project workspace. The script uses ignored `<F-HQ>/.hq/tools/`, disables telemetry and adds no Pi hook or MCP dependency. See the design office guide and skill SOURCE.md.
+
+## Solution Design G (new office)
+
+The new `solution-design` role focuses on framing, shaping, challenging and revising a solution. It adds two lightweight skills: `solution-shaping` and `solution-design-loop`. The existing `consultant-shower` shared skill covers optional fresh reading; there is no EGM runtime, second memory system or mandatory reviewer swarm. See [the guide](../docs/solution-design-consultant.md).
