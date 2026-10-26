@@ -2,6 +2,8 @@
 
 This is the canonical maintainer source, not a working consultant office.
 
+Start with the approved [Agent-First Design Principles](docs/AGENT-FIRST-PRINCIPLES.md) for the firm's philosophy; [FRAMEWORK.md](docs/FRAMEWORK.md) still governs technical architecture. The charter is guidance for design decisions, not a new consultant runtime gate.
+
 - `src/`, `extensions/`, `bin/`: shared runtime and operational CLI.
 - `offices.json`: the list of offices to build (folder, role, identity, banner).
 - `profiles/shared/AGENTS.md`: practice every consultant shares; `profiles/<role>/AGENTS.md`: the role's title, intro and own sections. The builder joins them into each office's `AGENTS.md`.

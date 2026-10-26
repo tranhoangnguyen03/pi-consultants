@@ -4,6 +4,10 @@ Five AI consultants for [Pi](https://pi.dev), the terminal coding agent. Each on
 
 The offices are **ready to use** in this repository's `offices/` folder. Clone it, run one setup command, and start Pi in an office.
 
+## Project philosophy
+
+Our [Agent-First Design Principles](firm/docs/AGENT-FIRST-PRINCIPLES.md) guide every office: equip, augment and empower the consultant; keep methods flexible and authority clear. This charter guides the product, not a new checklist for each consultation.
+
 ## Why use it
 
 - **A specialist, not a mode.** Each consultant has its own instructions, skills and history. It doesn't share a context window with your main session.
