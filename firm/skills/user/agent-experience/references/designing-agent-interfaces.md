@@ -10,6 +10,8 @@ One broad operation may hide several unrelated modes; many tiny tools may force 
 
 Teach discovery with a short description and a usable pointer to detail. Explain unavailable capabilities and setup needs without making the agent search repeatedly. Preserve information that changes action or risk even when trimming text.
 
+Inspect OpenAPI schemas, MCP tool names and descriptions, CLI help and other discoverable guidance; identify browser-only, CAPTCHA or visual-only steps that block the intended agent.
+
 ## Worked example: a bounded list with a clear next read
 
 Suppose an agent must find an open task and inspect it. A response containing every task's comments buries the choice. An unexplained empty array could mean no match, a failed request or an incomplete scan.

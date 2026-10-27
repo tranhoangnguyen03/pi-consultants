@@ -1,6 +1,6 @@
 # Agent experience design in D and B
 
-D remains the lead for how people and agents experience a product. B remains an independent technical practitioner. This change develops their existing skills; it creates no office, tool, runtime, memory store, mandatory workflow or automatic review gate.
+Consultant D (Users) leads experience design for people and agents using a client's product. Consultant B (Engineering) remains an independent technical practitioner. These guides teach product design choices; the firm's existing practice, authority and HQ ownership rules still govern consultant conduct.
 
 ## What D receives
 
@@ -13,7 +13,7 @@ The existing `user-agent-experience` skill now explicitly covers new designs as 
 
 Each guide includes a synthetic worked example, trade-offs and a small way to check the design. Examples are not claims about a real product. [The source ledger](../firm/skills/user/agent-experience/SOURCE.md) records inspected material, limits and rejected prescriptions. No upstream tool is installed or required.
 
-B keeps its own technical method, aligned with these choices, and has an optional link to the public firm guides. B does not load D's private records or require D's HQ. D's guides are bundled locally; B's optional deeper reference needs web access. Lack of that access does not block B's self-contained method.
+B's technical method remains self-contained and does not require D's private records or HQ. Its optional public reference follows the repository's `main` branch, so it may change independently of an installed office. D's guides ship locally; a missing web link does not prevent B from using its own method.
 
 ## Normal use
 

@@ -27,7 +27,7 @@ A service times out after receiving a post request. “Failed; retry” risks cr
 }
 ```
 
-Inspect the operation or destination before another write. A missing search hit is not always proof of non-delivery: indexing may lag or the search may have limited scope. Use an idempotency key only when the service documents its scope and lifetime; a locally invented key cannot make a remote action safe. If the outcome cannot be established, explain the uncertainty and pause dependent actions. Do not invent a readback endpoint.
+Inspect the operation or destination before another write. A missing search hit is not always proof of non-delivery: indexing may lag or the search may have limited scope. Use an idempotency key only when the service documents its scope and lifetime; a key the service does not recognize and enforce cannot prevent duplicate effects. If the outcome cannot be established, explain the uncertainty and pause dependent actions. Do not invent a readback endpoint.
 
 **Trade-off:** a status handle adds interface work but can avoid repeated irreversible effects. For a harmless read or a mutation rejected before execution, this machinery may be unnecessary. Bounded corrective retries help with invalid arguments; they do not resolve an uncertain write.
 
