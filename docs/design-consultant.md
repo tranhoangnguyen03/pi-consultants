@@ -60,3 +60,13 @@ The old `detect /project src/` form is still accepted. Always use the script in 
 Design context, accepted direction, feedback and rationale use existing `hq_paper`, `hq_note` and `hq_brief` records. F picks and runs its own methods without interrupting you for intermediate approval. For substantial UI, it presents the rendered **quality gate** for acceptance or rework, then obtains **delivery gate** authorization for a push, deploy or other outside action unless the present mandate already granted it.
 
 Upstream `init`, `document`, `critique-storage`, `live`, `generate`, hooks and separate critique subagents are **not installed** here; these require further Pi and project-state testing. F can already generate alternatives with the normal browser/frontend tools. This integration does not claim full Impeccable parity.
+
+## Optional visual-production pilot
+
+F now has two additional, **opt-in** methods without adding a mandatory startup dependency:
+
+- `pixel-art-production` uses reviewed local [Pxl](https://github.com/crsolver/claude-pxl). Configure `PXL_CLI=/absolute/path/to/claude-pxl/bin/pxl.js`, then `node .pi/skills/pixel-art-production/scripts/pxl.mjs doctor`. The wrapper does not install or download the tool.
+- `open-toonz-animation` uses [OpenToonz](https://github.com/opentoonz/opentoonz) for traditional 2D scenes. `node .pi/skills/open-toonz-animation/scripts/doctor.mjs` probes for `tcomposer` without running it. ToonzScript is normally driven through the GUI; use the OpenToonz Tasks pane's exact batch-render command for a saved scene.
+
+A passing probe is not an animation test. Before calling either workflow qualified on a target host, create, export and visually inspect a disposable asset or scene. `composition` remains F's default for animated explainers.
+
