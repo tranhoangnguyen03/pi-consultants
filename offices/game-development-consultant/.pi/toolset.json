@@ -1,0 +1,176 @@
+{
+  "packages": [
+    "git:github.com/fitchmultz/pi-change-working-dir@d0846a834036b17fd118d0ca1011331812cea52b",
+    "npm:pi-web-access@0.39.0",
+    "npm:pi-docparser@4.0.0",
+    "npm:pi-agent-browser@0.1.0",
+    "git:github.com/cathrynlavery/diagram-design@0a8ea20ae69b33a5edce6018eedd3a9d26e90c1c"
+  ],
+  "mcpServers": {
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@1.10.1"
+      ],
+      "enabled": true,
+      "description": "Inspect and audit web pages in Chrome: accessibility tree, Lighthouse accessibility and performance audits, traces, console, screenshots"
+    },
+    "github": {
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "!echo Bearer $(gh auth token)"
+      },
+      "enabled": false,
+      "description": "GitHub repositories, issues, pull requests and CI; uses the gh CLI login"
+    },
+    "sentry": {
+      "url": "https://mcp.sentry.dev/mcp",
+      "enabled": false,
+      "description": "Errors and performance issues users hit (Sentry, OAuth sign-in)"
+    },
+    "linear": {
+      "url": "https://mcp.linear.app/mcp",
+      "enabled": false,
+      "description": "Linear tickets, projects and comments (OAuth sign-in)"
+    },
+    "slack": {
+      "url": "https://mcp.slack.com/mcp",
+      "enabled": false,
+      "description": "Slack conversations and messages (OAuth sign-in; your workspace may require its own Slack app client ID)"
+    },
+    "figma": {
+      "url": "https://mcp.figma.com/mcp",
+      "oauth": {
+        "clientName": "Claude Code"
+      },
+      "enabled": false,
+      "description": "Figma design files: frames, components, comments (OAuth sign-in)"
+    },
+    "posthog": {
+      "url": "https://mcp.posthog.com/mcp",
+      "enabled": false,
+      "description": "PostHog product analytics: trends, funnels, retention, replays (OAuth sign-in)"
+    },
+    "mixpanel": {
+      "url": "https://mcp.mixpanel.com/mcp",
+      "enabled": false,
+      "description": "Mixpanel product analytics, US region (OAuth sign-in)"
+    },
+    "amplitude": {
+      "url": "https://mcp.amplitude.com/mcp",
+      "enabled": false,
+      "description": "Amplitude product analytics, US region (OAuth sign-in)"
+    },
+    "clarity": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@microsoft/clarity-mcp-server@2.0.1"
+      ],
+      "env": {
+        "CLARITY_API_TOKEN": "${CLARITY_API_TOKEN}"
+      },
+      "enabled": false,
+      "description": "Microsoft Clarity heatmaps and session recordings; needs CLARITY_API_TOKEN"
+    },
+    "dovetail": {
+      "url": "https://dovetail.com/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${DOVETAIL_API_TOKEN}"
+      },
+      "enabled": false,
+      "description": "Dovetail research library: projects, highlights, insights; needs DOVETAIL_API_TOKEN"
+    },
+    "intercom": {
+      "url": "https://mcp.intercom.com/mcp",
+      "enabled": false,
+      "description": "Intercom support conversations, contacts and help articles, US region (OAuth sign-in)"
+    }
+  },
+  "software": [
+    {
+      "name": "git",
+      "purpose": "Version control",
+      "required": true,
+      "commands": [
+        [
+          "git",
+          "--version"
+        ]
+      ],
+      "install": "https://git-scm.com/downloads (macOS: xcode-select --install)"
+    },
+    {
+      "name": "gh",
+      "purpose": "GitHub PRs, reviews, CI; also signs in the github connector",
+      "required": false,
+      "commands": [
+        [
+          "gh",
+          "--version"
+        ]
+      ],
+      "install": "https://cli.github.com (macOS: brew install gh), then gh auth login"
+    },
+    {
+      "name": "agent-browser",
+      "purpose": "Browser automation used by pi-agent-browser",
+      "required": false,
+      "commands": [
+        [
+          "agent-browser",
+          "--version"
+        ]
+      ],
+      "install": "npm install -g agent-browser && agent-browser install (pi-agent-browser also offers this on first use)"
+    },
+    {
+      "name": "Chrome",
+      "purpose": "Browser for the chrome-devtools connector",
+      "required": false,
+      "commands": [
+        [
+          "google-chrome",
+          "--version"
+        ],
+        [
+          "google-chrome-stable",
+          "--version"
+        ],
+        [
+          "chromium",
+          "--version"
+        ]
+      ],
+      "paths": [
+        "/Applications/Google Chrome.app"
+      ],
+      "install": "https://www.google.com/chrome/"
+    },
+    {
+      "name": "yt-dlp",
+      "purpose": "Video and recording transcripts",
+      "required": false,
+      "commands": [
+        [
+          "yt-dlp",
+          "--version"
+        ]
+      ],
+      "install": "https://github.com/yt-dlp/yt-dlp (macOS: brew install yt-dlp)"
+    },
+    {
+      "name": "ffmpeg",
+      "purpose": "Video frames and audio",
+      "required": false,
+      "commands": [
+        [
+          "ffmpeg",
+          "-version"
+        ]
+      ],
+      "install": "https://ffmpeg.org/download.html (macOS: brew install ffmpeg)"
+    }
+  ]
+}

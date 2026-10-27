@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "role": "game",
+  "office": {
+    "letter": "H",
+    "title": "GAME DEVELOPMENT",
+    "tagline": "imagine · prototype · build · test · tune · ship",
+    "banner": [
+      "  ╭──────────╮  ",
+      "  │ ◀  ●   ▶ │  ",
+      "  │    ◆     │  ",
+      "  │ ◇     ◇  │  ",
+      "  ╰──────────╯  "
+    ]
+  },
+  "hq": "..",
+  "stateDir": "../.hq",
+  "kitRoot": "..",
+  "sessionRoots": [],
+  "projectRoots": [],
+  "localReadRoots": [],
+  "attachmentRoots": [],
+  "maxSessionFiles": 500,
+  "maxSessionBytes": 16777216,
+  "maxConsultChars": 80000,
+  "policy": {}
+}
