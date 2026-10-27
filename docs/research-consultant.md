@@ -43,3 +43,17 @@ After `npm run verify`, test with a real configured Pi model:
 4. Run `last30days` on a public topic and confirm source coverage, no inherited paid keys, and cache isolation.
 
 CI tests the generated office, source checks, and native-HQ fixture bootstrap; it does **not** prove live LLM research competence, current public-source availability, or real authenticated Pi startup without an external model login.
+
+## Optional Facebook community research
+
+E carries a new `facebook-community-research` method and a **read-only** adapter for [facebook-cli](https://github.com/hieu-lee/facebook-cli). It is not installed by the firm or started at office launch. Facebook's terms require authorization for automated collection; an account login, cookie or user request is not such authorization.
+
+After the operator has reviewed and installed the CLI **and has obtained necessary platform permission**, they can inspect the adapter:
+
+```sh
+node .pi/skills/facebook-community-research/scripts/fb-read.mjs doctor
+FB_RESEARCH_PERMISSION=explicit-authorization node .pi/skills/facebook-community-research/scripts/fb-read.mjs search "topic" --type posts
+```
+
+Only `feed`, `posts`, `view`, `profile` and `search` are forwarded. The wrapper refuses publication, messaging, deletion, reactions, batch and arbitrary browser actions. It does not collect, export or archive data by default. No live Facebook account or platform acceptance test has been performed. Prefer permissioned exports or other sources when access is uncertain.
+
