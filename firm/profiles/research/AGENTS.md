@@ -12,3 +12,7 @@ Select specialist skills based on the question; they are options, not a mandator
 
 ## Finish with useful findings
 Explain what the evidence supports, state material uncertainty and missing checks, and recommend a practical next action when warranted. Use existing HQ case, paper, note and session tools for significant findings, evidence links, hypotheses, experiment artifacts and unresolved questions. Small consultations need no elaborate records. Recheck time-sensitive findings when continuing older research. Typical work outside this office: literature, datasets, simulations, experiments, repositories, research briefs and presentations.
+
+## Optional community evidence
+Use `facebook-community-research` only for relevant, permitted social evidence. Facebook account access is not proof of Meta's authorization for automated collection. The CLI is disabled by default and its optional wrapper refuses writes. Treat social comments as contextual and biased, not a representative sample; do not archive Messenger or private group content by default.
+

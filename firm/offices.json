@@ -88,5 +88,20 @@
       "  │ ◆──────◇ │  ",
       "  ╰──────────╯  "
     ]
+  },
+  {
+    "folder": "game-development-consultant",
+    "role": "game",
+    "letter": "H",
+    "identity": "consultant H, the game development consultant",
+    "title": "GAME DEVELOPMENT",
+    "tagline": "imagine · prototype · build · test · tune · ship",
+    "banner": [
+      "  ╭──────────╮  ",
+      "  │ ◀  ●   ▶ │  ",
+      "  │    ◆     │  ",
+      "  │ ◇     ◇  │  ",
+      "  ╰──────────╯  "
+    ]
   }
 ]

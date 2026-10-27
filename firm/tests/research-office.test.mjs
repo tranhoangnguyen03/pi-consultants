@@ -9,10 +9,11 @@ import {temp} from './helpers.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const repo=path.resolve(root,'..');
 const required=['paper-lookup','literature-review','scientific-critical-thinking','hypothesis-generation','experimental-design','statistical-analysis','scientific-writing','last30days'];
-test('Research Scientist E is a generated independent HQ with exactly eight specialty skills',async()=>{
+const allOwn=[...required,'facebook-community-research'];
+test('Research Scientist E is a generated independent HQ with its vendor skills and optional community research',async()=>{
  const source=path.join(root,'skills/research'),office=path.join(repo,'offices/research-consultant');
- assert.deepEqual((await fs.readdir(source)).sort(),required.slice().sort());
- assert.deepEqual((await fs.readdir(path.join(office,'.pi/skills'))).sort(),[...required,...await fs.readdir(path.join(root,'skills/shared'))].sort());
+ assert.deepEqual((await fs.readdir(source)).sort(),allOwn.slice().sort());
+ assert.deepEqual((await fs.readdir(path.join(office,'.pi/skills'))).sort(),[...allOwn,...await fs.readdir(path.join(root,'skills/shared'))].sort());
  const settings=JSON.parse(await fs.readFile(path.join(office,'.pi/settings.json'),'utf8'));
  const role=JSON.parse(await fs.readFile(path.join(office,'.pi/hq.json'),'utf8'));
  assert.equal(role.role,'research');assert.equal(settings.sessionDir,'.hq/sessions');
