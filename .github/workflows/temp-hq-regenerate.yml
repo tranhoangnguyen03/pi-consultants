@@ -1,0 +1,30 @@
+name: One-time consultant HQ regeneration
+on:
+  push:
+    branches: [feat/visual-gamedev-social-consultants]
+permissions:
+  contents: write
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Rebuild canonical office copies
+        run: npm run setup -- --rebuild --yes
+      - name: Stage generated files
+        run: git add offices
+      - name: Verify exact generated outputs
+        run: npm run verify
+      - name: Commit generated office copies
+        run: |
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "build(hq): regenerate shipped F E H offices"
+            git push origin HEAD:feat/visual-gamedev-social-consultants
+          fi
