@@ -16,7 +16,7 @@ const cut=s=>String(s).slice(0,500);
 export async function capture(spec,{chromium,axeSource}={}){
  const report={...spec,startedAt:new Date().toISOString(),status:'incomplete',pages:[],limits:[
   'Explicit URLs only; no crawl, clicks, form submission, saved login or production deployment.',
-  'Screenshots and scripted checks are not user research or acceptance. A human must inspect every relevant image.',
+  'Screenshots and scripted checks are not user research or acceptance. A reviewer must inspect every relevant image.',
   'Performance is a single short lab sample, not field Core Web Vitals. INP, FPS, sound and subjective motion quality are not measured.',
   'Build mode/revision describe the caller worksite, not proof of the served build. Compare that provenance before review.',
   'Page scripts and normal subresources may contact their own services. Tool telemetry is disabled; target-site analytics are not controlled.'
@@ -47,6 +47,7 @@ export async function capture(spec,{chromium,axeSource}={}){
          else if(!e.hadRecentInput)window.__fQaVitals.cls=(window.__fQaVitals.cls??0)+e.value;
         }}).observe({type,buffered:true});
         window.__fQaVitals.supported.push(type);
+        if(type==='layout-shift')window.__fQaVitals.cls=0;
        }catch{}
       }
      });
@@ -73,7 +74,9 @@ export async function capture(spec,{chromium,axeSource}={}){
       canonical:document.querySelector('link[rel="canonical"]')?.href??null,lang:document.documentElement.lang,
       headings:[...document.querySelectorAll('h1,h2,h3')].slice(0,30).map(e=>({level:e.tagName,text:e.textContent.trim().slice(0,120)})),
       mains:document.querySelectorAll('main,[role="main"]').length,
-      overflow:document.documentElement.scrollWidth>innerWidth+1,
+      // On mobile, innerWidth may expand to fit overflowing content; root clientWidth is the viewport.
+      overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1,
+      widths:{content:document.documentElement.scrollWidth,layoutViewport:document.documentElement.clientWidth,inner:innerWidth,visual:visualViewport?.width??null},
       imagesWithoutAlt:[...document.querySelectorAll('img:not([alt])')].slice(0,10).map(e=>e.getAttribute('src')),
       passwordField:Boolean(document.querySelector('input[type="password"]')),
       emptyBody:!document.body?.innerText.trim(),
@@ -83,7 +86,7 @@ export async function capture(spec,{chromium,axeSource}={}){
      const vitals=await page.evaluate(()=>({...(window.__fQaVitals??{}),observedAtMs:performance.now()}));
      data.performance={status:'sampled',...vitals,buildMode:spec.build.mode};
      // Do not silently call a login screen, blank content or bot challenge the reviewed product.
-     data.targetCheck={needsHumanConfirmation:true,possibleLogin:data.dom.passwordField,empty:data.dom.emptyBody};
+     data.targetCheck={needsReviewerInspection:true,possibleLogin:data.dom.passwordField,empty:data.dom.emptyBody};
      await page.evaluate(()=>scrollTo(0,Math.min(document.documentElement.scrollHeight-innerHeight,Math.max(innerHeight,document.documentElement.scrollHeight/2))));
      await page.waitForTimeout(200);await shot('middle');await page.evaluate(()=>scrollTo(0,0));
      if(axeSource){
@@ -109,8 +112,10 @@ export async function capture(spec,{chromium,axeSource}={}){
       await page.evaluate(()=>scrollTo(0,0));
       const controls=page.locator('a:visible,button:visible');
       data.hover=[];
-      for(let j=0;j<Math.min(2,await controls.count());j++){
-       const control=controls.nth(j);const file=`page-${i+1}-hover-${j+1}`;
+      for(let j=0;j<await controls.count()&&data.hover.length<2;j++){
+       const control=controls.nth(j),box=await control.boundingBox();
+       if(!box||box.x<0||box.y<0||box.x>=v.viewport.width||box.y>=v.viewport.height)continue;
+       const file=`page-${i+1}-hover-${j+1}`;
        try{
         await page.mouse.move(0,0);await control.screenshot({path:path.join(spec.run,file+'-rest.png')});
         await control.hover({timeout:2000});await page.waitForTimeout(200);
