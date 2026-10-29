@@ -42,13 +42,14 @@ export async function registerHQ(pi,{Type:T,configPath,answer}={}) {
   function tool(name,description,parameters,execute) {
     own.add(name);pi.registerTool({name,label:name.replaceAll('_',' '),description,parameters,execute:async(callId,params,signal,onUpdate,ctx)=>{
       const data=await execute(params,ctx,{callId,signal,onUpdate});if(config.version===1)return reply(data);
-      const target=params.caseKey??(params.client&&params.project?`${params.client}/${params.project}`:selected?`${selected.client}/${selected.project}`:null);
+      const discovery=name==='hq_find'||(name==='hq_navigate'&&['index','resolve','batch'].includes(params.operation));
+      const target=discovery?null:params.caseKey??(params.client&&params.project?`${params.client}/${params.project}`:selected?`${selected.client}/${selected.project}`:null);
       const context={targetCaseKey:target,caseKey:selected?`${selected.client}/${selected.project}`:null,engagementId:engagement,selectionSource,...(selected&&engagement?{engagementPointer:{caseKey:`${selected.client}/${selected.project}`,section:'engagement',id:engagement}}:{})};
       if(data?.engagements&&data.caseKey)data.engagements=data.engagements.map(e=>({...e,selected:data.caseKey===context.caseKey&&e.id===engagement}));
       return reply({... (Array.isArray(data)?{items:data}:data),context:{...context,meaning:selected?'Selection is the default write target, not permission. Pointer reads do not change it.':'No write target selected. Pointer reads do not select a case.',...(selected?{}:{next:{tool:'hq_navigate',operation:'select',caseKey:'Use the caseKey returned by discovery'}})}});
     }});
   }
-  function needCase(){assert(selected,'No case selected. Find it with hq_navigate index, then use hq_navigate select with its caseKey.');return selected;}
+  function needCase(){assert(selected,'No case selected. Find it with hq_find, then use hq_navigate select with its caseKey.');return selected;}
   const caseKey=()=>`${needCase().client}/${needCase().project}`;
   function writeTarget(asserted){const s=needCase();const key=`${s.client}/${s.project}`;if(asserted!==undefined){assert(typeof asserted==='string'&&asserted.trim().length>0,'caseKey must be a nonempty client/project key; omit it only for explicit selection');assert(asserted===key,`Selected case is ${key}; use hq_navigate select for the intended target`);}else assert(selectionSource==='explicit',`Restored case ${key}: use hq_navigate select or supply caseKey`);return s;}
   async function requireWritable(key) {
@@ -90,7 +91,15 @@ export async function registerHQ(pi,{Type:T,configPath,answer}={}) {
   pi.on('session_tree',async(_e,ctx)=>restore(ctx));
   pi.on('before_agent_start',async(_e,ctx)=>{ctx.ui?.setWidget?.('consultant-hq-intro',undefined);restore(ctx,{preserveExplicit:true});});
 
-  tool('hq_navigate','Discover and curate cases. index finds descriptions; get reads a returned pointer without selecting it; batch reads 1..8 pointers with a shared output budget and explicit remaining pointers; select explicitly sets a case as the write target and clears the selected engagement (use hq_engagement resume for an objective); create checks candidate duplicates; curate revises identity; reference registers one reference with top-level caseKey, system, namespace, key, source (workRefs is only for create). Notes views omit superseded notes; get section:notes with includeSuperseded:true shows them, and a singular note pointer always reads. This experimental navigation tool does not grant authority.',T.Object({
+  tool('hq_find','Find cases in this office by lexical search of case identity and navigation metadata, not full notes or saved conversations. Omit query to list cases. Returns bounded results, coverage and pointers for hq_navigate get; use next as after to continue. Does not select a case, change records or grant authority.',T.Object({
+    query:T.Optional(T.String()),limit:T.Optional(T.Number({minimum:1,maximum:30})),after:T.Optional(T.String())
+  },{additionalProperties:false}),async p=>{
+    assert(!Object.hasOwn(p,'operation'),'hq_find does not accept operation; use only query, limit and after');
+    navigation.validateOperation({...p,operation:'index'});
+    return navigation.index(cases,p);
+  });
+
+  tool('hq_navigate','Read and manage cases. Use hq_find for ordinary discovery; index remains compatible. Send only fields for the chosen operation. index finds descriptions; get reads a returned pointer without selecting it; batch reads 1..8 pointers with a shared output budget and explicit remaining pointers; select explicitly sets a case as the write target and clears the selected engagement (use hq_engagement resume for an objective); create checks candidate duplicates; curate revises identity; reference registers one reference with top-level caseKey, system, namespace, key, source (workRefs is only for create). Notes views omit superseded notes; get section:notes with includeSuperseded:true shows them, and a singular note pointer always reads. This experimental navigation tool does not grant authority.',T.Object({
     operation:T.Union(['index','get','batch','select','create','curate','reference','resolve'].map(x=>T.Literal(x))),caseKey:T.Optional(T.String({description:'Case locator client/project; required for get/select/curate/reference. Copy caseKey from a returned pointer.'})),query:T.Optional(T.String()),after:T.Optional(T.String()),limit:T.Optional(T.Number()),
     client:T.Optional(T.String()),project:T.Optional(T.String()),title:T.Optional(T.String()),purpose:T.Optional(T.String()),aliases:T.Optional(T.Array(T.String())),related:T.Optional(T.Array(T.Object({caseKey:T.String(),reason:T.String()}))),
     pointers:T.Optional(T.Array(T.Object({caseKey:T.String(),section:T.String(),id:T.Optional(T.String()),scope:T.Optional(T.String()),engagementId:T.Optional(T.String()),offset:T.Optional(T.Number()),length:T.Optional(T.Number()),after:T.Optional(T.String()),expectedRevision:T.Optional(T.Number()),contentRevision:T.Optional(T.Union([T.Number(),T.String()])),includeSuperseded:T.Optional(T.Boolean())}))),
@@ -131,13 +140,13 @@ export async function registerHQ(pi,{Type:T,configPath,answer}={}) {
     await associate(client,project,sid(ctx));return {engagement:result,...(recorded?{recorded}:{}),records:{caseKey:p.caseKey,section:'notes',scope:'engagement',engagementId:result.id},...(p.operation==='resume'?{meaning:'Reselected without changing lifecycle state.',...(result.state==='delivered'?{next:{tool:'hq_engagement',operation:'rework',caseKey:p.caseKey,id:result.id,basis:'Supply the current revision request; delivered is not closed.'}}:{})}:{})};
   });
 
-  tool('hq_case','Legacy compatibility interface; for v2 use hq_navigate index/get/select/create. Open, read or list private project cases. open: client + project for an existing case (legacy v1 configuration also permits creation with title); selects the case for hq_note/hq_brief. read: client + project, or the open case. list: all cases. Ordinary consultation is the entry point; identify the real project rather than forcing a form.',T.Object({
+  tool('hq_case','Legacy compatibility interface; for v2 use hq_find and hq_navigate get/select/create. Open, read or list private project cases. open: client + project for an existing case (legacy v1 configuration also permits creation with title); selects the case for hq_note/hq_brief. read: client + project, or the open case. list: all cases. Ordinary consultation is the entry point; identify the real project rather than forcing a form.',T.Object({
     operation:T.Union([T.Literal('open'),T.Literal('read'),T.Literal('list')]),client:T.Optional(T.String()),project:T.Optional(T.String()),title:T.Optional(T.String()),workspace:T.Optional(T.String()),query:T.Optional(T.String()),limit:T.Optional(T.Number())
   }),async(p,ctx)=>{
     if(p.operation==='list')return cases.list();
     if(p.operation==='read'){if(p.client||p.project)assert(p.client&&p.project,'read needs both client and project, or neither to read the open case');const s=p.client?{client:p.client,project:p.project}:needCase();const c=await cases.read(s.client,s.project);const limit=p.limit??8;assert(Number.isInteger(limit)&&limit>0&&limit<=30,'Case read limit must be 1..30');const {own,...past}=splitNotes(c.notes,p.query);const matches=own.filter(n=>!p.query||n.text.toLowerCase().includes(p.query.toLowerCase()));return {client:c.client,project:c.project,title:c.title,brief:c.brief,revision:c.revision,workspaces:c.workspaces,notes:matches.slice(-limit),totalNotes:own.length,matchedNotes:matches.length,...past};}
     assert(p.client&&p.project,'Open needs client and project (and a title when creating a new case); use list to find existing cases');
-    try {await cases.read(p.client,p.project);} catch(e){if(config.version===1&&p.title)await cases.open({...p,sessionId:sid(ctx)});else if(e.message.startsWith('No case '))return {status:'missing',next:'Use hq_navigate index to find a case, or create with a purpose; open never creates.'};else throw e;}
+    try {await cases.read(p.client,p.project);} catch(e){if(config.version===1&&p.title)await cases.open({...p,sessionId:sid(ctx)});else if(e.message.startsWith('No case '))return {status:'missing',next:'Use hq_find to find a case, or hq_navigate create with a purpose; open never creates.'};else throw e;}
     if(p.workspace)await requireWritable(`${p.client}/${p.project}`);
     const state=p.workspace?await cases.open({...p,sessionId:sid(ctx)}):await associate(p.client,p.project,sid(ctx));selected={client:p.client,project:p.project};engagement=null;selectionSource='explicit';
     pi.appendEntry('consultant-hq-case-v1',selected);ctx.ui?.setStatus?.('consultant-hq',`${config.role} · ${caseKey()}`);

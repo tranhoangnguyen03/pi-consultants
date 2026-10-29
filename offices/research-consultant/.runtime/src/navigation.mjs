@@ -16,9 +16,11 @@ export function keyParts(key) {
 }
 export function validateOperation(p) {
  const fields={batch:['pointers'],index:['query','limit','after'],get:['caseKey','section','id','offset','length','after','expectedRevision','contentRevision','query','scope','engagementId','includeSuperseded'],select:['caseKey'],create:['client','project','title','purpose','reviewToken','distinction','workspace','workRefs'],curate:['caseKey','expectedRevision','purpose','aliases','related'],reference:['caseKey','system','namespace','key','source'],resolve:['system','namespace','key','after','limit']};
- assert(fields[p.operation],`Unknown operation ${JSON.stringify(p.operation)}; use index, get, select, create, curate, reference or resolve`);
+ assert(Object.hasOwn(fields,p.operation),`Unknown operation ${JSON.stringify(p.operation)}; use ${Object.keys(fields).join(', ')}`);
  const hint=p.operation==='reference'?'; use {operation:"reference",caseKey,system,namespace,key,source}, one reference per call; workRefs is for create':'';
- for(const key of Object.keys(p))assert(key==='operation'||fields[p.operation].includes(key),`${p.operation} does not accept ${key}; remove it or use the appropriate operation${hint}`);
+ const unsupported=Object.keys(p).filter(key=>key!=='operation'&&!fields[p.operation].includes(key));
+ const recovery=p.operation==='index'?'; if you intend an office-wide case search, use hq_find with only query, limit and after (all optional). Example: hq_find {"query":"project topic"}. Omit unrelated fields; no search was performed.':'';
+ assert(!unsupported.length,`${p.operation} does not accept ${unsupported.join(', ')}; accepted fields: operation, ${fields[p.operation].join(', ')}${hint}${recovery}`);
  const required={batch:['pointers'],index:[],get:['caseKey','section'],select:['caseKey'],create:['client','project','title','purpose'],curate:['caseKey','expectedRevision','purpose'],reference:['caseKey','system','namespace','key','source'],resolve:['system','namespace','key']};
  for(const key of required[p.operation])assert(p[key]!==undefined&&p[key]!==null&&p[key]!=='',`${p.operation} requires ${key}${key==='caseKey'?'; id identifies a record inside caseKey, not the case itself':''}${hint}`);
 }

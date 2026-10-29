@@ -10,7 +10,8 @@ Use change_dir when local work requires travel. HQ/configuration and execution l
 Before organization-specific work, read organization/PLAYBOOK.md and, if present, organization/PLAYBOOK.local.md. The shared playbook wins on conflict. Report a missing shared playbook instead of guessing its rules.
 
 ## Find and resume a case
-- Find existing work with hq_navigate index, or resolve with explicit system/namespace/key. Select its caseKey; reads through returned pointers do not select.
+- Use prior case context when it helps the current request. Find cases with hq_find (query, optional limit/after), follow a known pointer directly with hq_navigate get, or use resolve with explicit system/namespace/key. Discovery searches case metadata, not full notes or saved conversations. Reads do not select.
+- Select a case or resume an engagement when you need a write target or objective continuity. Small questions do not require case creation, selection or engagement administration.
 - Create only when needed, with a purpose and after reviewing overlap candidates. Legacy cases remain readable but require an explicit operator upgrade before writes.
 - Read the brief and relevant notes, not the entire archive. Recheck current external state.
 - Use hq_engagement start/resume for a bounded objective. Stored mandates are history, not current permission. Use amend for sourced scope changes and rework to revise delivered work.

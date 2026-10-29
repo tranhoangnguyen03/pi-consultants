@@ -22,7 +22,7 @@
 
 ## 2. Find or create work
 
-`hq_navigate index` searches title, purpose, aliases, references and workspace hints lexically. `resolve` matches an explicit system/namespace/key and returns all matching cases, not a guessed winner. Namespace identity is not inferred from whichever organization happens to appear locally.
+`hq_find` is the ordinary discovery entry point: optional `query`, `limit` (1–30) and `after`. It searches case identity, title, purpose, aliases, references and workspace hints lexically, not full notes or saved conversations. Omitting query lists cases. It reuses the same search and result contract as the compatible `hq_navigate index` operation; unsupported legacy arguments are rejected together with guidance to use the smaller interface. `resolve` matches an explicit system/namespace/key and returns all matching cases, not a guessed winner. Namespace identity is not inferred from whichever organization happens to appear locally.
 
 Select an existing case explicitly. Creation is separate: give title/purpose and optional established workspace/references. The runtime checks name/alias/project/reference/workspace overlaps. Candidates are not a duplicate verdict. A review token binds the proposed identity and full checked candidate/unreadable set; changed uncertainty requires another review. Oversized candidate sets refuse creation without a token for an undisplayed set.
 
@@ -30,7 +30,7 @@ The office creation lock reduces racing creations. Existing-case updates are not
 
 ## 3. Selection versus target
 
-- `index`/`get`/`batch`/`resolve` do not select.
+- `hq_find` and navigation `index`/`get`/`batch`/`resolve` do not select. Discovery and batch responses report no single `targetCaseKey`; `context.caseKey` remains the selected case, and batch pointers identify their individual targets.
 - `select` sets the case and clears the selected objective.
 - `start`/`resume` select the objective and its case.
 - `resume` does not change lifecycle state.
