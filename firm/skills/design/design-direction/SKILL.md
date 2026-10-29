@@ -8,5 +8,9 @@ Inspect the actual product, brief, current design system and visual references. 
 
 For specific techniques to shape, strengthen, quiet or simplify the interface, use `design-impeccable` when helpful. Store meaningful direction decisions in HQ case papers and notes, not an external design-memory store.
 
+## Subject-grounded concept and craft
+
+For a substantial new direction, read [concepts and craft](references/concepts-and-craft.md): derive concrete layout/type/interaction choices from real product facts, compare alternatives internally, and apply a swap test. Use the expressive typography/composition/motion guidance only where it helps this surface; a working screen does not need an award-site look. This adds expertise, not a required concept tournament or an intermediate approval gate. See [source and license](AWWWARDS-SOURCE.md).
+
 ## Working contract
 Use the general consultation entry point in AGENTS.md. This is a method, not a compulsory workflow. Combine it with another method only when that improves the requested outcome. Respect review versus revision authority. Check the current case and retain only material findings, decisions and open questions. Report actual evidence and limitations.

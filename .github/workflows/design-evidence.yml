@@ -1,0 +1,33 @@
+name: Design evidence smoke
+on:
+  pull_request:
+    paths:
+      - 'firm/skills/design/visual-review/scripts/**'
+      - 'firm/scripts/design-qa-smoke.mjs'
+      - 'firm/tests/fixtures/design-evidence/**'
+      - '.github/workflows/design-evidence.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Capture synthetic landing and application pages
+        run: node firm/scripts/design-qa-smoke.mjs
+        env:
+          DO_NOT_TRACK: '1'
+          DISABLE_TELEMETRY: '1'
+      - name: Retain synthetic browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-evidence-fixtures
+          path: firm/results/design-evidence/
+          if-no-files-found: ignore
+          retention-days: 7
