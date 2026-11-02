@@ -60,14 +60,17 @@ async function command(executable, args, { cwd, env = {}, timeoutMs = 30000 } = 
   let stdout = '', stderr = '';
   child.stdout.on('data', bytes => { stdout += bytes; });
   child.stderr.on('data', bytes => { stderr = (stderr + bytes).slice(-16384); });
+  let timedOut = false;
   const stop = () => child.kill('SIGKILL');
-  const timer = setTimeout(stop, timeoutMs);
+  const timer = setTimeout(() => { timedOut = true; stop(); }, timeoutMs);
   budget.signal.addEventListener('abort', stop, { once: true });
   try {
     const [code, signal] = await new Promise((resolve, reject) => {
       child.once('error', reject);
       child.once('close', (...result) => resolve(result));
     });
+    budget.signal.throwIfAborted();
+    assert.ok(!timedOut, `${path.basename(executable)} exceeded its ${timeoutMs / 1000}-second CLI deadline: ${stderr}`);
     assert.equal(code, 0, `${path.basename(executable)} failed (${signal ?? code}): ${stderr}`);
     return stdout;
   } finally {
@@ -110,11 +113,11 @@ async function main() {
   await fs.cp(inputBundle, relocated, { recursive: true, dereference: false, verbatimSymlinks: true });
   report.relocation = 'Release copied to a different temporary path containing spaces; installed agents use their own release copies.';
   deadline = setTimeout(() => {
-    budget.abort(new Error('Smoke execution exceeded the three-minute budget'));
+    budget.abort(new Error('Smoke execution exceeded the ten-minute budget'));
     for (const child of processes) child.kill('SIGKILL');
     for (const client of clients) void client.close();
     server?.closeAllConnections();
-  }, 180000);
+  }, 600000);
 
   const parentHome = path.join(temporary, 'parent home'), peerHome = path.join(temporary, 'peer home');
   const initial = path.join(temporary, 'initial project'), target = path.join(temporary, 'target project'), peerProject = path.join(temporary, 'peer project');
@@ -129,7 +132,8 @@ async function main() {
   const args = ['--no-mcp', '--approve', '--provider', 'study', '--model', 'probe', '--thinking', 'off', '--no-context-files'];
 
   await check('CLI install and installed release identity', async () => {
-    for (const home of [parentHome, peerHome]) await command(releaseCommand, ['install', '--home', home], { cwd: initial, env, timeoutMs: 60000 });
+    // Full bundle hashing/copying is materially slower on hosted Intel macOS.
+    for (const home of [parentHome, peerHome]) await command(releaseCommand, ['install', '--home', home], { cwd: initial, env, timeoutMs: 180000 });
     const description = JSON.parse(await command(path.join(parentHome, 'bin/engineering-agent'), ['describe'], { cwd: initial, env }));
     assert.equal(description.id, 'engineering');
     assert.equal(description.buildId, release.buildId);
@@ -369,7 +373,7 @@ async function main() {
       const files = [path.join(home, '.pi/settings.json'), path.join(home, '.pi/models.json'), path.join(home, 'organization/PLAYBOOK.md'), path.join(home, '.hq/private-marker.txt'), path.join(home, '.hq/cases', casePath, 'case.json'), sessionFile];
       if (home === parentHome) files.push(path.join(home, '.pi/agents.json'));
       const before = await Promise.all(files.map(async file => sha(await fs.readFile(file))));
-      await command(releaseCommand, ['install', '--home', home], { cwd: initial, env, timeoutMs: 60000 });
+      await command(releaseCommand, ['install', '--home', home], { cwd: initial, env, timeoutMs: 180000 });
       assert.deepEqual(await Promise.all(files.map(async file => sha(await fs.readFile(file)))), before);
       assert.equal((await readJSON(path.join(home, '.agent/installed.json'))).buildId, release.buildId);
     }
