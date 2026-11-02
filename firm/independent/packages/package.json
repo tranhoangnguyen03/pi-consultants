@@ -1,0 +1,16 @@
+{
+  "name": "pi-consultants-engineering-packages",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pinned third-party package closure for the independent Engineering agent",
+  "type": "module",
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "dependencies": {
+    "pi-change-working-dir": "git+https://github.com/fitchmultz/pi-change-working-dir.git#d0846a834036b17fd118d0ca1011331812cea52b",
+    "pi-web-access": "0.39.0",
+    "pi-docparser": "4.0.0",
+    "pi-agent-browser": "0.1.0"
+  }
+}

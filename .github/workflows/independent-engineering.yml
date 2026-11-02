@@ -1,0 +1,70 @@
+name: independent-engineering
+
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    tags: ['engineering-v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: independent-engineering-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Engineering / ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x64
+            runner: ubuntu-24.04
+            platform: linux
+            arch: x64
+          - target: darwin-arm64
+            runner: macos-15
+            platform: darwin
+            arch: arm64
+          - target: darwin-x64
+            runner: macos-15-intel
+            platform: darwin
+            arch: x64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+      - name: Check native build target
+        env:
+          EXPECTED_PLATFORM: ${{ matrix.platform }}
+          EXPECTED_ARCH: ${{ matrix.arch }}
+        run: |
+          node --input-type=module -e '
+            if (process.platform !== process.env.EXPECTED_PLATFORM || process.arch !== process.env.EXPECTED_ARCH) {
+              throw new Error(`Expected ${process.env.EXPECTED_PLATFORM}-${process.env.EXPECTED_ARCH}, got ${process.platform}-${process.arch}`);
+            }
+          '
+      # The verification workflow owns the repository-wide npm run verify gate.
+      - name: Build native Engineering release
+        run: node firm/independent/build.mjs
+      - name: Exercise the relocated compiled bundle
+        run: node firm/independent/smoke.mjs --bundle firm/dist/independent/bundle
+      # Tags build reviewable artifacts; this workflow does not publish releases.
+      - name: Retain release and smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engineering-agent-${{ matrix.target }}
+          path: |
+            firm/dist/independent/*.tar.gz
+            firm/dist/independent/*.sha256
+            firm/dist/independent/**/smoke-report.json
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,11 @@
+{
+  "id": "engineering",
+  "name": "Engineering consultant B",
+  "version": "0.1.0-preview.1",
+  "protocol": 1,
+  "stateSchema": 1,
+  "role": "engineering",
+  "command": "engineering-agent",
+  "repository": "https://github.com/tranhoangnguyen03/pi-consultants",
+  "description": "Independent Engineering consultant: plan, review, debug, optimise, test, UX and documentation."
+}
