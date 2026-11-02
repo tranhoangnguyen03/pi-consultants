@@ -38,6 +38,8 @@ Create `<home>/organization/PLAYBOOK.md` from its adjacent example and edit it f
 
 The shared Pi packages are already installed. External integrations retain their requirements: Chrome/agent-browser, `gh`, `yt-dlp`, ffmpeg, LibreOffice for some Office-format conversions, connector accounts, and explicit HyperFrames setup where used. Chrome DevTools follows the shared toolset's enabled default and can download its pinned MCP program on first connection. `--no-mcp` is useful for a first test without connectors; it does not change saved configuration. The app has your ordinary operating-system access; it is not an execution sandbox.
 
+Optional npm helper installs made inside the agent use `<home>/.hq/tools/npm`, with cache in `.hq/cache/npm`. Their executables are on the agent's PATH, after bundled Node. This lets a confirmed browser-helper installation persist without modifying the versioned release or your daily-driver npm prefix. It does not install a browser automatically.
+
 ```sh
 engineering-agent -p "Review this project's error handling; do not edit files."
 engineering-agent --mode json -p "Explain the main technical risk."

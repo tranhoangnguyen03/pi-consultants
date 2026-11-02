@@ -64,6 +64,9 @@ async function main() {
   home = await fs.realpath(home);
   const endRun = await registerRun(home, release);
   try {
+    // Optional package installers must never mutate the versioned Node runtime.
+    const npmPrefix = path.join(home, '.hq/tools/npm');
+    const npmCache = path.join(home, '.hq/cache/npm');
     const env = {
       ...process.env,
       ENGINEERING_AGENT_HOME: home,
@@ -72,7 +75,11 @@ async function main() {
       PIG_TS_RUNTIME: 'node',
       PIG_CODING_AGENT_DIR: path.join(home, '.pi'),
       PI_CODING_AGENT_DIR: path.join(home, '.pi'),
-      PATH: `${path.join(bundle, 'runtime/node/bin')}${path.delimiter}${process.env.PATH || ''}`,
+      NPM_CONFIG_PREFIX: npmPrefix,
+      npm_config_prefix: npmPrefix,
+      NPM_CONFIG_CACHE: npmCache,
+      npm_config_cache: npmCache,
+      PATH: [path.join(bundle, 'runtime/node/bin'), path.join(npmPrefix, 'bin'), process.env.PATH || ''].join(path.delimiter),
     };
     delete env.CONSHQ_CONFIG; delete env.CONSHQ_HOME; delete env.PI_PROFILE_SWITCH_DIR;
     delete env.PIG_PIGLET_PATH; delete env.PIG_PIGLET_NAME;

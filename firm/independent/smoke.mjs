@@ -38,6 +38,8 @@ const writeJSON = (file, value) => fs.writeFile(file, JSON.stringify(value, null
 const textOf = value => typeof value === 'string' ? value : (value ?? []).map(item => item.text ?? '').join('\n');
 const inside = (file, root) => file === root || file.startsWith(root + path.sep);
 const clean = text => String(text).split(temporary || '\0').join('$SMOKE_TMP');
+// These arguments reach the real bash tool; temporary paths may contain quotes.
+const shellQuote = value => `'${String(value).replaceAll("'", "'\"'\"'")}'`;
 
 async function check(name, work) {
   currentCheck = name;
@@ -120,6 +122,14 @@ async function main() {
   }, 600000);
 
   const parentHome = path.join(temporary, 'parent home'), peerHome = path.join(temporary, 'peer home');
+  const helperName = 'engineering-smoke-helper';
+  const helperSource = path.join(temporary, 'offline npm fixture');
+  const helperTarball = path.join(helperSource, `${helperName}-1.0.0.tgz`);
+  const privatePrefix = path.join(parentHome, '.hq/tools/npm');
+  const privateCache = path.join(parentHome, '.hq/cache/npm');
+  const installedHelper = path.join(privatePrefix, 'lib/node_modules', helperName);
+  const helperBin = path.join(privatePrefix, 'bin', helperName);
+  const helperCode = '#!/usr/bin/env node\nconsole.log("PRIVATE_NPM_HELPER_VERIFIED");\n';
   const initial = path.join(temporary, 'initial project'), target = path.join(temporary, 'target project'), peerProject = path.join(temporary, 'peer project');
   for (const dir of [initial, target, peerProject]) await fs.mkdir(dir);
   await fs.writeFile(path.join(initial, 'marker.txt'), 'WRONG_INITIAL_DIRECTORY\n');
@@ -185,6 +195,13 @@ async function main() {
   const note = (text, extra = {}) => ({ kind: 'finding', state: 'observed', text, sources: ['fixture:local-integration'], attribution: 'deterministic smoke fixture', scope: 'case', ...extra });
   const parentNote = 'PARENT_PRIVATE_NOTE_MARKER', resumedNote = 'PARENT_EXPLICIT_RESUME_MARKER', rejectedNote = 'REJECTED_RESTORED_WRITE_MARKER', peerNote = 'PEER_PRIVATE_NOTE_MARKER';
   const step = (tool, params, verify) => ({ tool, params, verify });
+  plans.set('parent:npm-tools', [
+    step('bash', { command: 'npm config get prefix --loglevel=error' }, value => assert.equal(value.trim(), privatePrefix)),
+    step('bash', { command: 'npm config get cache --loglevel=error' }, value => assert.equal(value.trim(), privateCache)),
+    step('bash', { command: ['npm', 'install', '-g', '--offline', '--ignore-scripts', '--no-audit', '--no-fund', '--loglevel=error', helperTarball].map(shellQuote).join(' ') }, value => assert.match(value, /added 1 package/)),
+    step('bash', { command: `command -v ${shellQuote(helperName)}` }, value => assert.equal(value.trim(), helperBin)),
+    step('bash', { command: shellQuote(helperName) }, value => assert.equal(value.trim(), 'PRIVATE_NPM_HELPER_VERIFIED')),
+  ]);
   plans.set('parent:parent-work', [
     step('agent_identity', {}, expectJSON(value => { assert.equal(value.id, 'engineering'); assert.equal(value.home, parentHome); assert.equal(value.version, release.version); })),
     step('change_dir', { path: target }, expectText(target)),
@@ -317,6 +334,29 @@ async function main() {
     for (const name of ['consult', 'case-recap', 'close-consultation', 'doctor', 'export-diagram', 'import-excalidraw', 'import-mermaid', 'profile']) assert.ok(commands.some(item => item.source === 'prompt' && item.name === name), `Missing prompt ${name}`);
     return { registeredSkills: skills.length, prompts: commands.filter(item => item.source === 'prompt').map(item => item.name).sort() };
   });
+  await check('Runtime npm helpers install into private state without changing the release', async () => {
+    await fs.mkdir(helperSource);
+    await writeJSON(path.join(helperSource, 'package.json'), { name: helperName, version: '1.0.0', private: true, type: 'module', bin: { [helperName]: 'bin.mjs' }, files: ['bin.mjs'] });
+    await fs.writeFile(path.join(helperSource, 'bin.mjs'), helperCode, { mode: 0o755 });
+    const packCache = path.join(temporary, 'pack cache');
+    const packed = JSON.parse(await command(path.join(relocated, 'runtime/node/bin/node'), [
+      path.join(relocated, 'runtime/node/lib/node_modules/npm/bin/npm-cli.js'),
+      'pack', '--offline', '--ignore-scripts', '--json', '--loglevel=error', '--pack-destination', helperSource,
+    ], { cwd: helperSource, env: { ...env, npm_config_cache: packCache, NPM_CONFIG_CACHE: packCache } }));
+    assert.equal(packed.length, 1);
+    assert.equal(packed[0].filename, path.basename(helperTarball));
+    await prompt(parent, 'npm-tools');
+    assert.equal((await readJSON(path.join(installedHelper, 'package.json'))).name, helperName);
+    assert.equal(await fs.readFile(path.join(installedHelper, 'bin.mjs'), 'utf8'), helperCode);
+    assert.equal(await fs.realpath(helperBin), path.join(installedHelper, 'bin.mjs'));
+    await fs.access(privateCache);
+    const ownRelease = path.join(parentHome, '.agent/current');
+    for (const relative of [`runtime/node/lib/node_modules/${helperName}`, `runtime/node/bin/${helperName}`]) {
+      await assert.rejects(fs.access(path.join(ownRelease, relative)), { code: 'ENOENT' });
+      await assert.rejects(fs.access(path.join(relocated, relative)), { code: 'ENOENT' });
+    }
+    return { installSource: 'dependency-free local tarball; offline, scripts disabled', prefix: 'app home/.hq/tools/npm', cache: 'app home/.hq/cache/npm', executableOnPath: true, helperAbsentFromRelease: true };
+  });
   await check('Native read/bash travel, native PDF parsing and attributed HQ write', async () => {
     first = await prompt(parent, 'parent-work');
     assert.ok(inside(first.session.sessionFile, path.join(parentHome, '.hq/sessions')));
@@ -371,13 +411,14 @@ async function main() {
   await check('CLI reinstall preserves settings, private playbook, cases and sessions', async () => {
     for (const [home, sessionFile, casePath] of [[parentHome, first.session.sessionFile, 'fixture/parent'], [peerHome, delegatedSession.sessionFile, 'fixture/peer']]) {
       const files = [path.join(home, '.pi/settings.json'), path.join(home, '.pi/models.json'), path.join(home, 'organization/PLAYBOOK.md'), path.join(home, '.hq/private-marker.txt'), path.join(home, '.hq/cases', casePath, 'case.json'), sessionFile];
-      if (home === parentHome) files.push(path.join(home, '.pi/agents.json'));
+      if (home === parentHome) files.push(path.join(home, '.pi/agents.json'), path.join(installedHelper, 'package.json'), path.join(installedHelper, 'bin.mjs'));
       const before = await Promise.all(files.map(async file => sha(await fs.readFile(file))));
       await command(releaseCommand, ['install', '--home', home], { cwd: initial, env, timeoutMs: 180000 });
       assert.deepEqual(await Promise.all(files.map(async file => sha(await fs.readFile(file)))), before);
       assert.equal((await readJSON(path.join(home, '.agent/installed.json'))).buildId, release.buildId);
+      if (home === parentHome) assert.equal(await fs.realpath(helperBin), path.join(installedHelper, 'bin.mjs'));
     }
-    return { homes: 2, settingsPreserved: true, privateStatePreserved: true, sessionsPreserved: true };
+    return { homes: 2, settingsPreserved: true, privateStatePreserved: true, sessionsPreserved: true, privateNpmHelperPreserved: true };
   });
   report.fixture = { providerRequests: requestCount, verifiedToolResults: records.size, humanAnswersSent: 0, externalServicesUsed: 0 };
   report.status = 'passed';
