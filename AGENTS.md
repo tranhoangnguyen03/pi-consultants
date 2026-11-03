@@ -13,3 +13,4 @@ Before kit development, maintenance, or Office Admin work:
 1. Read `firm/docs/AGENT-FIRST-PRINCIPLES.md` (founding charter), `firm/docs/FRAMEWORK.md` (governing technical spec), `firm/docs/FACTORY-CONTRACT.md`, and `firm/docs/OFFICE-ADMIN.md`.
 2. Read the companion specs in `firm/docs/`: `CASE-ORGANIZATION-SYSTEM.md` and `SOLUTIONS.md`.
 3. Private admin state (checkpoints, decision history, rollout records, trial evidence) lives in gitignored `.hq/admin/` when present (`CHECKPOINT.md` and `DIRECTION.md`). Never put private notes, client data, or chat excerpts in tracked files.
+4. For independent applications, read `firm/docs/INDEPENDENT-AGENTS.md` and `firm/docs/INDEPENDENT-ENGINEERING.md`. Keep release packaging separate from private home state and from higher-level firm, team or room coordination.

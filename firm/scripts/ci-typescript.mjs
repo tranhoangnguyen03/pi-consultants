@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 const firm=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const repo=path.dirname(firm);
 const offices=JSON.parse(await fs.readFile(path.join(firm,'offices.json'),'utf8'));
-const files=[path.join(firm,'extensions/index.ts'),...offices.map(x=>path.join(repo,'offices',x.folder,'.pi/extensions/consultant.ts'))];
+const files=[path.join(firm,'extensions/index.ts'),path.join(firm,'independent/entry.ts'),path.join(firm,'independent/main-pi.ts'),...offices.map(x=>path.join(repo,'offices',x.folder,'.pi/extensions/consultant.ts'))];
 let failed=0;
 for(const file of files){
  const result=spawnSync(process.execPath,['--check',file],{encoding:'utf8'});

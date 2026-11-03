@@ -36,6 +36,8 @@ The engineering office includes an [agent-led review workbench](firm/docs/ENGINE
 
 ## What you need
 
+**Independent Engineering preview:** Engineering consultant B can also be built and installed as a versioned application with PiG, Node and its packages included. It supports direct use, delegation from your main Pi and bounded consultations with other independently installed agents. Start with the [preview installation and manual-test runbook](firm/docs/INDEPENDENT-ENGINEERING.md) and [living agent design](firm/docs/INDEPENDENT-AGENTS.md). The requirements and setup below apply to the ordinary Pi offices.
+
 - **macOS or Linux with a terminal.** The commands below were tested on macOS. Windows has not been tested.
 - **Git**, to clone this repository.
 - **Node.js 24.15 or newer.** Check with `node --version`. Pi itself accepts Node 22.19+, but the directory-switching package these offices install requires 24.15.0 or newer. We tested with Node 26.11.1. If you use nvm, `nvm install 26` and `nvm use 26` are one way to get there. Use the same Node version for every step below.
