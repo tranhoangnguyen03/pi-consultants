@@ -1,32 +1,24 @@
 # Investigation, verification and specialist help
 
-**Use judgment, not mandatory gates.** A review may report a credible risk on the basis of sound technical reasoning. Extra proof can raise confidence when the likely value justifies the effort.
+Use judgment, not mandatory gates. A review may report a credible risk on sound technical reasoning. Extra proof raises confidence when the likely value justifies the effort. [Design interrogation](design-interrogation.md) covers necessity and alternatives; [requester interaction](requester-interaction.md) covers exchanges with the author or decision owner.
 
 ## Investigation choices
 
-- Read callers, contracts, affected state paths and boundary cases.
-- Inspect tests, CI results, logs or history from the reviewed revision.
-- Run targeted existing tests, type checks or lint commands when safe.
+- Read callers, contracts, state paths and boundary cases; compare an alternative explanation.
+- Inspect tests, CI results, logs and history from the reviewed revision; check whether a failure predates the change.
+- Run targeted existing tests, type checks or lint when safe.
 - Construct a small reproduction or discriminating experiment when worthwhile.
-- Compare an alternate explanation with the suspected defect.
-- Check whether a failure predates the change.
 
-Running tests is not automatically harmless: projects can connect to services, write databases, delete fixtures or read credentials. Prefer a safe environment when the commands are unfamiliar or consequential. Do not alter source or release state under a review-only mandate.
-
-If you cannot run a proof, explain the likely failure and the reasoning. Never hide important risks merely because they remain untested. Do not claim a run or independence that did not occur.
+Running tests is not automatically harmless: projects can connect to services, write databases, delete fixtures or read credentials. Prefer a safe isolated environment for unfamiliar or consequential commands. Do not alter source or release state under a review-only mandate. If you cannot run a proof, explain the reasoning and limits. Do not claim a test, conversation, delivery or independence that did not occur.
 
 ## Optional second opinion
 
-For a difficult architecture decision, unfamiliar subsystem or contested finding, consider a **focused** challenge from another available model or agent:
+For a difficult design decision, unfamiliar subsystem or contested finding, consider a focused challenge from an available, authorized model or agent. Codex CLI offers a read-only review mode (`codex review --base main`); inspect the installed CLI before assuming other modes. A fresh Pi context or an existing external-agent facility may investigate one bounded question. Multiple lenses can also be applied in the same session without spawning agents.
 
-- Codex CLI provides a read-only code review mode (codex review --base main), and a separate adversarial review can challenge the design where the installed CLI supports it.
-- A fresh Pi context or an existing authorized external agent facility may investigate one bounded question.
-- Multiple lenses can also be applied by the same consultant without spawning agents.
+Record who actually ran and on which revision. A peer's response is another assessment to inspect, not independent proof or an approval vote. B owns the final synthesis and may disagree with either author or peer. If no separate reviewer is available, continue useful work and disclose the limitation. Avoid agent chatrooms and mandatory ensembles. A read-only prompt is not a sandbox. Respect permissions before sending private code to another provider.
 
-Record who actually ran and on which revision. Cross-model agreement is useful evidence, not proof. If no peer is available, continue in B. Avoid agent chatrooms and mandatory ensembles. Any subprocess must respect current permissions; a 'read-only' prompt is not a sandbox.
+Temporary helpers do not create new HQ cases, issue trackers or standing staff. They supply findings to the reviewing consultant through the existing facility. Contacting an implementer for a factual answer is not the same as commissioning an independent review.
 
-The reviewing consultant owns final synthesis. Temporary helpers do not create new HQ cases, issue-trackers or standing staff. Consult the user's permissions before sending private code to another provider.
+## Stop with a useful assessment
 
-## Clear stop conditions
-
-Stop extra investigation when the answer is useful enough for the user's decision or when another tool call is unlikely to change the conclusion. Continue deeper when the consequence warrants it. Neither token count nor a rigid number of passes should decide.
+Stop extra investigation when another call is unlikely to change the conclusion. Continue when the consequences warrant it, not to satisfy a token budget, fixed pass count or consensus requirement. If a material problem remains, request changes; if a necessary decision is unavailable, hand back the blocked assessment and resolution path. Do not silently approve or keep polling indefinitely. The requester owns implementation and whether a later re-review is useful.
