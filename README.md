@@ -8,6 +8,20 @@ The offices are **ready to use** in this repository's `offices/` folder. Clone i
 
 Our [Agent-First Design Principles](firm/docs/AGENT-FIRST-PRINCIPLES.md) guide every office: equip, augment and empower the consultant; keep methods flexible and authority clear. This charter guides the product, not a new checklist for each consultation.
 
+## Experimental standalone arrival (Milestone A)
+
+A source-checkout **standalone launcher**, not a Pi extension installed into your daily driver, can now open an engineering consultation at a project without manually entering the HQ first:
+
+```sh
+node /path/to/pi-consultants/bin/pi-consultants.mjs engineering --project /path/to/project
+# Or use --hq /path/to/engineering-HQ for an existing external office
+# Or use --office-only for a conversation at HQ without a project
+```
+
+This starts a **new native Pi session owned by the engineering HQ**. It uses the pinned directory extension to select the project as a temporary worksite before model tool calls, and blocks supported tool calls if that selection fails. It does not copy or move the HQ, change global Pi settings, or automatically load the project's `.pi` extensions and settings. Requires Node >=24.15, Pi >=1.2, and an existing configured engineering HQ; source developers may use `npm link` to expose the command. Installer, all-office picker, project-aware resume and multi-session controls remain later milestones.
+
+See [Milestone A architecture, original flowchart, scope and acceptance tests](docs/LAUNCHER-MILESTONE-A.md). Existing `cd <HQ> && pi` use is unchanged.
+
 ## Why use it
 
 - **A specialist, not a mode.** Each consultant has its own instructions, skills and history. It doesn't share a context window with your main session.
