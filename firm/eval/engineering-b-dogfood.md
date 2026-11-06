@@ -8,6 +8,29 @@ B already had broad review and agent-experience capabilities. Its engineering pr
 
 This is a static-design hypothesis, **not proof of improved model behavior**. The ten prior engineering skills remain; the candidate offers eleven. The higher skill count is acceptable only if selective discovery and real task quality justify it. The generated office must match canonical firm source; existing CI checks that structure, not model quality.
 
+## Static inventory: keep, challenge, or measure
+
+The original ten Engineering skills are not ten always-loaded bodies of text. Each has a distinct main task, so removing one solely to reduce the count would be a false optimization.
+
+| Existing skill | Current assessment |
+|---|---|
+| change-review | Keep: core independent judgment; substantial evaluated scenarios. |
+| plan-design | Keep: pre-implementation design; shares scrutiny with reviews without a new gate. |
+| debug-verify | Keep: fault investigation and proof of a fix. |
+| behavioral-assurance | Keep: test-value review, not test-count optimization. |
+| code-optimize | Keep: removal and simplification expertise. |
+| codebase-orientation | Keep: bounded repo discovery; verify it stays task-scaled. |
+| documentation | Keep: technical accuracy and runnable instructions. |
+| human-ux | Keep: implementation-centered human interface check; D retains deeper user research. |
+| agent-experience | Keep, but check routing overlap with the new whole-agentic-systems lens. |
+| asd-ste100 | Conditional: large optional method for exact agent-facing wording, not routine reviews. Verify lazy loading before calling it context bloat. |
+
+The new `engineering-agentic-systems` skill is the **candidate**, not yet an accepted improvement. Its value must outweigh the extra discovery entry and the overlap risk with agent-experience, change-review and plan-design.
+
+A separate potential cost is the shared `toolset.json`: B currently carries web, document, browser and diagram packages plus an enabled Chrome DevTools connector. The independent PiG release in PR #27 bundles these resources. Measure actual startup cost, exposed agent tools, package footprint, and task-level usefulness before changing the shared toolset. An unused tool is not automatically harmful, and a rarely used capability may still be valuable.
+
+**Removal rule:** propose consolidation or deletion only when a real task or trace shows overlapping selection, avoidable context/tool churn, maintenance burden, or a safe replacement. Preserve useful role coverage, authoring authority, and the existing Practice/Office/Site boundaries.
+
 ## Compare baseline and candidate
 
 Use the same model, Pi version, project revision, tool availability, organization playbook, budgets, and mandate. Open genuinely fresh sessions for independent initial reviews. Keep B's private history and workspaces isolated; do not expose scoring expectations to the consultant. Record sources loaded, methods used, actions, final artifacts, corrections, and evidence of actual results. The existing `firm/eval/review-judgment/` pack can supply non-agentic review regression cases.
