@@ -30,9 +30,9 @@ Our [Agent-First Design Principles](firm/docs/AGENT-FIRST-PRINCIPLES.md) guide e
 
 You don't need to pick a skill or fill in a form. Describe your concern in plain language and the consultant decides how to approach it. Every consultant has normal Pi powers: it can read files, run commands and edit files on your machine, and work in your repositories and connected services. Their specialty decides which tools they reach for, not which they may use. Before any outside action (pushing, posting, messaging, changing a ticket) a consultant gives you a heads-up. Any consultant can also prepare an exact outgoing action for you to approve with `/hq approve` first, then keep a receipt (the optional outbox).
 
-## Engineering review workbench
+## Engineering review workbench and agentic systems
 
-The engineering office includes an [agent-led review workbench](firm/docs/ENGINEERING-REVIEW-WORKBENCH.md) for PRs, branches, commits, files and wider architecture reviews. It offers read-only scope checks, specialist review guidance and optional code-graph, static-analysis and cross-model tools. They are discoverable on demand, not mandatory gates. Review-only work does not edit or publish code. No new reviewer office or separate case memory is required.
+The engineering office includes an [agent-led review workbench](firm/docs/ENGINEERING-REVIEW-WORKBENCH.md) for PRs, branches, commits, files and wider architecture reviews. It offers read-only scope checks, specialist review guidance and optional code-graph, static-analysis and cross-model tools. They are discoverable on demand, not mandatory gates. Review-only work does not edit or publish code. No new reviewer office or separate case memory is required. B also has an on-demand [Agentic Systems Engineering method](firm/skills/engineering/agentic-systems/SKILL.md) for assessing and developing agents, harnesses, plugins, extensions and portable packages. It adds no separate office, router or mandatory checklist.
 
 ## What you need
 
