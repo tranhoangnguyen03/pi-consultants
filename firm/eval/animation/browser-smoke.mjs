@@ -2,10 +2,11 @@
 // This tests example code and actual pixels, NOT agent autonomy or artistic merit.
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
-import {readFile, mkdir, writeFile} from 'node:fs/promises';
+import {readFile, mkdir, writeFile, rm, stat} from 'node:fs/promises';
 import {extname, join, resolve, relative, sep, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
 import {chromium} from 'playwright-chromium';
 import {PNG} from 'pngjs';
 
@@ -110,7 +111,57 @@ try{
       console.error(`FAIL ${mode}: ${e.message}`);
     }finally{await page.close();}
   }
-  report.status=report.tests.every(t=>t.status==='pass')?'pass':'fail';
+  // An explicit, seekable frame sequence proves browser -> actual MP4 delivery.
+  // This is an integration check; it does not imply H generated the source.
+  if (report.tests.every(t=>t.status==='pass')) {
+    const fps=12, frameCount=fps*duration;
+    const framesDir=join(reportDir,'mp4-frames');
+    const output=join(reportDir,'standalone-loop.mp4');
+    await mkdir(framesDir,{recursive:true});
+    const page=await browser.newPage({viewport:{width:400,height:300},deviceScaleFactor:1});
+    const media={build:'standalone',frameCount,fps,output:'standalone-loop.mp4'};
+    report.media=media;
+    try {
+      const run=(cmd,args)=>{
+        const p=spawnSync(cmd,args,{encoding:'utf8',maxBuffer:4*1024*1024});
+        if(p.error||p.status!==0)throw new Error(cmd+' failed: '+(p.error?.message||p.stderr||p.stdout||p.status));
+        return p.stdout;
+      };
+      await page.goto(`http://127.0.0.1:${listener.address().port}/scenes/standalone.html`,{waitUntil:'load'});
+      await page.waitForFunction(()=>window.sceneReady&&typeof window.renderAt==='function');
+      const canvas=page.locator('canvas').first();
+      for(let i=0;i<frameCount;i++){
+        await page.evaluate(t=>window.renderAt(t),i/frameCount);
+        const png=await canvas.screenshot();
+        await writeFile(join(framesDir,`frame-${String(i).padStart(4,'0')}.png`),png);
+      }
+      run('ffmpeg',['-hide_banner','-loglevel','error','-y','-framerate',String(fps),
+        '-i',join(framesDir,'frame-%04d.png'),'-c:v','libx264','-pix_fmt','yuv420p',
+        '-movflags','+faststart',output]);
+      const details=JSON.parse(run('ffprobe',['-v','error','-show_entries',
+        'format=duration:stream=codec_type,width,height,nb_frames,r_frame_rate',
+        '-of','json',output]));
+      const video=details.streams.find(x=>x.codec_type==='video');
+      assert(video,'MP4 must contain a video stream');
+      assert.equal(video.width,360);assert.equal(video.height,240);
+      assert.equal(video.nb_frames,String(frameCount));
+      assert.equal(video.r_frame_rate,`${fps}/1`);
+      assert(Math.abs(Number(details.format.duration)-duration)<.08,'Unexpected MP4 duration');
+      run('ffmpeg',['-v','error','-i',output,'-f','null','-']);
+      media.duration=Number(details.format.duration);
+      media.bytes=(await stat(output)).size;
+      assert(media.bytes>5000,'Output media unexpectedly small');
+      media.status='pass';
+      console.log(`PASS mp4 export: ${frameCount} frames, ${media.duration}s, 360x240, ${media.bytes} bytes, decoded`);
+    } catch(e) {
+      media.status='fail';media.failure=String(e?.stack||e);
+      console.error('FAIL mp4 export: '+e.message);
+    } finally {
+      await page.close();
+      await rm(framesDir,{recursive:true,force:true});
+    }
+  }
+  report.status=report.tests.every(t=>t.status==='pass') && report.media?.status==='pass'?'pass':'fail';
 } catch (e) {
   report.status='fail';report.runnerFailure=String(e?.stack||e);
   console.error(report.runnerFailure);

@@ -28,6 +28,8 @@ jobs:
       - name: Install Chromium dependencies
         working-directory: firm/eval/animation
         run: npx playwright install --with-deps chromium
+      - name: Check media encoder and decoder
+        run: ffmpeg -version && ffprobe -version
       - name: Render and inspect both builds in Chromium
         working-directory: firm/eval/animation
         run: npm run test:browser
