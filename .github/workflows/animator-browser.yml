@@ -1,0 +1,41 @@
+name: Animator browser trials
+on:
+  pull_request:
+    paths:
+      - 'firm/eval/animation/**'
+      - 'firm/profiles/animation/**'
+      - 'firm/skills/animation/**'
+      - 'offices/animator-consultant/**'
+      - '.github/workflows/animator-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    name: p5.brush two-build WebGL2
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15'
+      - name: Install isolated browser test dependencies
+        working-directory: firm/eval/animation
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium dependencies
+        working-directory: firm/eval/animation
+        run: npx playwright install --with-deps chromium
+      - name: Render and inspect both builds in Chromium
+        working-directory: firm/eval/animation
+        run: npm run test:browser
+      - name: Keep bounded result JSON and rendered frames
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: animator-two-build-browser
+          path: firm/eval/animation/results/*
+          if-no-files-found: ignore
+          retention-days: 14

@@ -1,0 +1,15 @@
+{
+  "name": "animator-h-browser-trials",
+  "private": true,
+  "type": "module",
+  "description": "Isolated real-browser checks of p5.brush two-build behavior; not an AI-agent quality test",
+  "scripts": {
+    "test:browser": "node browser-smoke.mjs"
+  },
+  "dependencies": {
+    "p5": "2.2.0",
+    "p5.brush": "3.0.0",
+    "playwright-chromium": "1.58.2",
+    "pngjs": "7.0.0"
+  }
+}
