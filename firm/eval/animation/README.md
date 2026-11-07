@@ -13,9 +13,9 @@ npx playwright install --with-deps chromium
 npm run test:browser
 ```
 
-The test serves `scenes/addon.html` and `scenes/standalone.html` locally. Dependencies live **only here**, not in the consultant office. It writes small PNG samples and a JSON report in `results/`. GitHub Actions runs the same check and keeps results as a short-lived artifact. The CI job uses Ubuntu 24.04 because its pinned Playwright version does not support the newer 26.04 runner.
+The test serves `scenes/addon.html` and `scenes/standalone.html` locally. Dependencies live **only here**, not in the consultant office. It writes small PNG samples, a standalone MP4 and a JSON report in `results/`. GitHub Actions runs the same check and keeps results as a short-lived artifact. The CI job uses Ubuntu 24.04 because its pinned Playwright version does not support the newer 26.04 runner.
 
-A passing result means both *fixed sketches* rendered and the tested loop closed. It does **not** prove that the agent wrote or corrected them, that the artistic direction is good, that the library works on every GPU, or that an actual media export works.
+A passing result means both *fixed sketches* rendered and the tested loop closed. It also proves MP4 export and decoding for the fixed standalone fixture, not arbitrary sketches or other export formats. It does **not** prove that the agent wrote or corrected the sketches, can perform the export workflow, that the artistic direction is good, or that the library works on every GPU.
 
 ## Real-agent qualification (separate)
 
