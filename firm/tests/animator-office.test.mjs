@@ -1,0 +1,40 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {buildOffice,loadFirm} from '../scripts/factory.mjs';
+
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+
+test('[EV-H01] H is an independent animation office without a forced p5 dependency',async t=>{
+  const temp=await fs.mkdtemp(path.join(os.tmpdir(),'hq-animation-'));
+  t.after(()=>fs.rm(temp,{recursive:true,force:true}));
+  const {offices,toolset}=await loadFirm(root);
+  const office=offices.find(o=>o.role==='animation');
+  assert.equal(office?.letter,'H');
+  assert.equal(office.folder,'animator-consultant');
+  assert.equal(new Set(offices.map(o=>o.letter)).size,offices.length);
+  const hq=await buildOffice(root,office,toolset,path.join(temp,office.folder));
+  const config=JSON.parse(await fs.readFile(path.join(hq,'.pi/hq.json'),'utf8'));
+  assert.equal(config.role,'animation');
+  assert.equal(config.stateDir,'../.hq');
+  const own=await fs.readdir(path.join(root,'skills/animation'));
+  const shared=await fs.readdir(path.join(root,'skills/shared'));
+  const actual=await fs.readdir(path.join(hq,'.pi/skills'));
+  assert.deepEqual(actual.sort(),[...own,...shared].sort());
+  for(const name of ['animation-direction','creative-coding','p5-brush','composition'])assert(actual.includes(name));
+  for(const name of ['design-direction','frontend-implementation','solution-shaping'])assert(!actual.includes(name));
+  const profile=await fs.readFile(path.join(hq,'AGENTS.md'),'utf8');
+  assert.match(profile,/consultant H, the animator and creative coding consultant/);
+  assert.match(profile,/Consultation is the entry point/);
+  assert.match(profile,/postdraw|browser|inspect the actual output/i);
+  const settings=JSON.parse(await fs.readFile(path.join(hq,'.pi/settings.json'),'utf8'));
+  assert.deepEqual(settings.packages,toolset.packages,'H does not add an automatic library dependency');
+  assert(!settings.packages.some(p=>p.includes('p5.brush')),'p5.brush belongs in the project that uses it');
+  const marker=JSON.parse(await fs.readFile(path.join(hq,'HQ-ROLE.json'),'utf8'));
+  assert.equal(marker.role,'animation');
+  assert(Object.keys(marker.generated).some(k=>k.startsWith('.pi/skills/p5-brush/')));
+  assert(!Object.keys(marker.generated).some(k=>k.includes('design-direction')));
+});

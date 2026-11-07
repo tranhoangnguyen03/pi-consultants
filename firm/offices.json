@@ -88,5 +88,20 @@
       "  │ ◆──────◇ │  ",
       "  ╰──────────╯  "
     ]
+  },
+  {
+    "folder": "animator-consultant",
+    "role": "animation",
+    "letter": "H",
+    "identity": "consultant H, the animator and creative coding consultant",
+    "title": "ANIMATION & CREATIVE CODING",
+    "tagline": "conceive · animate · render · refine",
+    "banner": [
+      "  ╭──────────╮  ",
+      "  │ ● ─── ◉  │  ",
+      "  │  ↘  ↗    │  ",
+      "  │ ◯ ─── ◆  │  ",
+      "  ╰──────────╯  "
+    ]
   }
 ]

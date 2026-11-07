@@ -1,0 +1,21 @@
+{
+  "sessionDir": ".hq/sessions",
+  "quietStartup": true,
+  "packages": [
+    "git:github.com/fitchmultz/pi-change-working-dir@d0846a834036b17fd118d0ca1011331812cea52b",
+    "npm:pi-web-access@0.39.0",
+    "npm:pi-docparser@4.0.0",
+    "npm:pi-agent-browser@0.1.0",
+    "git:github.com/cathrynlavery/diagram-design@0a8ea20ae69b33a5edce6018eedd3a9d26e90c1c"
+  ],
+  "defaultTools": [
+    "+read",
+    "+bash",
+    "+edit",
+    "+write",
+    "+grep",
+    "+find",
+    "+ls",
+    "+tool_search"
+  ]
+}

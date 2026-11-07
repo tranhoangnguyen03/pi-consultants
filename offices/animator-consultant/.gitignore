@@ -1,0 +1,12 @@
+
+# Private local HQ state and account configuration
+/.hq/
+/.env
+/organization/PLAYBOOK.md
+/organization/PLAYBOOK.local.md
+/.pi/hq.local.json
+/.pi/mcp.json
+/.pi/npm/
+/.pi/git/
+/.pi/runtime/
+/.pi/extensions/_hq-live-probe.ts

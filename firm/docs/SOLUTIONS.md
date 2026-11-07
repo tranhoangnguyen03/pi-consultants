@@ -26,7 +26,7 @@ The organization owns its playbook (identity, source precedence and working rule
 
 ## Shared scene-based composition (HyperFrames)
 
-**Status:** adopted and implemented in `firm/skills/shared/composition/` for B, C and D.
+**Status:** adopted and implemented in `firm/skills/shared/composition/` for every consultant, including Animator H.
 
 **Issue:** VHS terminal recordings and diagram-design's short explanatory motion do not provide a general scene-based visual-explainer production pipeline.
 
