@@ -77,7 +77,7 @@ This illustrates a nominal 60-fps frame step, **not** wall-clock-correct animati
 - Fields: `brush.field('waves')`, `brush.refreshField(t)`, `brush.noField()`; use `brush.listFields()` to check names.
 - Setup: `brush.scaleBrushes(scale)` for a matching mark size and `brush.box()` for the current brush names.
 
-Prefer primary drawing primitives for visible geometry; use `Plot` and `Polygon` data objects only when their stored geometry matters. Native p5 text and other overlays should be drawn after brush content so they remain on top.
+Prefer primary drawing primitives for visible geometry; use `Plot` and `Polygon` data objects only when their stored geometry matters. For a label that must remain above brush marks, use a separate transparent 2D canvas positioned above the WebGL canvas (for example with CSS stacking). The p5 build flushes brush composites after `draw()`, so drawing native p5 text later in the same `draw()` is not a reliable way to put it on top. Inspect the actual layers in the browser.
 
 ## Review checklist (select what matters)
 
