@@ -117,7 +117,7 @@ Reusable improvements belong in Practice; specialist tool configuration remains 
 
 Composition is separate from the user consultant's public-presentation method, which may select and review a composed visual without owning the production manual. VHS records terminal interactions; diagram-design explains structures, relationships and short sequences; composition produces timed scene-based explanations. Reuse a qualified production tool's skills rather than duplicate them per role. An illustration is not evidence of real product behaviour; disclose fixtures and simulated recordings.
 
-Composition is a shared capability for B, C and D (`firm/skills/shared/composition/`), not a new consultant specialty or an exclusive tool entitlement. Engineering, communication and user-experience judgment stay in their respective practices; no mandatory multi-consultant handoff. Explicit tool setup, controlled updates, specialist judgment and current authority still apply.
+Composition is available to every consultant (`firm/skills/shared/composition/`); it is not an exclusive tool entitlement. Animator H owns specialist motion craft and creative coding, while other consultants retain their own engineering, communication, user-experience and design judgment. No mandatory multi-consultant handoff. Explicit tool setup, controlled updates, specialist judgment and current authority still apply.
 
 ## 6. Master table: every component, placed
 
