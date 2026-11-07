@@ -13,7 +13,7 @@ permissions:
 jobs:
   browser:
     name: p5.brush two-build WebGL2
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
           node-version: '24.15'
       - name: Install isolated browser test dependencies
         working-directory: firm/eval/animation
-        run: npm install --no-audit --no-fund
+        run: npm install --ignore-scripts --no-audit --no-fund
       - name: Install Chromium dependencies
         working-directory: firm/eval/animation
         run: npx playwright install --with-deps chromium
