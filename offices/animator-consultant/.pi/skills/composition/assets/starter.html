@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Illustrative update</title>
+<style>
+body{margin:0;background:#f4f4ee;color:#162c38;font-family:sans-serif}#root{position:relative;width:100%;height:100%;overflow:hidden}.clip{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:72px;box-sizing:border-box;gap:24px}h1,h2,p{margin:0}h1{font-size:72px}h2{font-size:56px}p{font-size:32px;line-height:1.4}.bars{display:flex;align-items:flex-end;height:260px;gap:48px}.column{width:240px;display:flex;flex-direction:column;gap:12px;font-size:28px}.bar{height:180px;flex-shrink:0;background:#176b66;transform-origin:bottom}.baseline{height:120px;background:#4b6070}.footer{position:absolute;bottom:24px;left:72px;font-size:20px}.image{width:240px;height:180px}
+</style></head><body>
+<div id="root" data-composition-id="example" data-no-timeline data-start="0" data-width="1280" data-height="720" data-duration="30" data-fps="30">
+<section id="opening-scene" class="clip" data-start="0" data-duration="10" data-track-index="0"><h1 id="title">Explain one useful change.</h1><p>Start with what matters to the audience.</p></section>
+<section id="chart-scene" class="clip" data-start="10" data-duration="10" data-track-index="0"><h2>Illustrative comparison</h2><div class="bars" role="img" aria-label="Synthetic baseline 12 percent, updated 18 percent"><div class="column"><span>12%</span><div class="bar baseline"></div><span>Baseline</span></div><div class="column"><span>18%</span><div id="bar" class="bar"></div><span>Updated</span></div></div></section>
+<section id="closing-scene" class="clip" data-start="20" data-duration="10" data-track-index="0"><img class="image" src="image.svg" alt="Illustration of an information card"><h2>State the next action.</h2><p>This example is not evidence of product performance.</p></section>
+<div class="footer">Synthetic example · silent animation</div>
+</div><script>
+for(const [id,frames,delay,duration] of [
+ ['title',[{opacity:0,transform:'translateY(24px)'},{opacity:1,transform:'translateY(0)'}],200,800],
+ ['bar',[{transform:'scaleY(0)'},{transform:'scaleY(1)'}],10500,1000]
+]){const animation=document.getElementById(id).animate(frames,{delay,duration,fill:'both',iterations:1});animation.pause();}
+</script></body></html>
