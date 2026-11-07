@@ -9,6 +9,7 @@ From this folder:
 ```sh
 npm install --ignore-scripts --no-audit --no-fund
 npx playwright install --with-deps chromium
+# Also install ffmpeg and ffprobe through your OS package manager.
 npm run test:browser
 ```
 
