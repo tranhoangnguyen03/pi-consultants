@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "role": "animation",
+  "office": {
+    "letter": "H",
+    "title": "ANIMATION & CREATIVE CODING",
+    "tagline": "conceive · animate · render · refine",
+    "banner": [
+      "  ╭──────────╮  ",
+      "  │ ● ─── ◉  │  ",
+      "  │  ↘  ↗    │  ",
+      "  │ ◯ ─── ◆  │  ",
+      "  ╰──────────╯  "
+    ]
+  },
+  "hq": "..",
+  "stateDir": "../.hq",
+  "kitRoot": "..",
+  "sessionRoots": [],
+  "projectRoots": [],
+  "localReadRoots": [],
+  "attachmentRoots": [],
+  "maxSessionFiles": 500,
+  "maxSessionBytes": 16777216,
+  "maxConsultChars": 80000,
+  "policy": {}
+}

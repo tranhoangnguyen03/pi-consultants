@@ -4,7 +4,7 @@ description: Create or revise a scene-based animated explainer, chart video, onb
 ---
 # Compose an explanation, then verify what it says
 
-This is one shared production method for engineering (B), communication (C) and user experience (D). Keep your specialist judgment; no handoff is required. Use VHS for actual terminal interaction, diagram-design for structures and short diagram motion, and this method for a timed scene-based explanation. An illustration does not prove product behaviour. Label invented examples, fixtures and simulations.
+This shared production method is available to every consultant. Keep your specialist judgment; no handoff is required. When relevant, use VHS for actual terminal interaction, diagram-design for structures and short diagram motion, and this method for timed scene-based explanations. An illustration does not prove product behaviour. Label invented examples, fixtures and simulations.
 
 ## Scope and plan
 
