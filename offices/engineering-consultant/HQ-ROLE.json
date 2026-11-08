@@ -73,10 +73,13 @@
     ".runtime/src/sessions.mjs": "0f4e232f8060dabeb3d62cddd774e844bcbcbd5062a429a9dedc9e2b2460ca56",
     ".runtime/src/upgrade.mjs": "79e10286baecd0f5e5613124fd0617e48b10b99f9be9ef3de46109c38fd1de93",
     ".runtime/src/util.mjs": "7bac0378e305f11a8ba33e1e8e942bf1c80a6ddde1c9a95848de86c5e5c8d021",
-    "AGENTS.md": "8de74c993dbe34d15fc7b173699055f59d8063aa037baaca8ce55e037fbcebc4",
+    "AGENTS.md": "a399e9084cd5deab58f49e83e9437a07770598a1b74e98eb8a312498a1e0d8ba",
     "LICENSE": "2f80ad90b0b3ead0ac928340c096946b482180ede21944cdb6420fbb609c738f",
     "README.md": "b451ea9290cf9d8481ea0d5192358d9ddd60034224e5860cd08cd84d9bdc96e7",
     "organization/PLAYBOOK.example.md": "71909cc0666b7c50e6f44f6c079a4d8409fee9786f2643481fe8d37ed2982537",
-    "package.json": "e23bc9f31ea6beb92da1b5e92f0bc8f9d02f32db89d129783cf2e7928db1c0b5"
+    "package.json": "e23bc9f31ea6beb92da1b5e92f0bc8f9d02f32db89d129783cf2e7928db1c0b5",
+    ".pi/skills/agentic-systems/SKILL.md": "bd56c1400d8d51d6e75e53e75ec9e1c0fab57616c17a372df22ebaa3076b5176",
+    ".pi/skills/agentic-systems/references/system-assessment.md": "4bae5e00c44a4c38e7b6bd3ff66fc9c81b57e1c15eea1a40525d973457e632e3",
+    ".pi/skills/agentic-systems/references/harness-design.md": "50cd4cdf870014a8e946fa055de77230aaa31ae8fc391421364919abaa8b74ac"
   }
 }
