@@ -1,0 +1,24 @@
+{
+  "pig": {
+    "version": "0.5.3",
+    "source": "https://github.com/MichaelKinsy/PiG",
+    "archives": {
+      "linux-x64": { "name": "pig-0.5.3-linux-amd64.tar.gz", "sha256": "1e45e5e591a06d087587d5f09d2b6d61673a1e262cb2609e6189defffd5ae7ec" },
+      "darwin-arm64": { "name": "pig-0.5.3-darwin-arm64.tar.gz", "sha256": "b243e00305e2c7d3d5de12743bb4654cf6324a6282b0c2e0671cc29bfbde3a99" },
+      "darwin-x64": { "name": "pig-0.5.3-darwin-amd64.tar.gz", "sha256": "1a836381d46ca14e72c9b28e4d33c247de115cf4f980e4879587c3fa4ff4387a" }
+    }
+  },
+  "node": {
+    "version": "24.15.0",
+    "source": "https://nodejs.org/dist/v24.15.0/SHASUMS256.txt",
+    "archives": {
+      "linux-x64": { "name": "node-v24.15.0-linux-x64.tar.gz", "sha256": "44836872d9aec49f1e6b52a9a922872db9a2b02d235a616a5681b6a85fec8d89" },
+      "darwin-arm64": { "name": "node-v24.15.0-darwin-arm64.tar.gz", "sha256": "372331b969779ab5d15b949884fc6eaf88d5afe87bde8ba881d6400b9100ffc4" },
+      "darwin-x64": { "name": "node-v24.15.0-darwin-x64.tar.gz", "sha256": "ffd5ee293467927f3ee731a553eb88fd1f48cf74eebc2d74a6babe4af228673b" }
+    }
+  },
+  "diagram": {
+    "repository": "https://github.com/cathrynlavery/diagram-design.git",
+    "commit": "0a8ea20ae69b33a5edce6018eedd3a9d26e90c1c"
+  }
+}

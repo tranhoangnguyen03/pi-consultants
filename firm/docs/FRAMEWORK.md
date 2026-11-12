@@ -97,7 +97,13 @@ A general uncertain-write procedure for ordinary tools outside the optional outb
 9. **Closure is explicit.** An engagement closes when its done-condition is met or the user says so. Unmet requirements remain unfinished; moving them into follow-ups does not complete the job. Checks outside the done-condition become follow-ups only when agreed with the user. User-stopped work is recorded as stopped, not successful delivery; a block alone does not close it. There is no background monitoring.
 10. **A specialist layer on a regular toolset.** A consultant works on top of the regular toolset where it works: your everyday Pi, with its global extensions and MCP servers. Each HQ adds and carries only its specialist layer: practice, office, specialist tools, connector policy and credentials (`.env`). That layer moves with the consultant when it is moved, copied, split off or added, and never depends on another HQ or a firm-wide store.
 
-## Human-steered parallel branches — approved practice
+## Application and collaboration forms
+
+### Independent application distribution
+
+The [independent-agent design](INDEPENDENT-AGENTS.md) adds a versioned application form, first implemented by [Engineering consultant B](INDEPENDENT-ENGINEERING.md). An independent release supplies its own PiG runtime and regular toolset; ordinary Pi offices continue to inherit their host's toolset as described above. Both retain the same Practice, Office and Site ownership. The installation's private home survives release replacement and remains separate from the execution directory. Interactive use, main-agent delegation and agent-to-agent consultation use that same specialist. Firms, departments and rooms compose these applications; they do not become a shared private Office. Explicitly configured bounded RPC delegation is an additional opt-in interaction, separate from the human-steered Intercom practice below.
+
+### Human-visitable Intercom branches
 
 For work that benefits from separate human-visitable sessions, agree a bounded branch plan first. The user creates the agreed named Pi sessions; the main consultant identifies their Intercom targets and sends nonblocking kickoff briefs. Branches gather context, present a situation report in their own session, and pause for direct user steering. When the user signals readiness, main requests the handback, clarifies bounded gaps with the branch, verifies the actual work products, and incorporates the required branches before resuming the main path. The user does not copy messages or manually merge outputs.
 
